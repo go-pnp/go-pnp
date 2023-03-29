@@ -3,9 +3,6 @@ package pnphttpserver
 import (
 	"context"
 	"net/http"
-	"time"
-
-	"github.com/go-pnp/go-pnp/tls/tlsutil"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/fx"
