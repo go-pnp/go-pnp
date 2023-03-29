@@ -14,6 +14,32 @@ Moreover, Go PnP Framework helps with deployment by ensuring that configuration 
 
 Whether you're building a small microservice or a large-scale distributed system, Go PnP Framework can help you accelerate development, improve code maintainability, and simplify deployment. So why not give it a try and see how it can simplify your life as a Go developer?
 
+After I fully implement the framework, it will be possible to write fully functional applications with just a few lines of code like this: 
+```go
+func main(){
+    app := fx.New(
+        pnpzap.Module(),
+        pnpzapsentry.Module(),
+		
+        pnptracing.Module(),
+
+        pnpprometheus.Module(),
+        
+        pnpgrpcserver.Module(),
+        pnpgrpcserverlog.Module(),
+        pnpgrpcservermetrics.Module(),
+        pnpgrpcservertracing.Module(),
+        
+        pnpsarama.Module(),
+        pnpsarama.ConsumerModule(),
+        // Your business logic modules.
+        // And that's it! You have a fully functional application without boilerplate code.
+    )
+    app.Run()
+}
+```
+
+
 ## Concepts Used in Framework
 
 Go PnP Framework uses the following concepts:
@@ -23,11 +49,14 @@ Go PnP Framework uses the following concepts:
 - **Extendability** Each module in the framework is designed to be extendable, allowing developers to add their own functionality to the framework.
 ## List of Modules
 - [x] [HTTP Server](https://github.com/go-pnp/go-pnp/tree/master/http/pnphttpserver)
+  - [ ] HTTP middleware for logging, metrics aggregation, and tracing
 - [x] [Zap logging](https://github.com/go-pnp/go-pnp/tree/master/logging/pnpzap)
-- [x] [gRPC Server](https://github.com/go-pnp/go-pnp/tree/master/grpc/pnpgrpcserver)
-- [ ] gRPC Web
-- [ ] Sentry
+  - [ ] Zap hooks for sentry
 - [ ] Logrus logging
+  - [ ] Logrus hooks for sentry
+- [x] [gRPC Server](https://github.com/go-pnp/go-pnp/tree/master/grpc/pnpgrpcserver)
+  - [ ] gRPC interceptors for logging, metrics aggregation, and tracing 
+- [ ] gRPC Web
 - [ ] Prometheus metrics
 - [ ] Jaeger tracing
 - [ ] Redis client
