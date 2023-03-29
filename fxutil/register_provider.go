@@ -7,6 +7,8 @@ import (
 	"go.uber.org/fx"
 )
 
+// GroupProvider returns an fx.Annotated and checks that the target is a function that returns at least one value of type T.
+// In most cases, you don't need it unless you writing your own module.
 func GroupProvider[T any](groupName string, target interface{}) fx.Annotated {
 	if groupName == "" {
 		panic(errors.New("empty group name"))

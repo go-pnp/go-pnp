@@ -105,3 +105,13 @@ func TestApp(t *testing.T) {
 }
 
 ```
+
+## Contribution Guide
+We welcome contributions to Go PnP Framework! To contribute, please follow these steps:
+
+- Fork the repository.
+- Create a new branch for your changes.
+- Make your changes and commit them to your branch.
+- Submit a pull request.
+
+Please be consistent with the existing code style and with existing module structure.
