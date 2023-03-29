@@ -59,7 +59,7 @@ Go PnP Framework uses the following concepts:
 - [ ] gRPC Web
 - [ ] Prometheus metrics
 - [ ] Jaeger tracing
-- [ ] Redis client
+- [ ] Redis
 - [ ] SQL connection
 - [ ] Sarama client
 - [ ] Redis client
