@@ -22,9 +22,9 @@ Go PnP Framework uses the following concepts:
 - **Modularity:** The framework is designed to be modular, allowing developers to add or remove functionality as needed.
 - **Extendability** Each module in the framework is designed to be extendable, allowing developers to add their own functionality to the framework.
 ## List of Modules
-- [x] [HTTP Server](https://github.com/go-pnp/go-pnp/tree/main/http/pnphttpserver)
-- [x] [Zap logging](https://github.com/go-pnp/go-pnp/tree/main/logging/onpzap)
-- [x] [gRPC Server](https://github.com/go-pnp/go-pnp/tree/main/grpc/pnpgrpcserver)
+- [x] [HTTP Server](https://github.com/go-pnp/go-pnp/tree/master/http/pnphttpserver)
+- [x] [Zap logging](https://github.com/go-pnp/go-pnp/tree/master/logging/pnpzap)
+- [x] [gRPC Server](https://github.com/go-pnp/go-pnp/tree/master/grpc/pnpgrpcserver)
 - [ ] gRPC Web
 - [ ] Sentry
 - [ ] Logrus logging
@@ -37,6 +37,8 @@ Go PnP Framework uses the following concepts:
 - [ ] TODO: Add more modules
 
 ## Usage Examples
+Each module contains a example_test.go file that demonstrates how to use the module.
+
 Here's a simple example of pnphttpserver module usage:
 ```go
 type Handler struct {
