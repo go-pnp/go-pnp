@@ -1,0 +1,66 @@
+package pnpzap
+
+import (
+	"context"
+	"fmt"
+
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+
+	"github.com/go-pnp/go-pnp/logging"
+)
+
+type LoggingLogger struct {
+	zapLogger *zap.Logger
+}
+
+var _ logging.Logger = (*LoggingLogger)(nil)
+
+func (l LoggingLogger) Info(ctx context.Context, msg string, args ...interface{}) {
+	l.withContext(ctx).Info(fmt.Sprintf(msg, args...))
+}
+
+func (l LoggingLogger) Debug(ctx context.Context, msg string, args ...interface{}) {
+	l.withContext(ctx).Debug(fmt.Sprintf(msg, args...))
+}
+
+func (l LoggingLogger) Error(ctx context.Context, msg string, args ...interface{}) {
+	l.withContext(ctx).Error(fmt.Sprintf(msg, args...))
+}
+
+func (l LoggingLogger) WithFields(fields map[string]interface{}) logging.Logger {
+	zapFields := make([]zap.Field, 0, len(fields))
+	for k, v := range fields {
+		zapFields = append(zapFields, zap.Any(k, v))
+	}
+	return &LoggingLogger{
+		zapLogger: l.zapLogger.With(zapFields...),
+	}
+}
+
+func (l LoggingLogger) WithField(key string, value interface{}) logging.Logger {
+	return &LoggingLogger{
+		zapLogger: l.zapLogger.With(zap.Any(key, value)),
+	}
+}
+
+func (l LoggingLogger) Named(component string) logging.Logger {
+	return &LoggingLogger{
+		zapLogger: l.zapLogger.Named(component),
+	}
+}
+
+func (l LoggingLogger) withContext(ctx context.Context) *zap.Logger {
+	return l.zapLogger.With(zap.Field{
+		Key:       "context",
+		Type:      zapcore.SkipType,
+		String:    "context",
+		Interface: ctx,
+	})
+}
+
+func NewLoggingLogger(logger *zap.Logger) logging.Logger {
+	return &LoggingLogger{
+		zapLogger: logger,
+	}
+}

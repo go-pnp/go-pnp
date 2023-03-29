@@ -2,9 +2,10 @@ package pnphttpserver
 
 import (
 	"context"
-	"github.com/go-pnp/go-pnp/tls/tlsutil"
 	"net/http"
 	"time"
+
+	"github.com/go-pnp/go-pnp/tls/tlsutil"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/fx"
@@ -44,14 +45,14 @@ func NewServer(
 
 type MuxHandlerRegistrar func(mux *mux.Router)
 
-func ProvideMuxHandlerRegistrar(target any) fx.Option {
-	return fxutil.ProvideToGroup[MuxHandlerRegistrar](
+func MuxHandlerRegistrarProvider(target any) fx.Annotated {
+	return fxutil.GroupProvider[MuxHandlerRegistrar](
 		"pnp_http_server.mux_handler_registrars",
 		target,
 	)
 }
-func ProvideMuxMiddlewareFunc(target any) fx.Option {
-	return fxutil.ProvideToGroup[mux.MiddlewareFunc](
+func MuxMiddlewareFuncProvider(target any) fx.Annotated {
+	return fxutil.GroupProvider[mux.MiddlewareFunc](
 		"pnp_http_server.mux_middleware_funcs",
 		target,
 	)

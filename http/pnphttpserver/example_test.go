@@ -1,11 +1,13 @@
 package pnphttpserver
 
 import (
-	"github.com/go-pnp/go-pnp/fxutil"
-	"github.com/gorilla/mux"
-	"go.uber.org/fx"
 	"net/http"
 	"testing"
+
+	"github.com/gorilla/mux"
+	"go.uber.org/fx"
+
+	"github.com/go-pnp/go-pnp/fxutil"
 )
 
 type Handler struct {
@@ -21,23 +23,28 @@ func (h Handler) RegisterEndpoints(mux *mux.Router) {
 
 func TestApp(t *testing.T) {
 	fxutil.StartApp(
-		Module(),
+		Module(
+			WithFxPrivate(),
+		),
 		fx.Supply(Handler{}),
 
 		// Register our application endpoints
-		ProvideMuxHandlerRegistrar(func(handler Handler) MuxHandlerRegistrar {
-			return handler.RegisterEndpoints
-		}),
+		fx.Provide(
+			MuxHandlerRegistrarProvider(func(handler Handler) MuxHandlerRegistrar {
+				return handler.RegisterEndpoints
+			}),
+			MuxMiddlewareFuncProvider(func() mux.MiddlewareFunc {
+				return func(mux http.Handler) http.Handler {
+					return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						w.Write([]byte("Hello from middleware\n"))
+
+						mux.ServeHTTP(w, r)
+					})
+				}
+			}),
+			fx.Private,
+		),
 
 		// Register middleware
-		ProvideMuxMiddlewareFunc(func() mux.MiddlewareFunc {
-			return func(mux http.Handler) http.Handler {
-				return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					w.Write([]byte("Hello from middleware\n"))
-
-					mux.ServeHTTP(w, r)
-				})
-			}
-		}),
 	)
 }

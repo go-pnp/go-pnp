@@ -1,8 +1,8 @@
-# Go PnP (Plug and Play) Framework (WIP)
+# Go PnP Application Framework (WIP)
 
 Go PnP (Plug and Play) Framework is a simple and easy-to-use application framework for the Go programming language. It provides a set of commonly-used libraries that are wrapped with Uber FX, making it easy for developers to create and run their applications.
 
-### Uber Fx
+### [Uber Fx](https://github.com/uber-go/fx)
 While Uber FX may not be everyone's cup of tea, it's worth giving it a chance and seeing how it can simplify your development workflow and improve your code quality. By using Go PnP Framework with Uber FX, you can take advantage of its many benefits without sacrificing convenience or flexibility.
 ## Motivation
 
@@ -21,7 +21,6 @@ Go PnP Framework uses the following concepts:
 - **Dependency Injection:** The framework uses Uber FX for dependency injection, which makes it easy to manage dependencies and improve code maintainability.
 - **Modularity:** The framework is designed to be modular, allowing developers to add or remove functionality as needed.
 - **Extendability** Each module in the framework is designed to be extendable, allowing developers to add their own functionality to the framework.
-
 ## List of Modules
 - [HTTP Server](https://github.com/go-pnp/go-pnp/tree/main/http/pnphttpserver)
 

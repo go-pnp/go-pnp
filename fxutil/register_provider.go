@@ -7,7 +7,7 @@ import (
 	"go.uber.org/fx"
 )
 
-func ProvideToGroup[T any](groupName string, target interface{}) fx.Option {
+func GroupProvider[T any](groupName string, target interface{}) fx.Annotated {
 	if groupName == "" {
 		panic(errors.New("empty group name"))
 	}
@@ -33,8 +33,8 @@ func ProvideToGroup[T any](groupName string, target interface{}) fx.Option {
 		panic(errors.Errorf("provider should return at least one value of type %v", zeroT))
 	}
 
-	return fx.Provide(fx.Annotated{
+	return fx.Annotated{
 		Group:  groupName,
 		Target: target,
-	})
+	}
 }

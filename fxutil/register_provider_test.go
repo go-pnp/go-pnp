@@ -1,8 +1,9 @@
 package fxutil
 
 import (
-	"go.uber.org/fx"
 	"testing"
+
+	"go.uber.org/fx"
 )
 
 type SomeStruct struct{ Val string }
@@ -27,16 +28,16 @@ type AllGroupsInput struct {
 
 func TestNewGroupProvider(t *testing.T) {
 	fx.New(
-		fx.Provide(ProvideToGroup[SomeStruct]("structs_group", func() SomeStruct {
+		fx.Provide(GroupProvider[SomeStruct]("structs_group", func() SomeStruct {
 			return SomeStruct{Val: "hello"}
 		})),
-		fx.Provide(ProvideToGroup[*SomeStruct]("struct_ptrs_group", func() *SomeStruct {
+		fx.Provide(GroupProvider[*SomeStruct]("struct_ptrs_group", func() *SomeStruct {
 			return &SomeStruct{Val: "hello1"}
 		})),
-		fx.Provide(ProvideToGroup[SomeInterface]("interfaces_group", func() SomeInterface {
+		fx.Provide(GroupProvider[SomeInterface]("interfaces_group", func() SomeInterface {
 			return SomeInterfaceImpl{Val: "world"}
 		})),
-		fx.Provide(ProvideToGroup[SomeFunc]("funcs_group", func() SomeFunc {
+		fx.Provide(GroupProvider[SomeFunc]("funcs_group", func() SomeFunc {
 			return func() string {
 				return "!"
 			}

@@ -2,35 +2,32 @@ package pnphttpserver
 
 import (
 	"github.com/caarlos0/env/v6"
+	"go.uber.org/fx"
+
 	"github.com/go-pnp/go-pnp/config/configutil"
 	"github.com/go-pnp/go-pnp/fxutil"
-	"go.uber.org/fx"
+	"github.com/go-pnp/go-pnp/pkg/optionutil"
 )
 
-func Module(options ...ServerOption) fx.Option {
-	srvOptions := &serverOptions{
+func Module(opts ...optionutil.Option[options]) fx.Option {
+	options := optionutil.ApplyOptions(&options{
 		start:      true,
 		provideMux: true,
-	}
-	for _, opt := range options {
-		opt(srvOptions)
-	}
+	}, opts...)
 
-	moduleBuilder := fxutil.ModuleBuilder{
-		ModuleName: "httpserver",
-		Options: []fx.Option{
-			fx.Provide(NewServer),
-		},
+	moduleBuilder := &fxutil.OptionsBuilder{
+		PrivateProvides: options.fxPrivate,
 	}
-	moduleBuilder.InvokeIf(srvOptions.start, RegisterStartHooks)
-	moduleBuilder.ProvideIf(srvOptions.provideMux, NewMux)
+	moduleBuilder.Provide(NewServer)
+	moduleBuilder.ProvideIf(options.provideMux, NewMux)
+	moduleBuilder.InvokeIf(options.start, RegisterStartHooks)
 
-	if srvOptions.config == nil {
+	if options.config == nil {
 		moduleBuilder.Provide(configutil.NewConfigProvider[Config](
 			env.Options{Prefix: "HTTP_SERVER_"},
 		))
 	} else {
-		moduleBuilder.Supply(srvOptions.config)
+		fxutil.OptionsBuilderSupply(moduleBuilder, options.config)
 	}
 
 	return moduleBuilder.Build()
