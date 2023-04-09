@@ -13,5 +13,5 @@ type Config struct {
 	WriteTimeout      time.Duration `env:"WRITE_TIMEOUT" envDefault:"0s"`
 	IdleTimeout       time.Duration `env:"IDLE_TIMEOUT" envDefault:"0s"`
 
-	TLS tlsutil.TLSConfig `envPrefix:"TLS_"`
+	TLS tlsutil.ServerTLSConfig `envPrefix:"TLS_"`
 }

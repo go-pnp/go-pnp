@@ -1,18 +1,41 @@
 package configutil
 
 import (
-	"github.com/caarlos0/env/v6"
-	"github.com/pkg/errors"
+	"fmt"
+	"github.com/caarlos0/env/v8"
+	"go.uber.org/fx"
 )
 
-func NewConfigProvider[T any](opts ...env.Options) func() (*T, error) {
-	return func() (*T, error) {
-		c := new(T)
+type ConfigParams struct {
+	EnvVariable  string
+	DefaultValue string
+	Required     bool
+}
 
-		if err := env.Parse(c, opts...); err != nil {
-			return nil, errors.WithStack(err)
+type ConfigProviderResult[T any] struct {
+	fx.Out
+	Config       *T
+	ConfigParams []ConfigParams `group:"config_fields,flatten"`
+}
+
+type Options = env.Options
+
+func NewConfigProvider[T any](opts Options) func() (ConfigProviderResult[T], error) {
+	return func() (ConfigProviderResult[T], error) {
+		c := new(T)
+		if err := env.ParseWithOptions(c, opts); err != nil {
+			return ConfigProviderResult[T]{}, fmt.Errorf("parse config from env: %w", err)
 		}
 
-		return c, nil
+		// https://github.com/caarlos0/env/issues/260
+		//configParams, err := env.GetFieldParams(c, opts)
+		//if err != nil {
+		//	return ConfigProviderResult[T]{}, fmt.Errorf("get config params: %w", err)
+		//}
+
+		return ConfigProviderResult[T]{
+			Config: c,
+			//ConfigParams: configParams,
+		}, nil
 	}
 }

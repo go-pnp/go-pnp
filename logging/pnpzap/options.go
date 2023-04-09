@@ -1,26 +1,24 @@
 package pnpzap
 
 import (
-	"go.uber.org/zap"
-
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
 )
 
 type options struct {
-	zapConfig  *zap.Config
-	zapOptions []zap.Option
-	fxPrivate  bool
+	zapConfigFromContainer bool
+	configFromContainer    bool
+	fxPrivate              bool
 }
 
-func WithZapConfig(config zap.Config) optionutil.Option[options] {
+func WithZapConfigFromContainer() optionutil.Option[options] {
 	return func(o *options) {
-		o.zapConfig = &config
+		o.zapConfigFromContainer = true
 	}
 }
 
-func WithZapOptions(zapOptions ...zap.Option) optionutil.Option[options] {
+func WithConfigFromContainer() optionutil.Option[options] {
 	return func(o *options) {
-		o.zapOptions = append(o.zapOptions, zapOptions...)
+		o.configFromContainer = true
 	}
 }
 

@@ -2,9 +2,9 @@ package pnpgrpcserver
 
 import (
 	"context"
+	"github.com/go-pnp/go-pnp/logging"
 	"net"
 
-	"github.com/caarlos0/env/v6"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -25,19 +25,9 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 
-	builder.Provide(
-		configutil.NewConfigProvider[Config](env.Options{
-			Prefix: "GRPC_",
-		}),
-		NewGRPCServer,
-	)
-
-	if len(options.serverOptions) > 0 {
-		for _, serverOption := range options.serverOptions {
-			fxutil.OptionsBuilderGroupSupply(builder, "pnpgrpcserver.server_options", serverOption)
-		}
-
-	}
+	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](
+		configutil.Options{Prefix: "GRPC_"},
+	))
 
 	builder.InvokeIf(options.start, RegisterStartHooks)
 
@@ -47,16 +37,17 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 
 type ServiceRegistrar func(server *grpc.Server)
 
-func ServiceRegistrarProvider(target interface{}) fx.Annotated {
+func ServiceRegistrarProvider(target any) any {
 	return fxutil.GroupProvider[ServiceRegistrar]("pnpgrpcserver.service_registrars", target)
 }
-func UnaryInterceptorProvider(target interface{}) fx.Annotated {
+func UnaryInterceptorProvider(target any) any {
 	return fxutil.GroupProvider[grpc.UnaryServerInterceptor]("pnpgrpcserver.unary_interceptors", target)
 }
-func StreamInterceptorProvider(target interface{}) fx.Annotated {
+func StreamInterceptorProvider(target any) any {
 	return fxutil.GroupProvider[grpc.StreamServerInterceptor]("pnpgrpcserver.stream_interceptors", target)
 }
-func ServerOptionProvider(target interface{}) fx.Annotated {
+
+func ServerOptionProvider(target any) any {
 	return fxutil.GroupProvider[grpc.ServerOption]("pnpgrpcserver.server_options", target)
 }
 
@@ -98,22 +89,26 @@ func NewGRPCServer(params NewGRPCServerParams) (*grpc.Server, error) {
 	return server, nil
 }
 
-func RegisterStartHooks(
-	lc fx.Lifecycle,
-	runtimeErr chan error,
-	server *grpc.Server,
-	config *Config,
-) {
-	lc.Append(fx.Hook{
+type RegisterStartHooksParams struct {
+	fx.In
+	RuntimeErr chan error
+	Server     *grpc.Server
+	Config     *Config
+	Lc         fx.Lifecycle
+	Logger     *logging.Logger `optional:"true"`
+}
+
+func RegisterStartHooks(params RegisterStartHooksParams) {
+	params.Lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			listener, err := net.Listen("tcp", config.Addr)
+			listener, err := net.Listen("tcp", params.Config.Addr)
 			if err != nil {
 				return err
 			}
 
 			go func() {
-				if err := server.Serve(listener); err != nil {
-					runtimeErr <- err
+				if err := params.Server.Serve(listener); err != nil {
+					params.RuntimeErr <- err
 				}
 			}()
 

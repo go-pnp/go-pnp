@@ -55,7 +55,12 @@ Go PnP Framework uses the following concepts:
 - [ ] Logrus logging
   - [ ] Logrus hooks for sentry
 - [x] [gRPC Server](https://github.com/go-pnp/go-pnp/tree/master/grpc/pnpgrpcserver)
-  - [ ] gRPC interceptors for logging, metrics aggregation, and tracing 
+  - [ ] gRPC interceptors for logging, metrics aggregation, and tracing
+- [x] [SQL](https://github.com/go-pnp/go-pnp/tree/master/sql/pnpsql)
+- [x] [SQLx](https://github.com/go-pnp/go-pnp/tree/master/sql/pnpsqlx)
+- [ ] Nats
+  - [x] [JetStream Subscriptions](https://github.com/go-pnp/go-pnp/tree/master/nats/pnpnats)
+  - [ ] Nats Regular Consumers
 - [ ] gRPC Web
 - [ ] Prometheus metrics
 - [ ] Jaeger tracing

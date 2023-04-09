@@ -14,7 +14,7 @@ type LoggingLogger struct {
 	zapLogger *zap.Logger
 }
 
-var _ logging.Logger = (*LoggingLogger)(nil)
+var _ logging.Delegate = (*LoggingLogger)(nil)
 
 func (l LoggingLogger) Info(ctx context.Context, msg string, args ...interface{}) {
 	l.withContext(ctx).Info(fmt.Sprintf(msg, args...))
@@ -28,7 +28,7 @@ func (l LoggingLogger) Error(ctx context.Context, msg string, args ...interface{
 	l.withContext(ctx).Error(fmt.Sprintf(msg, args...))
 }
 
-func (l LoggingLogger) WithFields(fields map[string]interface{}) logging.Logger {
+func (l LoggingLogger) WithFields(fields map[string]interface{}) logging.Delegate {
 	zapFields := make([]zap.Field, 0, len(fields))
 	for k, v := range fields {
 		zapFields = append(zapFields, zap.Any(k, v))
@@ -38,13 +38,13 @@ func (l LoggingLogger) WithFields(fields map[string]interface{}) logging.Logger 
 	}
 }
 
-func (l LoggingLogger) WithField(key string, value interface{}) logging.Logger {
+func (l LoggingLogger) WithField(key string, value interface{}) logging.Delegate {
 	return &LoggingLogger{
 		zapLogger: l.zapLogger.With(zap.Any(key, value)),
 	}
 }
 
-func (l LoggingLogger) Named(component string) logging.Logger {
+func (l LoggingLogger) Named(component string) logging.Delegate {
 	return &LoggingLogger{
 		zapLogger: l.zapLogger.Named(component),
 	}
@@ -59,7 +59,7 @@ func (l LoggingLogger) withContext(ctx context.Context) *zap.Logger {
 	})
 }
 
-func NewLoggingLogger(logger *zap.Logger) logging.Logger {
+func NewLoggingLogger(logger *zap.Logger) logging.Delegate {
 	return &LoggingLogger{
 		zapLogger: logger,
 	}

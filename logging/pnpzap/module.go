@@ -16,20 +16,10 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	builder := &fxutil.OptionsBuilder{
 		PrivateProvides: options.fxPrivate,
 	}
-	builder.Provide(
-		configutil.NewConfigProvider[Config](),
-		NewLogger,
-		NewLoggingLogger,
-	)
-	if options.zapConfig != nil {
-		fxutil.OptionsBuilderSupply(builder, *options.zapConfig)
-	} else {
-		builder.Provide(NewZapLoggerConfig)
-	}
+	builder.Provide(NewLogger, NewLoggingLogger)
 
-	for _, option := range options.zapOptions {
-		fxutil.OptionsBuilderGroupSupply(builder, "pnpzap.zap_options", option)
-	}
+	builder.ProvideIf(!options.zapConfigFromContainer, NewZapLoggerConfig)
+	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](configutil.Options{}))
 
 	return builder.Build()
 }
@@ -38,13 +28,13 @@ func NewZapLoggerConfig(config *Config) zap.Config {
 	return config.EnvironmentConfig()
 }
 
-func ZapHookProvider(target interface{}) fx.Annotated {
+func ZapHookProvider(target any) any {
 	return fxutil.GroupProvider[func(zapcore.Entry) error](
 		"pnpzap.hooks",
 		target,
 	)
 }
-func ZapOptionProvider(target interface{}) fx.Annotated {
+func ZapOptionProvider(target any) any {
 	return fxutil.GroupProvider[zap.Option](
 		"pnpzap.zap_options",
 		target,

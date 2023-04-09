@@ -35,6 +35,9 @@ func TestNewGroupProvider(t *testing.T) {
 			return &SomeStruct{Val: "hello1"}
 		})),
 		fx.Provide(GroupProvider[SomeInterface]("interfaces_group", func() SomeInterface {
+			return SomeInterfaceImpl{Val: "world1"}
+		})),
+		fx.Provide(GroupProvider[SomeInterface]("interfaces_group", func() SomeInterfaceImpl {
 			return SomeInterfaceImpl{Val: "world"}
 		})),
 		fx.Provide(GroupProvider[SomeFunc]("funcs_group", func() SomeFunc {

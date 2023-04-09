@@ -1,7 +1,6 @@
 package pnphttpserver
 
 import (
-	"github.com/caarlos0/env/v6"
 	"go.uber.org/fx"
 
 	"github.com/go-pnp/go-pnp/config/configutil"
@@ -20,15 +19,11 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	}
 	moduleBuilder.Provide(NewServer)
 	moduleBuilder.ProvideIf(options.provideMux, NewMux)
-	moduleBuilder.InvokeIf(options.start, RegisterStartHooks)
+	moduleBuilder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](
+		configutil.Options{Prefix: "HTTP_SERVER_"},
+	))
 
-	if options.config == nil {
-		moduleBuilder.Provide(configutil.NewConfigProvider[Config](
-			env.Options{Prefix: "HTTP_SERVER_"},
-		))
-	} else {
-		fxutil.OptionsBuilderSupply(moduleBuilder, options.config)
-	}
+	moduleBuilder.InvokeIf(options.start, RegisterStartHooks)
 
 	return moduleBuilder.Build()
 }

@@ -1,20 +1,22 @@
 package fxutil
 
-import "go.uber.org/fx"
+import (
+	"go.uber.org/fx"
+)
 
 type OptionsBuilder struct {
-	Options         []fx.Option
+	options         []fx.Option
 	PrivateProvides bool
 }
 
 func (m *OptionsBuilder) InvokeIf(condition bool, fns ...interface{}) {
 	if condition {
-		m.Options = append(m.Options, fx.Invoke(fns...))
+		m.options = append(m.options, fx.Invoke(fns...))
 	}
 }
 
 func (m *OptionsBuilder) Invoke(fns ...interface{}) {
-	m.Options = append(m.Options, fx.Invoke(fns...))
+	m.options = append(m.options, fx.Invoke(fns...))
 }
 
 func (m *OptionsBuilder) ProvideIf(condition bool, fns ...interface{}) {
@@ -26,7 +28,7 @@ func (m *OptionsBuilder) ProvideIf(condition bool, fns ...interface{}) {
 		fns = append(fns, fx.Private)
 	}
 
-	m.Options = append(m.Options, fx.Provide(fns...))
+	m.options = append(m.options, fx.Provide(fns...))
 }
 
 // OptionsBuilderSupply is a helper to supply a value using Provide. It's required to supply a value privately.
@@ -49,17 +51,17 @@ func (m *OptionsBuilder) Provide(fns ...interface{}) {
 		fns = append([]interface{}{}, fns...)
 		fns = append(fns, fx.Private)
 	}
-	m.Options = append(m.Options, fx.Provide(fns...))
+	m.options = append(m.options, fx.Provide(fns...))
 }
 
 func (m *OptionsBuilder) Option(opts ...fx.Option) {
-	m.Options = append(m.Options, opts...)
+	m.options = append(m.options, opts...)
 }
 
 // We don't use Supply as it do not support fx.PrivateProvides yet
 
 func (m *OptionsBuilder) Build() fx.Option {
 	return fx.Options(
-		m.Options...,
+		m.options...,
 	)
 }

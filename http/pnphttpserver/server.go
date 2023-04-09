@@ -32,13 +32,13 @@ func NewServer(
 
 type MuxHandlerRegistrar func(mux *mux.Router)
 
-func MuxHandlerRegistrarProvider(target any) fx.Annotated {
+func MuxHandlerRegistrarProvider(target any) any {
 	return fxutil.GroupProvider[MuxHandlerRegistrar](
 		"pnp_http_server.mux_handler_registrars",
 		target,
 	)
 }
-func MuxMiddlewareFuncProvider(target any) fx.Annotated {
+func MuxMiddlewareFuncProvider(target any) any {
 	return fxutil.GroupProvider[mux.MiddlewareFunc](
 		"pnp_http_server.mux_middleware_funcs",
 		target,
@@ -66,7 +66,7 @@ type RegisterStartHooksParams struct {
 	fx.In
 	RuntimeErrors chan error
 	Lc            fx.Lifecycle
-	//Logger        *logfx.Logger
+	//delegate        *logfx.Logger
 	Config *Config
 	Server *http.Server
 }
@@ -77,7 +77,7 @@ func RegisterStartHooks(params RegisterStartHooksParams) {
 			go func() {
 				var err error
 				if params.Server.TLSConfig != nil {
-					err = params.Server.ListenAndServeTLS(params.Config.TLS.TLSCertPath, params.Config.TLS.TLSKeyPath)
+					err = params.Server.ListenAndServeTLS(params.Config.TLS.CertPath, params.Config.TLS.KeyPath)
 				} else {
 					err = params.Server.ListenAndServe()
 				}

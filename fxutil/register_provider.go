@@ -1,6 +1,7 @@
 package fxutil
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/pkg/errors"
@@ -9,7 +10,7 @@ import (
 
 // GroupProvider returns an fx.Annotated and checks that the target is a function that returns at least one value of type T.
 // In most cases, you don't need it unless you writing your own module.
-func GroupProvider[T any](groupName string, target interface{}) fx.Annotated {
+func GroupProvider[T any](groupName string, target any) any {
 	if groupName == "" {
 		panic(errors.New("empty group name"))
 	}
@@ -21,12 +22,19 @@ func GroupProvider[T any](groupName string, target interface{}) fx.Annotated {
 
 	zeroT := new(T)
 	requiredType := reflect.TypeOf(zeroT).Elem()
-
+	annotations := []fx.Annotation{
+		fx.ResultTags(fmt.Sprintf(`group:"%s"`, groupName)),
+	}
 	var foundRequiredType bool
 	for i := 0; i < targetType.NumOut(); i++ {
 		outType := targetType.Out(i)
 		if outType == requiredType {
 			foundRequiredType = true
+			break
+		}
+		if requiredType.Kind() == reflect.Interface && outType.Implements(requiredType) {
+			foundRequiredType = true
+			annotations = append(annotations, fx.As(zeroT))
 			break
 		}
 	}
@@ -35,8 +43,8 @@ func GroupProvider[T any](groupName string, target interface{}) fx.Annotated {
 		panic(errors.Errorf("provider should return at least one value of type %v", zeroT))
 	}
 
-	return fx.Annotated{
-		Group:  groupName,
-		Target: target,
-	}
+	return fx.Annotate(
+		target,
+		annotations...,
+	)
 }
