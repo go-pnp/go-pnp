@@ -3,12 +3,12 @@ package pnpgrpcserver
 import (
 	"context"
 	"github.com/go-pnp/go-pnp/logging"
-	"net"
-
+	"github.com/go-pnp/go-pnp/pkg/ordering"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
+	"net"
 
 	"github.com/go-pnp/go-pnp/config/configutil"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
@@ -32,7 +32,6 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	builder.InvokeIf(options.start, RegisterStartHooks)
 
 	return builder.Build()
-
 }
 
 type ServiceRegistrar func(server *grpc.Server)
@@ -41,22 +40,22 @@ func ServiceRegistrarProvider(target any) any {
 	return fxutil.GroupProvider[ServiceRegistrar]("pnpgrpcserver.service_registrars", target)
 }
 func UnaryInterceptorProvider(target any) any {
-	return fxutil.GroupProvider[grpc.UnaryServerInterceptor]("pnpgrpcserver.unary_interceptors", target)
+	return fxutil.GroupProvider[ordering.OrderedItem[grpc.UnaryServerInterceptor]]("pnpgrpcserver.unary_interceptors", target)
 }
 func StreamInterceptorProvider(target any) any {
 	return fxutil.GroupProvider[grpc.StreamServerInterceptor]("pnpgrpcserver.stream_interceptors", target)
 }
 
 func ServerOptionProvider(target any) any {
-	return fxutil.GroupProvider[grpc.ServerOption]("pnpgrpcserver.server_options", target)
+	return fxutil.GroupProvider[ordering.OrderedItem[grpc.StreamServerInterceptor]]("pnpgrpcserver.server_options", target)
 }
 
 type NewGRPCServerParams struct {
 	fx.In
-	ServiceRegistrars  []ServiceRegistrar             `group:"pnpgrpcserver.service_registrars"`
-	UnaryInterceptors  []grpc.UnaryServerInterceptor  `group:"pnpgrpcserver.unary_interceptors"`
-	StreamInterceptors []grpc.StreamServerInterceptor `group:"pnpgrpcserver.stream_interceptors"`
-	ServerOptions      []grpc.ServerOption            `group:"pnpgrpcserver.server_options"`
+	ServiceRegistrars  []ServiceRegistrar                                  `group:"pnpgrpcserver.service_registrars"`
+	UnaryInterceptors  ordering.OrderedItems[grpc.UnaryServerInterceptor]  `group:"pnpgrpcserver.unary_interceptors"`
+	StreamInterceptors ordering.OrderedItems[grpc.StreamServerInterceptor] `group:"pnpgrpcserver.stream_interceptors"`
+	ServerOptions      []grpc.ServerOption                                 `group:"pnpgrpcserver.server_options"`
 	Config             *Config
 }
 
@@ -74,11 +73,11 @@ func NewGRPCServer(params NewGRPCServerParams) (*grpc.Server, error) {
 	serverOptions := append([]grpc.ServerOption{grpc.Creds(grpcCredentials)}, params.ServerOptions...)
 
 	if len(params.UnaryInterceptors) > 0 {
-		serverOptions = append(serverOptions, grpc.ChainUnaryInterceptor(params.UnaryInterceptors...))
+		serverOptions = append(serverOptions, grpc.ChainUnaryInterceptor(params.UnaryInterceptors.Get()...))
 	}
 
 	if len(params.StreamInterceptors) > 0 {
-		serverOptions = append(serverOptions, grpc.ChainStreamInterceptor(params.StreamInterceptors...))
+		serverOptions = append(serverOptions, grpc.ChainStreamInterceptor(params.StreamInterceptors.Get()...))
 	}
 
 	server := grpc.NewServer(serverOptions...)

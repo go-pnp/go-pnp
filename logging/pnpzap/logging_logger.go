@@ -20,6 +20,10 @@ func (l LoggingLogger) Info(ctx context.Context, msg string, args ...interface{}
 	l.withContext(ctx).Info(fmt.Sprintf(msg, args...))
 }
 
+func (l LoggingLogger) Warn(ctx context.Context, msg string, args ...interface{}) {
+	l.withContext(ctx).Warn(fmt.Sprintf(msg, args...))
+}
+
 func (l LoggingLogger) Debug(ctx context.Context, msg string, args ...interface{}) {
 	l.withContext(ctx).Debug(fmt.Sprintf(msg, args...))
 }
@@ -44,9 +48,21 @@ func (l LoggingLogger) WithField(key string, value interface{}) logging.Delegate
 	}
 }
 
+func (l LoggingLogger) WithError(err error) logging.Delegate {
+	return &LoggingLogger{
+		zapLogger: l.zapLogger.With(zap.Error(err)),
+	}
+}
+
 func (l LoggingLogger) Named(component string) logging.Delegate {
 	return &LoggingLogger{
 		zapLogger: l.zapLogger.Named(component),
+	}
+}
+
+func (l LoggingLogger) SkipCallers(count int) logging.Delegate {
+	return &LoggingLogger{
+		zapLogger: l.zapLogger.WithOptions(zap.AddCallerSkip(count)),
 	}
 }
 

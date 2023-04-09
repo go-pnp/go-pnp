@@ -60,12 +60,11 @@ Go PnP Framework uses the following concepts:
 - [x] [SQLx](https://github.com/go-pnp/go-pnp/tree/master/sql/pnpsqlx)
 - [ ] Nats
   - [x] [JetStream Subscriptions](https://github.com/go-pnp/go-pnp/tree/master/nats/pnpnats)
-  - [ ] Nats Regular Consumers
+  - [ ] Regular Subscriptions
 - [ ] gRPC Web
-- [ ] Prometheus metrics
+- [x] [Prometheus metrics server](https://github.com/go-pnp/go-pnp/tree/master/prometheus/pnpprometheus)
 - [ ] Jaeger tracing
 - [ ] Redis
-- [ ] SQL connection
 - [ ] Sarama client
 - [ ] Redis client
 - [ ] TODO: Add more modules

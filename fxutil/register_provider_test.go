@@ -58,11 +58,14 @@ func TestNewGroupProvider(t *testing.T) {
 			if inp.SomeStructsPtrs[0].Val != "hello1" {
 				t.Fatalf("expected *SomeStruct.Val == 'hello', got %s", inp.SomeStructsPtrs[0].Val)
 			}
-			if len(inp.SomeInterfaces) != 1 {
-				t.Fatalf("expected 1 SomeInterface, got %d", len(inp.SomeInterfaces))
+			if len(inp.SomeInterfaces) != 2 {
+				t.Fatalf("expected 2 SomeInterface, got %d", len(inp.SomeInterfaces))
 			}
-			if inp.SomeInterfaces[0].(SomeInterfaceImpl).Val != "world" {
-				t.Fatalf("expected SomeInterfaceImpl.Val == 'world', got %s", inp.SomeInterfaces[0].(SomeInterfaceImpl).Val)
+			if inp.SomeInterfaces[0].(SomeInterfaceImpl).Val != "world1" {
+				t.Fatalf("expected SomeInterfaceImpl.Val == 'world1', got %s", inp.SomeInterfaces[0].(SomeInterfaceImpl).Val)
+			}
+			if inp.SomeInterfaces[1].(SomeInterfaceImpl).Val != "world" {
+				t.Fatalf("expected SomeInterfaceImpl.Val == 'world', got %s", inp.SomeInterfaces[1].(SomeInterfaceImpl).Val)
 			}
 			if len(inp.SomeFuncs) != 1 {
 				t.Fatalf("expected 1 SomeFunc, got %d", len(inp.SomeFuncs))
