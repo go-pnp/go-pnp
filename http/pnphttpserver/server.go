@@ -8,6 +8,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/go-pnp/go-pnp/fxutil"
+	"github.com/go-pnp/go-pnp/logging"
 )
 
 func NewServer(
@@ -64,17 +65,23 @@ func NewMux(params NewMuxParams) http.Handler {
 
 type RegisterStartHooksParams struct {
 	fx.In
-	RuntimeErrors chan error
+	RuntimeErrors chan<- error
 	Lc            fx.Lifecycle
-	//delegate        *logfx.Logger
-	Config *Config
-	Server *http.Server
+	Logger        *logging.Logger `optional:"true"`
+	Config        *Config
+	Server        *http.Server
 }
 
 func RegisterStartHooks(params RegisterStartHooksParams) {
+	logger := params.Logger.Named("http_server").WithFields(map[string]interface{}{
+		"addr":        params.Config.Addr,
+		"tls_enabled": params.Config.TLS.Enabled,
+	})
+
 	params.Lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			go func() {
+				logger.Info(ctx, "Starting HTTP server...")
 				var err error
 				if params.Server.TLSConfig != nil {
 					err = params.Server.ListenAndServeTLS(params.Config.TLS.CertPath, params.Config.TLS.KeyPath)
@@ -82,13 +89,20 @@ func RegisterStartHooks(params RegisterStartHooksParams) {
 					err = params.Server.ListenAndServe()
 				}
 				if err != nil && err != http.ErrServerClosed {
+					logger.WithError(err).Error(ctx, "Error starting HTTP server")
 					params.RuntimeErrors <- err
 				}
 			}()
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			return params.Server.Shutdown(ctx)
+			logger.Info(ctx, "Stopping HTTP server...")
+			if err := params.Server.Shutdown(ctx); err != nil {
+				logger.WithError(err).Error(ctx, "Error stopping HTTP server")
+				return err
+			}
+			logger.Info(ctx, "HTTP server stopped")
+			return nil
 		},
 	})
 }

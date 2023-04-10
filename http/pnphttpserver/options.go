@@ -17,7 +17,7 @@ func DoNotProvideMux() optionutil.Option[options] {
 
 func Start(start bool) optionutil.Option[options] {
 	return func(o *options) {
-		o.start = false
+		o.start = start
 	}
 }
 

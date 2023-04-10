@@ -2,6 +2,7 @@ package pnpnats
 
 import (
 	"context"
+
 	"github.com/nats-io/nats.go"
 	"go.uber.org/fx"
 )

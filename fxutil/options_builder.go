@@ -20,7 +20,7 @@ func (m *OptionsBuilder) Invoke(fns ...interface{}) {
 }
 
 func (m *OptionsBuilder) ProvideIf(condition bool, fns ...interface{}) {
-	if condition {
+	if !condition {
 		return
 	}
 	if m.PrivateProvides {

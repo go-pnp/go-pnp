@@ -2,6 +2,7 @@ package configutil
 
 import (
 	"fmt"
+
 	"github.com/caarlos0/env/v8"
 	"go.uber.org/fx"
 )

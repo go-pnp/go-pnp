@@ -2,11 +2,13 @@ package pnpnats
 
 import (
 	"context"
+
+	"github.com/nats-io/nats.go"
+	"go.uber.org/fx"
+
 	"github.com/go-pnp/go-pnp/config/configutil"
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
-	"github.com/nats-io/nats.go"
-	"go.uber.org/fx"
 )
 
 func Module(opts ...optionutil.Option[options]) fx.Option {

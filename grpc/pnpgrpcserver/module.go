@@ -2,13 +2,15 @@ package pnpgrpcserver
 
 import (
 	"context"
-	"github.com/go-pnp/go-pnp/logging"
-	"github.com/go-pnp/go-pnp/pkg/ordering"
+	"net"
+
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
-	"net"
+
+	"github.com/go-pnp/go-pnp/logging"
+	"github.com/go-pnp/go-pnp/pkg/ordering"
 
 	"github.com/go-pnp/go-pnp/config/configutil"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
@@ -25,6 +27,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 
+	builder.Provide(NewGRPCServer)
 	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](
 		configutil.Options{Prefix: "GRPC_"},
 	))
@@ -90,7 +93,7 @@ func NewGRPCServer(params NewGRPCServerParams) (*grpc.Server, error) {
 
 type RegisterStartHooksParams struct {
 	fx.In
-	RuntimeErr chan error
+	RuntimeErr chan<- error
 	Server     *grpc.Server
 	Config     *Config
 	Lc         fx.Lifecycle
@@ -98,8 +101,10 @@ type RegisterStartHooksParams struct {
 }
 
 func RegisterStartHooks(params RegisterStartHooksParams) {
+	logger := params.Logger.Named("grpc_server").WithField("addr", params.Config.Addr)
 	params.Lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
+			logger.Info(ctx, "Starting gRPC server")
 			listener, err := net.Listen("tcp", params.Config.Addr)
 			if err != nil {
 				return err
@@ -111,6 +116,12 @@ func RegisterStartHooks(params RegisterStartHooksParams) {
 				}
 			}()
 
+			return nil
+		},
+		OnStop: func(ctx context.Context) error {
+			logger.Info(ctx, "Stopping gRPC server...")
+			params.Server.GracefulStop()
+			logger.Info(ctx, "Stopped gRPC server")
 			return nil
 		},
 	})

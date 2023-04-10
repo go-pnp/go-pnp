@@ -2,14 +2,16 @@ package pnpgrpclogging
 
 import (
 	"context"
+	"math"
+
+	intLogging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	"go.uber.org/fx"
+	"google.golang.org/grpc"
+
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/logging"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
 	"github.com/go-pnp/go-pnp/pkg/ordering"
-	intLogging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
-	"go.uber.org/fx"
-	"google.golang.org/grpc"
-	"math"
 )
 
 func Module(opts ...optionutil.Option[options]) fx.Option {

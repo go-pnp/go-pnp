@@ -2,15 +2,14 @@ package pnpprometheus
 
 import (
 	"context"
-	"fmt"
-	"github.com/go-pnp/go-pnp/logging"
-	"go.uber.org/fx"
 	"net"
 	"net/http"
-	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.uber.org/fx"
+
+	"github.com/go-pnp/go-pnp/logging"
 )
 
 type Server struct {
@@ -30,8 +29,8 @@ func NewServer(registry *prometheus.Registry, config *Config) *Server {
 	}
 }
 
-func (s *Server) Start(listenPort int) error {
-	metricsListener, err := net.Listen("tcp", ":"+strconv.Itoa(listenPort))
+func (s *Server) Start(listenAddr string) error {
+	metricsListener, err := net.Listen("tcp", listenAddr)
 	if err != nil {
 		return err
 	}
@@ -53,12 +52,14 @@ type RegisterServerStartHooksParams struct {
 }
 
 func RegisterServerStartHooks(params RegisterServerStartHooksParams) {
+	logger := params.Logger.Named("prometheus.metrics_exporter").WithField("addr", params.Config.Addr)
 	params.Lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			params.Logger.Info(ctx, fmt.Sprintf("Running metrics server on 0.0.0.0:%d", params.Config.Port))
+			logger.Info(ctx, "Starting metrics server")
 
 			go func() {
-				if err := params.Server.Start(params.Config.Port); err != nil && err != http.ErrServerClosed {
+				if err := params.Server.Start(params.Config.Addr); err != nil && err != http.ErrServerClosed {
+					logger.WithError(err).Error(ctx, "Error starting metrics server")
 					params.RuntimeErr <- err
 				}
 			}()
@@ -66,9 +67,16 @@ func RegisterServerStartHooks(params RegisterServerStartHooksParams) {
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			params.Logger.Info(ctx, "Metrics server shutting down...")
+			params.Logger.Info(ctx, "Stopping metrics server...")
 
-			return params.Server.Shutdown(ctx)
+			if err := params.Server.Shutdown(ctx); err != nil {
+				params.Logger.WithError(err).Error(ctx, "Error shutting down metrics server")
+
+				return err
+			}
+
+			params.Logger.Info(ctx, "Metrics server stopped")
+			return nil
 		},
 	})
 }

@@ -2,11 +2,13 @@ package pnpsqlx
 
 import (
 	"database/sql"
+
+	"github.com/jmoiron/sqlx"
+	"go.uber.org/fx"
+
 	"github.com/go-pnp/go-pnp/config/configutil"
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
-	"github.com/jmoiron/sqlx"
-	"go.uber.org/fx"
 )
 
 func Module(driver string, opts ...optionutil.Option[options]) fx.Option {

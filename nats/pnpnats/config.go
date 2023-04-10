@@ -1,9 +1,11 @@
 package pnpnats
 
 import (
-	"github.com/go-pnp/go-pnp/tls/tlsutil"
-	"github.com/nats-io/nats.go"
 	"time"
+
+	"github.com/nats-io/nats.go"
+
+	"github.com/go-pnp/go-pnp/tls/tlsutil"
 )
 
 type Config struct {

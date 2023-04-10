@@ -23,7 +23,7 @@ func StartApp(options ...fx.Option) error {
 	runtimeErrors := make(chan error)
 
 	options = append([]fx.Option{
-		fx.Supply(runtimeErrors)},
+		fx.Supply((chan<- error)(runtimeErrors))},
 		options...,
 	)
 
