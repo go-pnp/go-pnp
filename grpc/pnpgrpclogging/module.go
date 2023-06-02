@@ -21,8 +21,12 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 
-	builder.Provide(NewLoggerUnaryServerInterceptorProvider)
-	builder.Provide(NewLoggerUnaryClientInterceptorProvider)
+	builder.Provide(
+		NewLoggerUnaryServerInterceptorProvider,
+		NewLoggerUnaryClientInterceptorProvider,
+		NewLoggerStreamServerInterceptorProvider,
+		NewLoggerStreamClientInterceptorProvider,
+	)
 
 	return builder.Build()
 }
@@ -67,9 +71,22 @@ func NewLoggerUnaryServerInterceptorProvider(params NewLoggerInterceptorParams) 
 	}
 }
 
+func NewLoggerStreamServerInterceptorProvider(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
+	return ordering.OrderedItem[grpc.StreamServerInterceptor]{
+		Order: math.MaxInt,
+		Value: intLogging.StreamServerInterceptor(InterceptorLogger{params.Logger}),
+	}
+}
+
 func NewLoggerUnaryClientInterceptorProvider(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.UnaryClientInterceptor] {
 	return ordering.OrderedItem[grpc.UnaryClientInterceptor]{
 		Order: math.MaxInt,
 		Value: intLogging.UnaryClientInterceptor(InterceptorLogger{params.Logger}),
+	}
+}
+func NewLoggerStreamClientInterceptorProvider(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
+	return ordering.OrderedItem[grpc.StreamClientInterceptor]{
+		Order: math.MaxInt,
+		Value: intLogging.StreamClientInterceptor(InterceptorLogger{params.Logger}),
 	}
 }
