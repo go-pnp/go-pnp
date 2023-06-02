@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/caarlos0/env/v8 v8.0.0
 	github.com/gorilla/mux v1.8.0
+	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0-rc.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/joho/godotenv v1.5.1

@@ -28,6 +28,8 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
+github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0-rc.0 h1:mdLirNAJBxnGgyB6pjZLcs6ue/6eZGBui6gXspfq4ks=
+github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0-rc.0/go.mod h1:kdXbOySqcQeTxiqglW7aahTmWZy3Pgi6SYL36yvKeyA=
 github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5 h1:3IZOAnD058zZllQTZNBioTlrzrBG/IjpiZ133IEtusM=
 github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0-rc.5/go.mod h1:xbKERva94Pw2cPen0s79J3uXmGzbbpDYFBFDlZ4mV/w=
 github.com/jmoiron/sqlx v1.3.5 h1:vFFPA71p1o5gAeqtEAwLU4dnX2napprKtHr7PYIcN3g=
