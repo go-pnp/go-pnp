@@ -1,4 +1,4 @@
-package pnpgrpclogging
+package pnpgrpcprometheus
 
 import "github.com/go-pnp/go-pnp/pkg/optionutil"
 

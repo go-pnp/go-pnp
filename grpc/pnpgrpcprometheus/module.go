@@ -1,4 +1,4 @@
-package pnpgrpclogging
+package pnpgrpcprometheus
 
 import (
 	"math"
