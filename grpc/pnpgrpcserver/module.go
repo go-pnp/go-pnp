@@ -46,7 +46,7 @@ func UnaryInterceptorProvider(target any) any {
 	return fxutil.GroupProvider[ordering.OrderedItem[grpc.UnaryServerInterceptor]]("pnpgrpcserver.unary_interceptors", target)
 }
 func StreamInterceptorProvider(target any) any {
-	return fxutil.GroupProvider[grpc.StreamServerInterceptor]("pnpgrpcserver.stream_interceptors", target)
+	return fxutil.GroupProvider[ordering.OrderedItem[grpc.StreamServerInterceptor]]("pnpgrpcserver.stream_interceptors", target)
 }
 
 func ServerOptionProvider(target any) any {
