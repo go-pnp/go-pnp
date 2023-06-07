@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/go-pnp/go-pnp/fxutil"
+	"github.com/go-pnp/go-pnp/grpc/pnpgrpcserver"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
 	"github.com/go-pnp/go-pnp/pkg/ordering"
 )
@@ -19,11 +20,11 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	}
 
 	builder.Provide(
-		NewOpenTelemetryUnaryServerInterceptorProvider,
-		NewOpenTelemetryStreamServerInterceptorProvider,
+		pnpgrpcserver.UnaryInterceptorProvider(NewOpenTelemetryUnaryServerInterceptorProvider),
+		pnpgrpcserver.StreamInterceptorProvider(NewOpenTelemetryStreamServerInterceptorProvider),
 
-		NewOpenTelemetryUnaryClientInterceptorProvider,
-		NewOpenTelemetryStreamClientInterceptorProvider,
+		//NewOpenTelemetryUnaryClientInterceptorProvider,
+		//NewOpenTelemetryStreamClientInterceptorProvider,
 	)
 
 	return builder.Build()

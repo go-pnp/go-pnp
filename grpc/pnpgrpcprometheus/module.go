@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/go-pnp/go-pnp/fxutil"
+	"github.com/go-pnp/go-pnp/grpc/pnpgrpcserver"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
 	"github.com/go-pnp/go-pnp/pkg/ordering"
 	"github.com/go-pnp/go-pnp/prometheus/pnpprometheus"
@@ -27,10 +28,10 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		pnpprometheus.MetricsCollectorProvider(NewServerPrometheusCollector),
 		pnpprometheus.MetricsCollectorProvider(NewClientPrometheusCollector),
 
-		NewLoggerUnaryServerInterceptorProvider,
-		NewLoggerUnaryClientInterceptorProvider,
-		NewLoggerStreamServerInterceptorProvider,
-		NewLoggerStreamClientInterceptorProvider,
+		pnpgrpcserver.UnaryInterceptorProvider(NewLoggerUnaryServerInterceptorProvider),
+		pnpgrpcserver.StreamInterceptorProvider(NewLoggerStreamServerInterceptorProvider),
+		//NewLoggerUnaryClientInterceptorProvider,
+		//NewLoggerStreamClientInterceptorProvider,
 	)
 
 	return builder.Build()
