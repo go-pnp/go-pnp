@@ -9,7 +9,7 @@ type DecorateNamedParams struct {
 
 func DecorateNamed(name string) fx.Option {
 	return fx.Decorate(func(params DecorateNamedParams) *Logger {
-		if params.Logger != nil {
+		if params.Logger == nil {
 			return nil
 		}
 
