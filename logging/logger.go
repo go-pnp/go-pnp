@@ -1,6 +1,8 @@
 package logging
 
-import "context"
+import (
+	"context"
+)
 
 type Delegate interface {
 	Info(ctx context.Context, msg string, args ...interface{})

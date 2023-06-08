@@ -85,7 +85,9 @@ func NewGRPCServer(params NewGRPCServerParams) (*grpc.Server, error) {
 
 	server := grpc.NewServer(serverOptions...)
 	for _, reg := range params.ServiceRegistrars {
-		reg(server)
+		if reg != nil {
+			reg(server)
+		}
 	}
 
 	return server, nil
