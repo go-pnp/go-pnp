@@ -41,7 +41,7 @@ func NewServerPrometheusCollector(metrics *intPrometheus.ServerMetrics) promethe
 	return metrics
 }
 
-func NewClientPrometheusCollector(metrics *intPrometheus.ServerMetrics) prometheus.Collector {
+func NewClientPrometheusCollector(metrics *intPrometheus.ClientMetrics) prometheus.Collector {
 	return metrics
 }
 

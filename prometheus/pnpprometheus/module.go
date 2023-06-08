@@ -3,7 +3,6 @@ package pnpprometheus
 import (
 	"go.uber.org/fx"
 
-	"github.com/go-pnp/go-pnp/config/configutil"
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
 )
@@ -15,12 +14,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 
-	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](configutil.Options{
-		Prefix: "METRICS_SERVER_",
-	}))
-	builder.Provide(NewServer)
 	builder.Provide(NewPrometheusRegistry)
-	builder.InvokeIf(options.start, RegisterServerStartHooks)
 
 	return builder.Build()
 }
