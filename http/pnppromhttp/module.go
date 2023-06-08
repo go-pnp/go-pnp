@@ -27,9 +27,10 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 	moduleBuilder.Provide(NewHealthcheckHandler)
-	moduleBuilder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](
-		configutil.Options{Prefix: "PROMETHEUS_HANDLER_"},
-	))
+	moduleBuilder.ProvideIf(
+		!options.configFromContainer,
+		configutil.NewPrefixedConfigProvider[Config]("PROMETHEUS_HANDLER_"),
+	)
 	moduleBuilder.ProvideIf(options.registerInMux, pnphttpserver.MuxHandlerRegistrarProvider(NewMuxHandlerRegistrar))
 
 	return moduleBuilder.Build()

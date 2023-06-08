@@ -21,6 +21,12 @@ type ConfigProviderResult[T any] struct {
 
 type Options = env.Options
 
+func NewPrefixedConfigProvider[T any](prefix string) func() (ConfigProviderResult[T], error) {
+	return NewConfigProvider[T](env.Options{
+		Prefix: prefix,
+	})
+}
+
 func NewConfigProvider[T any](opts Options) func() (ConfigProviderResult[T], error) {
 	return func() (ConfigProviderResult[T], error) {
 		c := new(T)
