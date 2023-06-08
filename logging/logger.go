@@ -27,28 +27,28 @@ func (o *Logger) Info(ctx context.Context, msg string, args ...interface{}) {
 	if o == nil {
 		return
 	}
-	o.Delegate.Info(ctx, msg, args...)
+	o.Delegate.SkipCallers(2).Info(ctx, msg, args...)
 }
 
 func (o *Logger) Warn(ctx context.Context, msg string, args ...interface{}) {
 	if o == nil {
 		return
 	}
-	o.Delegate.Warn(ctx, msg, args...)
+	o.Delegate.SkipCallers(2).Warn(ctx, msg, args...)
 }
 
 func (o *Logger) Debug(ctx context.Context, msg string, args ...interface{}) {
 	if o == nil {
 		return
 	}
-	o.Delegate.Debug(ctx, msg, args...)
+	o.Delegate.SkipCallers(2).Debug(ctx, msg, args...)
 }
 
 func (o *Logger) Error(ctx context.Context, msg string, args ...interface{}) {
 	if o == nil {
 		return
 	}
-	o.Delegate.Error(ctx, msg, args...)
+	o.Delegate.SkipCallers(2).Error(ctx, msg, args...)
 }
 
 func (o *Logger) WithFields(fields map[string]interface{}) *Logger {

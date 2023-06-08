@@ -103,7 +103,7 @@ type RegisterStartHooksParams struct {
 }
 
 func RegisterStartHooks(params RegisterStartHooksParams) {
-	logger := params.Logger.Named("grpc_server").WithField("addr", params.Config.Addr)
+	logger := params.Logger.WithField("addr", params.Config.Addr)
 	params.Lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			logger.Info(ctx, "Starting gRPC server")

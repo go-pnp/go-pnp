@@ -73,7 +73,7 @@ type RegisterStartHooksParams struct {
 }
 
 func RegisterStartHooks(params RegisterStartHooksParams) {
-	logger := params.Logger.Named("http_server").WithFields(map[string]interface{}{
+	logger := params.Logger.WithFields(map[string]interface{}{
 		"addr":        params.Config.Addr,
 		"tls_enabled": params.Config.TLS.Enabled,
 	})
