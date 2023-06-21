@@ -67,3 +67,32 @@ func RunJob(options ...fx.Option) error {
 		return err
 	}
 }
+
+func RunInvokes(options ...fx.Option) error {
+	systemLogger := logrus.New()
+	systemLogger.SetFormatter(&logrus.JSONFormatter{})
+	systemLogger.SetLevel(logrus.DebugLevel)
+
+	runtimeErrors := make(chan error)
+	jobResult := make(chan JobResult)
+
+	options = append([]fx.Option{
+		fx.Supply(runtimeErrors),
+		fx.Supply(jobResult),
+	},
+		options...,
+	)
+
+	app := fx.New(
+		options...,
+	)
+
+	if app.Err() != nil {
+		fmt.Println(fx.VisualizeError(app.Err()))
+		systemLogger.WithError(app.Err()).Error("failed to start application. stopping...")
+
+		return errors.WithStack(app.Err())
+	}
+
+	return nil
+}

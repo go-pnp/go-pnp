@@ -58,6 +58,10 @@ func (m *OptionsBuilder) Option(opts ...fx.Option) {
 	m.options = append(m.options, opts...)
 }
 
+func (m *OptionsBuilder) Decorate(fns ...interface{}) {
+	m.options = append(m.options, fx.Decorate(fns...))
+}
+
 // We don't use Supply as it do not support fx.PrivateProvides yet
 
 func (m *OptionsBuilder) Build() fx.Option {

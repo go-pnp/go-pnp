@@ -20,7 +20,8 @@ import (
 
 func Module(opts ...optionutil.Option[options]) fx.Option {
 	options := optionutil.ApplyOptions(&options{
-		start: true,
+		start:        true,
+		configPrefix: "GRPC_",
 	}, opts...)
 
 	builder := &fxutil.OptionsBuilder{
@@ -29,7 +30,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 
 	builder.Provide(NewGRPCServer)
 	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](
-		configutil.Options{Prefix: "GRPC_"},
+		configutil.Options{Prefix: options.configPrefix},
 	))
 
 	builder.InvokeIf(options.start, RegisterStartHooks)
@@ -55,6 +56,7 @@ func ServerOptionProvider(target any) any {
 
 type NewGRPCServerParams struct {
 	fx.In
+	Logger             *logging.Logger                                     `optional:"true"`
 	ServiceRegistrars  []ServiceRegistrar                                  `group:"pnpgrpcserver.service_registrars"`
 	UnaryInterceptors  ordering.OrderedItems[grpc.UnaryServerInterceptor]  `group:"pnpgrpcserver.unary_interceptors"`
 	StreamInterceptors ordering.OrderedItems[grpc.StreamServerInterceptor] `group:"pnpgrpcserver.stream_interceptors"`
@@ -84,6 +86,8 @@ func NewGRPCServer(params NewGRPCServerParams) (*grpc.Server, error) {
 	}
 
 	server := grpc.NewServer(serverOptions...)
+
+	params.Logger.Info(context.Background(), "Calling %d service registrars...", len(params.ServiceRegistrars))
 	for _, reg := range params.ServiceRegistrars {
 		if reg != nil {
 			reg(server)

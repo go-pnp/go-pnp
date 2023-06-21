@@ -1,25 +1,13 @@
-package pnphttpserver
+package pnpgorm
 
-import "github.com/go-pnp/go-pnp/pkg/optionutil"
+import (
+	"github.com/go-pnp/go-pnp/pkg/optionutil"
+)
 
 type options struct {
-	start               bool
-	provideMux          bool
 	fxPrivate           bool
 	configFromContainer bool
 	configPrefix        string
-}
-
-func DoNotProvideMux() optionutil.Option[options] {
-	return func(o *options) {
-		o.provideMux = false
-	}
-}
-
-func Start(start bool) optionutil.Option[options] {
-	return func(o *options) {
-		o.start = start
-	}
 }
 
 // WithFxPrivate is an option to add fx.Private to all module provides.
@@ -29,12 +17,14 @@ func WithFxPrivate() optionutil.Option[options] {
 	}
 }
 
+// WithConfigFromContainer if used, module will not provide config, but will use config already provided to fx di container.
 func WithConfigFromContainer() optionutil.Option[options] {
 	return func(o *options) {
 		o.configFromContainer = true
 	}
 }
 
+// WithConfigPrefix is an option to set config prefix for config provider.
 func WithConfigPrefix(prefix string) optionutil.Option[options] {
 	return func(o *options) {
 		o.configPrefix = prefix
