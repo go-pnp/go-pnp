@@ -60,34 +60,42 @@ func (i InterceptorLogger) Log(ctx context.Context, level intLogging.Level, msg 
 	}
 }
 
+func LoggingOptionProvider(target any) any {
+	return fxutil.GroupProvider[intLogging.Option](
+		"pnpgrpclogging.option",
+		target,
+	)
+}
+
 type NewLoggerInterceptorParams struct {
 	fx.In
-	Logger *logging.Logger `optional:"true"`
+	Logger  *logging.Logger     `optional:"true"`
+	Options []intLogging.Option `group:"pnpgrpclogging.option"`
 }
 
 func NewLoggerUnaryServerInterceptorProvider(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
 	return ordering.OrderedItem[grpc.UnaryServerInterceptor]{
 		Order: math.MaxInt,
-		Value: intLogging.UnaryServerInterceptor(InterceptorLogger{params.Logger}),
+		Value: intLogging.UnaryServerInterceptor(InterceptorLogger{params.Logger}, params.Options...),
 	}
 }
 
 func NewLoggerStreamServerInterceptorProvider(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
 	return ordering.OrderedItem[grpc.StreamServerInterceptor]{
 		Order: math.MaxInt,
-		Value: intLogging.StreamServerInterceptor(InterceptorLogger{params.Logger}),
+		Value: intLogging.StreamServerInterceptor(InterceptorLogger{params.Logger}, params.Options...),
 	}
 }
 
 func NewLoggerUnaryClientInterceptorProvider(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.UnaryClientInterceptor] {
 	return ordering.OrderedItem[grpc.UnaryClientInterceptor]{
 		Order: math.MaxInt,
-		Value: intLogging.UnaryClientInterceptor(InterceptorLogger{params.Logger}),
+		Value: intLogging.UnaryClientInterceptor(InterceptorLogger{params.Logger}, params.Options...),
 	}
 }
 func NewLoggerStreamClientInterceptorProvider(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
 	return ordering.OrderedItem[grpc.StreamClientInterceptor]{
 		Order: math.MaxInt,
-		Value: intLogging.StreamClientInterceptor(InterceptorLogger{params.Logger}),
+		Value: intLogging.StreamClientInterceptor(InterceptorLogger{params.Logger}, params.Options...),
 	}
 }
