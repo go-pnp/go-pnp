@@ -39,7 +39,7 @@ type InterceptorLogger struct {
 func (i InterceptorLogger) Log(ctx context.Context, level intLogging.Level, msg string, fields ...any) {
 	delegateFields := make(map[string]interface{})
 	iter := intLogging.Fields(fields).Iterator()
-	if iter.Next() {
+	for iter.Next() {
 		k, v := iter.At()
 		delegateFields[k] = v
 	}
