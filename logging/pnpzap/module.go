@@ -41,15 +41,30 @@ func ZapOptionProvider(target any) any {
 	)
 }
 
+func ZapContextFieldResolverProvider(target any) any {
+	return fxutil.GroupProvider[ContextFieldResolver](
+		"pnpzap.context_fields_resolver",
+		target,
+	)
+}
+
 type NewLoggerParams struct {
 	fx.In
-	ZapConfig zap.Config
-	Hooks     []func(zapcore.Entry) error `group:"pnpzap.hooks"`
-	Options   []zap.Option                `group:"pnpzap.zap_options"`
+	ZapConfig             zap.Config
+	Hooks                 []func(zapcore.Entry) error `group:"pnpzap.hooks"`
+	Options               []zap.Option                `group:"pnpzap.zap_options"`
+	ContextFieldResolvers []ContextFieldResolver      `group:"pnpzap.context_fields_resolver"`
 }
 
 func (n NewLoggerParams) BuildOptions() []zap.Option {
-	var result []zap.Option
+	result := []zap.Option{
+		zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+			return ZapCore{
+				Delegate:              core,
+				ContextFieldResolvers: n.ContextFieldResolvers,
+			}
+		}),
+	}
 	if len(n.Hooks) > 0 {
 		result = append(result, zap.Hooks(n.Hooks...))
 	}

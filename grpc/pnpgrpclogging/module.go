@@ -2,7 +2,6 @@ package pnpgrpclogging
 
 import (
 	"context"
-	"math"
 
 	intLogging "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"go.uber.org/fx"
@@ -23,8 +22,8 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	}
 
 	builder.Provide(
-		pnpgrpcserver.UnaryInterceptorProvider(NewLoggerUnaryServerInterceptorProvider),
-		pnpgrpcserver.StreamInterceptorProvider(NewLoggerStreamServerInterceptorProvider),
+		pnpgrpcserver.UnaryInterceptorProvider(NewLoggerUnaryServerInterceptorProvider(options)),
+		pnpgrpcserver.StreamInterceptorProvider(NewLoggerStreamServerInterceptorProvider(options)),
 		//NewLoggerUnaryClientInterceptorProvider,
 		//NewLoggerStreamClientInterceptorProvider,
 	)
@@ -73,29 +72,37 @@ type NewLoggerInterceptorParams struct {
 	Options []intLogging.Option `group:"pnpgrpclogging.option"`
 }
 
-func NewLoggerUnaryServerInterceptorProvider(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
-	return ordering.OrderedItem[grpc.UnaryServerInterceptor]{
-		Order: math.MaxInt,
-		Value: intLogging.UnaryServerInterceptor(InterceptorLogger{params.Logger}, params.Options...),
+func NewLoggerUnaryServerInterceptorProvider(opts *options) func(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
+	return func(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
+		return ordering.OrderedItem[grpc.UnaryServerInterceptor]{
+			Order: opts.getServerOrder(),
+			Value: intLogging.UnaryServerInterceptor(InterceptorLogger{params.Logger}, params.Options...),
+		}
 	}
 }
 
-func NewLoggerStreamServerInterceptorProvider(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
-	return ordering.OrderedItem[grpc.StreamServerInterceptor]{
-		Order: math.MaxInt,
-		Value: intLogging.StreamServerInterceptor(InterceptorLogger{params.Logger}, params.Options...),
+func NewLoggerStreamServerInterceptorProvider(opts *options) func(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
+	return func(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
+		return ordering.OrderedItem[grpc.StreamServerInterceptor]{
+			Order: opts.getServerOrder(),
+			Value: intLogging.StreamServerInterceptor(InterceptorLogger{params.Logger}, params.Options...),
+		}
 	}
 }
 
-func NewLoggerUnaryClientInterceptorProvider(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.UnaryClientInterceptor] {
-	return ordering.OrderedItem[grpc.UnaryClientInterceptor]{
-		Order: math.MaxInt,
-		Value: intLogging.UnaryClientInterceptor(InterceptorLogger{params.Logger}, params.Options...),
+func NewLoggerUnaryClientInterceptorProvider(opts *options) func(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.UnaryClientInterceptor] {
+	return func(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.UnaryClientInterceptor] {
+		return ordering.OrderedItem[grpc.UnaryClientInterceptor]{
+			Order: opts.getClientOrder(),
+			Value: intLogging.UnaryClientInterceptor(InterceptorLogger{params.Logger}, params.Options...),
+		}
 	}
 }
-func NewLoggerStreamClientInterceptorProvider(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
-	return ordering.OrderedItem[grpc.StreamClientInterceptor]{
-		Order: math.MaxInt,
-		Value: intLogging.StreamClientInterceptor(InterceptorLogger{params.Logger}, params.Options...),
+func NewLoggerStreamClientInterceptorProvider(opts *options) func(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
+	return func(params NewLoggerInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
+		return ordering.OrderedItem[grpc.StreamClientInterceptor]{
+			Order: opts.getClientOrder(),
+			Value: intLogging.StreamClientInterceptor(InterceptorLogger{params.Logger}, params.Options...),
+		}
 	}
 }

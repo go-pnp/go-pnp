@@ -76,18 +76,23 @@ func NewGRPCServer(params NewGRPCServerParams) (*grpc.Server, error) {
 	}
 
 	serverOptions := append([]grpc.ServerOption{grpc.Creds(grpcCredentials)}, params.ServerOptions...)
+	if len(params.ServerOptions) > 0 {
+		params.Logger.Debug(context.Background(), "Registered %d server options...", len(params.ServerOptions))
+	}
 
 	if len(params.UnaryInterceptors) > 0 {
+		params.Logger.Debug(context.Background(), "Registered %d unary interceptors...", len(params.UnaryInterceptors))
 		serverOptions = append(serverOptions, grpc.ChainUnaryInterceptor(params.UnaryInterceptors.Get()...))
 	}
 
 	if len(params.StreamInterceptors) > 0 {
+		params.Logger.Debug(context.Background(), "Registered %d stream interceptors...", len(params.StreamInterceptors))
 		serverOptions = append(serverOptions, grpc.ChainStreamInterceptor(params.StreamInterceptors.Get()...))
 	}
 
 	server := grpc.NewServer(serverOptions...)
 
-	params.Logger.Info(context.Background(), "Calling %d service registrars...", len(params.ServiceRegistrars))
+	params.Logger.Debug(context.Background(), "Calling %d service registrars...", len(params.ServiceRegistrars))
 	for _, reg := range params.ServiceRegistrars {
 		if reg != nil {
 			reg(server)

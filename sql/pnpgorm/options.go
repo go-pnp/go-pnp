@@ -8,6 +8,7 @@ type options struct {
 	fxPrivate           bool
 	configFromContainer bool
 	configPrefix        string
+	enableLogger        bool
 }
 
 // WithFxPrivate is an option to add fx.Private to all module provides.
@@ -28,5 +29,11 @@ func WithConfigFromContainer() optionutil.Option[options] {
 func WithConfigPrefix(prefix string) optionutil.Option[options] {
 	return func(o *options) {
 		o.configPrefix = prefix
+	}
+}
+
+func WithLogger() optionutil.Option[options] {
+	return func(o *options) {
+		o.enableLogger = true
 	}
 }

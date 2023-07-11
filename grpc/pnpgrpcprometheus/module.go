@@ -1,8 +1,6 @@
 package pnpgrpcprometheus
 
 import (
-	"math"
-
 	intPrometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/fx"
@@ -28,8 +26,8 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		pnpprometheus.MetricsCollectorProvider(NewServerPrometheusCollector),
 		pnpprometheus.MetricsCollectorProvider(NewClientPrometheusCollector),
 
-		pnpgrpcserver.UnaryInterceptorProvider(NewLoggerUnaryServerInterceptorProvider),
-		pnpgrpcserver.StreamInterceptorProvider(NewLoggerStreamServerInterceptorProvider),
+		pnpgrpcserver.UnaryInterceptorProvider(NewPrometheusUnaryServerInterceptorProvider(options)),
+		pnpgrpcserver.StreamInterceptorProvider(NewPrometheusStreamServerInterceptorProvider(options)),
 		//NewLoggerUnaryClientInterceptorProvider,
 		//NewLoggerStreamClientInterceptorProvider,
 	)
@@ -50,17 +48,21 @@ type NewServerPrometheusInterceptorParams struct {
 	ServerMetrics *intPrometheus.ServerMetrics
 }
 
-func NewLoggerUnaryServerInterceptorProvider(params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
-	return ordering.OrderedItem[grpc.UnaryServerInterceptor]{
-		Order: math.MaxInt,
-		Value: params.ServerMetrics.UnaryServerInterceptor(),
+func NewPrometheusUnaryServerInterceptorProvider(opts *options) func(params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
+	return func(params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
+		return ordering.OrderedItem[grpc.UnaryServerInterceptor]{
+			Order: opts.getServerOrder(),
+			Value: params.ServerMetrics.UnaryServerInterceptor(),
+		}
 	}
 }
 
-func NewLoggerStreamServerInterceptorProvider(params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
-	return ordering.OrderedItem[grpc.StreamServerInterceptor]{
-		Order: math.MaxInt,
-		Value: params.ServerMetrics.StreamServerInterceptor(),
+func NewPrometheusStreamServerInterceptorProvider(opts *options) func(params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
+	return func(params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
+		return ordering.OrderedItem[grpc.StreamServerInterceptor]{
+			Order: opts.getServerOrder(),
+			Value: params.ServerMetrics.StreamServerInterceptor(),
+		}
 	}
 }
 
@@ -69,15 +71,19 @@ type NewClientPrometheusInterceptorParams struct {
 	ClientMetrics *intPrometheus.ClientMetrics
 }
 
-func NewLoggerUnaryClientInterceptorProvider(params NewClientPrometheusInterceptorParams) ordering.OrderedItem[grpc.UnaryClientInterceptor] {
-	return ordering.OrderedItem[grpc.UnaryClientInterceptor]{
-		Order: math.MaxInt,
-		Value: params.ClientMetrics.UnaryClientInterceptor(),
+func NewLoggerUnaryClientInterceptorProvider(opts *options) func(params NewClientPrometheusInterceptorParams) ordering.OrderedItem[grpc.UnaryClientInterceptor] {
+	return func(params NewClientPrometheusInterceptorParams) ordering.OrderedItem[grpc.UnaryClientInterceptor] {
+		return ordering.OrderedItem[grpc.UnaryClientInterceptor]{
+			Order: opts.getClientOrder(),
+			Value: params.ClientMetrics.UnaryClientInterceptor(),
+		}
 	}
 }
-func NewLoggerStreamClientInterceptorProvider(params NewClientPrometheusInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
-	return ordering.OrderedItem[grpc.StreamClientInterceptor]{
-		Order: math.MaxInt,
-		Value: params.ClientMetrics.StreamClientInterceptor(),
+func NewLoggerStreamClientInterceptorProvider(opts *options) func(params NewClientPrometheusInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
+	return func(params NewClientPrometheusInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
+		return ordering.OrderedItem[grpc.StreamClientInterceptor]{
+			Order: opts.getClientOrder(),
+			Value: params.ClientMetrics.StreamClientInterceptor(),
+		}
 	}
 }
