@@ -8,6 +8,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 
 	"github.com/go-pnp/go-pnp/config/configutil"
 	"github.com/go-pnp/go-pnp/fxutil"
@@ -64,7 +65,9 @@ type NewGormDBParams struct {
 
 func NewGormDBProvider(opts *options) func(params NewGormDBParams) (_ *gorm.DB, rerr error) {
 	return func(params NewGormDBParams) (_ *gorm.DB, rerr error) {
-		config := &gorm.Config{}
+		config := &gorm.Config{
+			Logger: logger.Discard,
+		}
 		if opts.enableLogger {
 			config.Logger = &Logger{Delegate: params.Logger}
 		}
