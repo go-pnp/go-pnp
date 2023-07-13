@@ -23,8 +23,8 @@ func RunJob(options ...fx.Option) error {
 	jobResult := make(chan JobResult)
 
 	options = append([]fx.Option{
-		fx.Supply(runtimeErrors),
-		fx.Supply(jobResult),
+		fx.Supply((chan<- error)(runtimeErrors)),
+		fx.Supply((chan<- JobResult)(jobResult)),
 	},
 		options...,
 	)
@@ -57,11 +57,7 @@ func RunJob(options ...fx.Option) error {
 
 		return err
 	case err := <-jobResult:
-		if err == nil {
-			systemLogger.Info("job completed successfully. stopping...")
-		} else {
-			systemLogger.WithError(err).Error("job failed. stopping...")
-		}
+
 		stopApp(systemLogger, app)
 
 		return err
