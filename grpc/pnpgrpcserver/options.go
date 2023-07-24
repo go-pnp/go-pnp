@@ -9,6 +9,7 @@ type options struct {
 	fxPrivate           bool
 	configFromContainer bool
 	configPrefix        string
+	reflection          bool
 }
 
 func Start(start bool) optionutil.Option[options] {
@@ -33,5 +34,11 @@ func WithConfigFromContainer() optionutil.Option[options] {
 func WithConfigPrefix(prefix string) optionutil.Option[options] {
 	return func(o *options) {
 		o.configPrefix = prefix
+	}
+}
+
+func WithReflection() optionutil.Option[options] {
+	return func(o *options) {
+		o.reflection = true
 	}
 }

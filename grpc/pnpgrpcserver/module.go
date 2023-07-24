@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/go-pnp/go-pnp/logging"
 	"github.com/go-pnp/go-pnp/pkg/ordering"
@@ -32,6 +33,11 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](
 		configutil.Options{Prefix: options.configPrefix},
 	))
+	builder.ProvideIf(options.reflection, ServiceRegistrarProvider(func() ServiceRegistrar {
+		return func(server *grpc.Server) {
+			reflection.Register(server)
+		}
+	}))
 
 	builder.InvokeIf(options.start, RegisterStartHooks)
 
@@ -39,6 +45,14 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 }
 
 type ServiceRegistrar func(server *grpc.Server)
+
+func NewServiceRegistrarProvider[T any](registerFunc func(s grpc.ServiceRegistrar, srv T)) any {
+	return ServiceRegistrarProvider(func(handler T) ServiceRegistrar {
+		return func(server *grpc.Server) {
+			registerFunc(server, handler)
+		}
+	})
+}
 
 func ServiceRegistrarProvider(target any) any {
 	return fxutil.GroupProvider[ServiceRegistrar]("pnpgrpcserver.service_registrars", target)
