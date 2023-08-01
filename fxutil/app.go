@@ -13,7 +13,7 @@ import (
 type App struct {
 	options        []fx.Option
 	startCtxCancel context.CancelFunc
-	quitCh         chan struct{}
+	quitCh         chan chan struct{}
 }
 
 func (a *App) Start() error {
@@ -70,8 +70,14 @@ func (a *App) Close() error {
 	if a.startCtxCancel != nil {
 		a.startCtxCancel()
 	}
-
-	close(a.quitCh)
+	resultCh := make(chan struct{})
+	a.quitCh <- resultCh
+	select {
+	case <-resultCh:
+		return nil
+	case <-time.After(time.Second * 10):
+		return errors.New("stopping application time out")
+	}
 
 	return nil
 }
@@ -79,6 +85,6 @@ func (a *App) Close() error {
 func NewApp(options ...fx.Option) *App {
 	return &App{
 		options: options,
-		quitCh:  make(chan struct{}),
+		quitCh:  make(chan chan struct{}),
 	}
 }
