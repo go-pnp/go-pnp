@@ -48,9 +48,10 @@ func (a *App) Start() error {
 	}
 
 	select {
-	case <-a.quitCh:
+	case res := <-a.quitCh:
 		systemLogger.Infof("stopping application...")
 		stopApp(systemLogger, app)
+		res <- struct{}{}
 
 		return nil
 	case signal := <-app.Done():
