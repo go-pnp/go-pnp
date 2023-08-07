@@ -6,6 +6,7 @@ import (
 
 type options struct {
 	fxPrivate bool
+	serveGRPC bool
 	useMux    bool
 	muxPrefix string
 }
@@ -21,5 +22,11 @@ func WithMuxHandler(prefix string) optionutil.Option[options] {
 	return func(o *options) {
 		o.useMux = true
 		o.muxPrefix = prefix
+	}
+}
+
+func WithServeGRPC() optionutil.Option[options] {
+	return func(o *options) {
+		o.serveGRPC = true
 	}
 }
