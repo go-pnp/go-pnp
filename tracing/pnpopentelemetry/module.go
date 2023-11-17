@@ -1,7 +1,8 @@
 package pnpopentelemetry
 
 import (
-	"go.opentelemetry.io/otel/sdk/trace"
+	sdkTrace "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/fx"
 
 	"github.com/go-pnp/go-pnp/fxutil"
@@ -16,7 +17,10 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	builder := &fxutil.OptionsBuilder{
 		PrivateProvides: options.fxPrivate,
 	}
-	builder.Provide(trace.NewTracerProvider)
+	builder.Provide(sdkTrace.NewTracerProvider)
+	builder.Provide(func(provider *sdkTrace.TracerProvider) trace.TracerProvider {
+		return provider
+	})
 
 	return builder.Build()
 }
