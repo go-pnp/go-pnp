@@ -5,27 +5,38 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"go.uber.org/fx"
 
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/logging"
 )
 
-func NewServer(
-	config *Config,
-	handler http.Handler,
-) (*http.Server, error) {
-	tlsConfig, err := config.TLS.TLSConfig()
+type NewServerParams struct {
+	fx.In
+
+	Config  *Config
+	Handler http.Handler
+	CORS    *cors.Cors `optional:"true"`
+}
+
+func NewServer(params NewServerParams) (*http.Server, error) {
+	tlsConfig, err := params.Config.TLS.TLSConfig()
 	if err != nil {
 		return nil, err
 	}
 
+	handler := params.Handler
+	if params.CORS != nil {
+		handler = params.CORS.Handler(handler)
+	}
+
 	return &http.Server{
-		Addr:              config.Addr,
-		ReadTimeout:       config.ReadTimeout,
-		ReadHeaderTimeout: config.ReadHeaderTimeout,
-		WriteTimeout:      config.WriteTimeout,
-		IdleTimeout:       config.IdleTimeout,
+		Addr:              params.Config.Addr,
+		ReadTimeout:       params.Config.ReadTimeout,
+		ReadHeaderTimeout: params.Config.ReadHeaderTimeout,
+		WriteTimeout:      params.Config.WriteTimeout,
+		IdleTimeout:       params.Config.IdleTimeout,
 		Handler:           handler,
 		TLSConfig:         tlsConfig,
 	}, nil
