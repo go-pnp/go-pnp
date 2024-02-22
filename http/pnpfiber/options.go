@@ -17,7 +17,7 @@ type options struct {
 	configPrefix string
 
 	// fiber config to be used
-	fiberConfig fiber.Config
+	fiberConfig *fiber.Config
 }
 
 func newOptions() *options {
@@ -42,8 +42,8 @@ func WithConfigPrefix(prefix string) optionutil.Option[options] {
 	}
 }
 
-func WithFiberConfig(config *fiber.Config) optionutil.Option[options] {
+func WithFiberConfig(config fiber.Config) optionutil.Option[options] {
 	return func(o *options) {
-		o.fiberConfig = config
+		o.fiberConfig = &config
 	}
 }

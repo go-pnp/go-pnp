@@ -20,7 +20,9 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 	moduleBuilder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
-	moduleBuilder.Option(fx.Supply(options.fiberConfig))
+	if options.fiberConfig != nil {
+		moduleBuilder.Option(fx.Supply(&options.fiberConfig))
+	}
 	return moduleBuilder.Build()
 }
 
@@ -35,12 +37,17 @@ func EndpointRegistrarProvider(target any) any {
 
 type NewFiberParams struct {
 	fx.In
-	FiberConfig        fiber.Config
+	FiberConfig        *fiber.Config
 	EndpointsRegistrar EndpointRegistrar `group:"pnp_fiber.endpoint_registrars"`
 }
 
 func NewFiber(params NewFiberParams) (*fiber.App, error) {
-	app := fiber.New(params.FiberConfig)
+	var configs []fiber.Config
+	if params.FiberConfig != nil {
+		configs = append(configs, *params.FiberConfig)
+	}
+
+	app := fiber.New(configs...)
 
 	for params.EndpointsRegistrar != nil {
 		params.EndpointsRegistrar(app)
