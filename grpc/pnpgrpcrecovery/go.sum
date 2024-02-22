@@ -7,8 +7,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-pnp/go-pnp v0.0.2 h1:bJ9O96MdU7J7v18QF5qMKbcJL6RTYKdcusPr8+F3r8U=
 github.com/go-pnp/go-pnp v0.0.2/go.mod h1:RKUfiIUxhrjkFSUD5ZaI8JP9xjnwuhEKhJFXhRnxqwY=
-github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.2 h1:y7bv/BaZPmSKP8ucZ5JXx/ThGF6eEooG2gzMdCGrGks=
-github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.2/go.mod h1:HlhLqriiYcb6+ycXPQUMTUn23GE1MmJCF/rv94t/9rg=
+github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.3 h1:VatvdAggUL+ASyb/6lPB2NWh2NjZ+bjuB1hNouHsoSQ=
+github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.3/go.mod h1:8C0h6YB5Jc5DYngspdoPFoBBnhJy4tCnKMbwcwN0Bas=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=
 github.com/golang/protobuf v1.5.3 h1:KhyjKVUg7Usr/dYsdSqoFveMYd5ko72D+zANwlG1mmg=
 github.com/golang/protobuf v1.5.3/go.mod h1:XVQd3VNwM+JqD3oG2Ue2ip4fOMUkwXdXDdiuN0vRsmY=

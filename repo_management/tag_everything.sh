@@ -25,13 +25,13 @@ fi
 
 echo "All modules will be tagged with version ${version}"
 
-for i in $(find "." -type d -name 'pnp*'); do
+for i in $(find ".." -type d -name 'pnp*'); do
   # skip .git and _refactor directory
-  if [[ $i == *".git"* ]] || [[ $i == *"_refactor"* ]]; then
+  if [[ $i == *"../.git"* ]] || [[ $i == *"../_refactor"* ]]; then
     continue
   fi
   # Remove leading './' using parameter expansion
-  dir=${i#./}
+  dir=${i#../}
   module="github.com/go-pnp/go-pnp/${dir}"
 
   echo "Tagging with version ${dir}/${version}"

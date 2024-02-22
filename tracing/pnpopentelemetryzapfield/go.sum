@@ -7,8 +7,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-pnp/go-pnp v0.0.2 h1:bJ9O96MdU7J7v18QF5qMKbcJL6RTYKdcusPr8+F3r8U=
 github.com/go-pnp/go-pnp v0.0.2/go.mod h1:RKUfiIUxhrjkFSUD5ZaI8JP9xjnwuhEKhJFXhRnxqwY=
-github.com/go-pnp/go-pnp/logging/pnpzap v0.0.2 h1:6qTBNqzM04x/ZcA0aP+t1IraTxypdX+35Eo8RDyZ0Ro=
-github.com/go-pnp/go-pnp/logging/pnpzap v0.0.2/go.mod h1:RLPyX9p89UN368i0SArsmeEprSMseGHmunzhnw9jdPQ=
+github.com/go-pnp/go-pnp/logging/pnpzap v0.0.3 h1:0qdmlRCgbyTK/9vRgY4nXm8cU76iLke4OPNYEz8iwiA=
+github.com/go-pnp/go-pnp/logging/pnpzap v0.0.3/go.mod h1:GkqncRUgO8dvzNrW8WIk093gKHOkBQIOJvnPeYmG1P8=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
