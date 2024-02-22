@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/grpc/pnpgrpcprometheus
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.2
+	github.com/go-pnp/go-pnp v0.0.3
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.3
 	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.3
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0
@@ -14,7 +14,7 @@ require (
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/caarlos0/env/v8 v8.0.0 // indirect
+	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1 // indirect

@@ -1,12 +1,12 @@
 github.com/benbjohnson/clock v1.3.0 h1:ip6w0uFQkncKQ979AypyG0ER7mqUSBdKLOgAle/AT8A=
 github.com/benbjohnson/clock v1.3.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
-github.com/caarlos0/env/v8 v8.0.0 h1:POhxHhSpuxrLMIdvTGARuZqR4Jjm8AYmoi/JKlcScs0=
-github.com/caarlos0/env/v8 v8.0.0/go.mod h1:7K4wMY9bH0esiXSSHlfHLX5xKGQMnkH5Fk4TDSSSzfo=
+github.com/caarlos0/env/v10 v10.0.0 h1:yIHUBZGsyqCnpTkbjk8asUlx6RFhhEs+h7TOBdgdzXA=
+github.com/caarlos0/env/v10 v10.0.0/go.mod h1:ZfulV76NvVPw3tm591U4SwL3Xx9ldzBP9aGxzeN7G18=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/go-pnp/go-pnp v0.0.2 h1:bJ9O96MdU7J7v18QF5qMKbcJL6RTYKdcusPr8+F3r8U=
-github.com/go-pnp/go-pnp v0.0.2/go.mod h1:RKUfiIUxhrjkFSUD5ZaI8JP9xjnwuhEKhJFXhRnxqwY=
+github.com/go-pnp/go-pnp v0.0.3 h1:PXinxH7Bqg3r857vIkVkVSt3gDOvD2ujgd9/8m/kOoA=
+github.com/go-pnp/go-pnp v0.0.3/go.mod h1:pWuJqgVhttuOfGWc9nmQOWzhMBHJxfVUI0v2eu5JzW8=
 github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.3 h1:VatvdAggUL+ASyb/6lPB2NWh2NjZ+bjuB1hNouHsoSQ=
 github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.3/go.mod h1:8C0h6YB5Jc5DYngspdoPFoBBnhJy4tCnKMbwcwN0Bas=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=

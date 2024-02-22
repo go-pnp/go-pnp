@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/sql/pnpgorm
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.2
+	github.com/go-pnp/go-pnp v0.0.3
 	go.uber.org/fx v1.20.1
 	gorm.io/driver/mysql v1.5.4
 	gorm.io/driver/postgres v1.5.6
@@ -12,7 +12,7 @@ require (
 )
 
 require (
-	github.com/caarlos0/env/v8 v8.0.0 // indirect
+	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
@@ -24,7 +24,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
 	go.uber.org/dig v1.17.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect

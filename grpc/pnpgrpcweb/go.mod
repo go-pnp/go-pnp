@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/grpc/pnpgrpcweb
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.2
+	github.com/go-pnp/go-pnp v0.0.3
 	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.3
 	github.com/gorilla/mux v1.8.1
 	github.com/improbable-eng/grpc-web v0.15.0
@@ -12,7 +12,7 @@ require (
 )
 
 require (
-	github.com/caarlos0/env/v8 v8.0.0 // indirect
+	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/golang/protobuf v1.5.3 // indirect

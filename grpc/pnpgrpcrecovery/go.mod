@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/grpc/pnpgrpcrecovery
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.2
+	github.com/go-pnp/go-pnp v0.0.3
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.3
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
 	go.uber.org/fx v1.20.1
@@ -11,7 +11,7 @@ require (
 )
 
 require (
-	github.com/caarlos0/env/v8 v8.0.0 // indirect
+	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect

@@ -3,14 +3,14 @@ module github.com/go-pnp/go-pnp/tracing/pnpopentelemetryzapfield
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.2
+	github.com/go-pnp/go-pnp v0.0.3
 	github.com/go-pnp/go-pnp/logging/pnpzap v0.0.3
 	go.opentelemetry.io/otel/trace v1.23.1
 	go.uber.org/fx v1.20.1
 )
 
 require (
-	github.com/caarlos0/env/v8 v8.0.0 // indirect
+	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
