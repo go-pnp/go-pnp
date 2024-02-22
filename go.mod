@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp
 go 1.21.4
 
 require (
-	github.com/caarlos0/env/v8 v8.0.0
+	github.com/caarlos0/env/v10 v10.0.0
 	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3

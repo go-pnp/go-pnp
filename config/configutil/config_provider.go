@@ -3,7 +3,7 @@ package configutil
 import (
 	"fmt"
 
-	"github.com/caarlos0/env/v8"
+	"github.com/caarlos0/env/v10"
 	"go.uber.org/fx"
 )
 
@@ -16,7 +16,7 @@ type ConfigParams struct {
 type ConfigProviderResult[T any] struct {
 	fx.Out
 	Config       *T
-	ConfigParams []ConfigParams `group:"config_fields,flatten"`
+	ConfigParams []env.FieldParams `group:"config_fields,flatten"`
 }
 
 type Options = env.Options
@@ -34,15 +34,14 @@ func NewConfigProvider[T any](opts Options) func() (ConfigProviderResult[T], err
 			return ConfigProviderResult[T]{}, fmt.Errorf("parse config from env: %w", err)
 		}
 
-		// https://github.com/caarlos0/env/issues/260
-		//configParams, err := env.GetFieldParams(c, opts)
-		//if err != nil {
-		//	return ConfigProviderResult[T]{}, fmt.Errorf("get config params: %w", err)
-		//}
+		configParams, err := env.GetFieldParamsWithOptions(c, opts)
+		if err != nil {
+			return ConfigProviderResult[T]{}, fmt.Errorf("get config params: %w", err)
+		}
 
 		return ConfigProviderResult[T]{
-			Config: c,
-			//ConfigParams: configParams,
+			Config:       c,
+			ConfigParams: configParams,
 		}, nil
 	}
 }
