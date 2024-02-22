@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"golang.org/x/mod/modfile"
 )
 
@@ -23,25 +24,41 @@ type Upgrader struct {
 
 func (u *Upgrader) loadModuleDependencies() error {
 	for moduleName, currentVersion := range u.currentModuleVersions {
-		moduleLocalPath := strings.TrimPrefix(moduleName, "github.com/go-pnp/go-pnp/")
+		moduleLocalPath := strings.TrimPrefix(moduleName, "github.com/go-pnp/go-pnp")
+		if strings.HasPrefix(moduleLocalPath, "/") {
+			moduleLocalPath = moduleLocalPath[1:]
+		}
+		tagName := moduleLocalPath + "/v" + currentVersion
+		if moduleLocalPath == "" {
+			tagName = "v" + currentVersion
+		}
 		tag, err := u.repo.Tag(moduleLocalPath + "/v" + currentVersion)
 		if err != nil {
-			return fmt.Errorf("tag: %w", err)
+			return fmt.Errorf("tag '%s': %w", tagName, err)
 		}
 
+		var tree *object.Tree
 		tagObject, err := u.repo.TagObject(tag.Hash())
 		if err != nil {
-			return fmt.Errorf("commit object 1: %w", err)
+			commitObject, err := u.repo.CommitObject(tag.Hash())
+			if err != nil {
+				return fmt.Errorf("commit object '%s': %w", tagName, err)
+			}
+			tree, err = commitObject.Tree()
+			if err != nil {
+				return fmt.Errorf("object type: %w", err)
+			}
+		} else {
+			tree, err = tagObject.Tree()
+			if err != nil {
+				return fmt.Errorf("object type: %w", err)
+			}
 		}
 
-		tree, err := tagObject.Tree()
+		modFile := filepath.Join(moduleLocalPath, "go.mod")
+		modTreeFile, err := tree.File(modFile)
 		if err != nil {
-			return fmt.Errorf("object type: %w", err)
-		}
-
-		modTreeFile, err := tree.File(filepath.Join(moduleLocalPath, "go.mod"))
-		if err != nil {
-			return fmt.Errorf("file: %w", err)
+			return fmt.Errorf("file %s: %w", modFile, err)
 		}
 
 		modBlob, err := modTreeFile.Contents()
@@ -54,7 +71,7 @@ func (u *Upgrader) loadModuleDependencies() error {
 		}
 
 		for _, require := range modfile.Require {
-			if !strings.HasPrefix(require.Mod.Path, "github.com/go-pnp/go-pnp/") {
+			if !strings.HasPrefix(require.Mod.Path, "github.com/go-pnp/go-pnp") {
 				continue
 			}
 
@@ -80,6 +97,15 @@ func (u *Upgrader) loadModuleVersions() error {
 
 		tagParts := strings.Split(tagName, "/")
 		if len(tagParts) < 2 {
+			if strings.HasPrefix(tagName, "v") {
+				moduleName := ""
+				version := strings.TrimPrefix(tagName, "v")
+				if _, ok := allModuleVersions[moduleName]; !ok {
+					allModuleVersions[moduleName] = make([]string, 0, 1)
+				}
+
+				allModuleVersions[moduleName] = append(allModuleVersions[moduleName], version)
+			}
 			return nil
 		}
 
@@ -100,54 +126,26 @@ func (u *Upgrader) loadModuleVersions() error {
 	u.currentModuleVersions = make(map[string]string)
 	for moduleName, versions := range allModuleVersions {
 		sort.Sort(sort.StringSlice(versions))
-		u.currentModuleVersions["github.com/go-pnp/go-pnp/"+moduleName] = versions[len(versions)-1]
+		if moduleName == "" {
+			u.currentModuleVersions["github.com/go-pnp/go-pnp"] = versions[len(versions)-1]
+		} else {
+			u.currentModuleVersions["github.com/go-pnp/go-pnp/"+moduleName] = versions[len(versions)-1]
+		}
 	}
 
 	return nil
 }
 
-//	func (u *Upgrader) loadModules() error {
-//		var result []string
-//		err := filepath.Walk("..", func(path string, info os.FileInfo, err error) error {
-//			if !info.IsDir() {
-//				return nil
-//			}
-//			if info.Name() == ".git" || info.Name() == "_refactor" {
-//				return filepath.SkipDir
-//			}
-//
-//			if _, err := os.Stat(filepath.Join(path, "go.mod")); err != nil {
-//				return nil
-//			}
-//
-//			if strings.HasPrefix(info.Name(), "pnp") {
-//				result = append(result, path)
-//
-//				return filepath.SkipDir
-//			}
-//
-//			return nil
-//		})
-//		if err != nil {
-//			return fmt.Errorf("walk: %w", err)
-//		}
-//
-//		for _, modulePath := range result {
-//			moduleDir, err := filepath.Rel(u.rootDir, modulePath)
-//			if err != nil {
-//				return fmt.Errorf("rel: %w", err)
-//			}
-//		}
-//
-//		return nil
-//	}
 func (u *Upgrader) Release() {
 	updatedPaths := make(map[string]struct{})
 	for moduleName, dependencies := range u.currentModuleDependencies {
 		for dependency, version := range dependencies {
 			if version != u.currentModuleVersions[dependency] {
 				fmt.Printf("module %s depends on %s@%s, but the latest version is %s\n", moduleName, dependency, version, u.currentModuleVersions[dependency])
-				moduleLocalPath := strings.TrimPrefix(moduleName, "github.com/go-pnp/go-pnp/")
+				moduleLocalPath := strings.TrimPrefix(moduleName, "github.com/go-pnp/go-pnp")
+				if strings.HasPrefix(moduleLocalPath, "/") {
+					moduleLocalPath = moduleLocalPath[1:]
+				}
 				// executing go get
 				cmd := exec.Command("go", "get", "-u", dependency+"@v"+u.currentModuleVersions[dependency])
 				cmd.Stdout = os.Stdout
@@ -170,7 +168,6 @@ func (u *Upgrader) Release() {
 		}
 	}
 
-	//commit
 	w, err := u.repo.Worktree()
 	if err != nil {
 		fmt.Printf("can't get worktree: %v\n", err)
