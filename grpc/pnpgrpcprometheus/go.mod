@@ -3,9 +3,9 @@ module github.com/go-pnp/go-pnp/grpc/pnpgrpcprometheus
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.3
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.3
-	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.3
+	github.com/go-pnp/go-pnp v0.0.4
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.4
+	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.4
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0
 	github.com/prometheus/client_golang v1.18.0
 	go.uber.org/fx v1.20.1
@@ -21,7 +21,7 @@ require (
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_model v0.6.0 // indirect
-	github.com/prometheus/common v0.47.0 // indirect
+	github.com/prometheus/common v0.48.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	go.uber.org/dig v1.17.1 // indirect

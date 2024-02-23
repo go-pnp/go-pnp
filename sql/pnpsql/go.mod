@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/sql/pnpsql
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.3
+	github.com/go-pnp/go-pnp v0.0.4
 	go.uber.org/fx v1.20.1
 )
 
