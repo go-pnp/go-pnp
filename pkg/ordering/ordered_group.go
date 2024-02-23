@@ -21,3 +21,7 @@ func (o OrderedItems[T]) Get() []T {
 
 	return result
 }
+
+func Ordered[T any](order int, val T) OrderedItem[T] {
+	return OrderedItem[T]{Value: val, Order: order}
+}

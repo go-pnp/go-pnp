@@ -9,6 +9,7 @@ import (
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/logging"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
+	"github.com/go-pnp/go-pnp/pkg/ordering"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/fx"
 )
@@ -22,16 +23,14 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	moduleBuilder.Provide(NewFiber)
 	moduleBuilder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
 	moduleBuilder.InvokeIf(options.startServer, RegisterStartHooks)
-	if options.fiberConfig != nil {
-		moduleBuilder.Option(fx.Supply(&options.fiberConfig))
-	}
+	moduleBuilder.Option(fx.Supply(options.fiberConfig))
 	return moduleBuilder.Build()
 }
 
 type EndpointRegistrar func(app *fiber.App)
 
 func EndpointRegistrarProvider(target any) any {
-	return fxutil.GroupProvider[EndpointRegistrar](
+	return fxutil.GroupProvider[ordering.OrderedItem[EndpointRegistrar]](
 		"pnp_fiber.endpoint_registrars",
 		target,
 	)
@@ -40,7 +39,7 @@ func EndpointRegistrarProvider(target any) any {
 type NewFiberParams struct {
 	fx.In
 	FiberConfig        *fiber.Config
-	EndpointsRegistrar EndpointRegistrar `group:"pnp_fiber.endpoint_registrars"`
+	EndpointsRegistrar ordering.OrderedItems[EndpointRegistrar] `group:"pnp_fiber.endpoint_registrars"`
 }
 
 func NewFiber(params NewFiberParams) (*fiber.App, error) {
@@ -51,8 +50,8 @@ func NewFiber(params NewFiberParams) (*fiber.App, error) {
 
 	app := fiber.New(configs...)
 
-	for params.EndpointsRegistrar != nil {
-		params.EndpointsRegistrar(app)
+	for _, registrar := range params.EndpointsRegistrar.Get() {
+		registrar(app)
 	}
 
 	return app, nil
