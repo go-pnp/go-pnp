@@ -82,10 +82,10 @@ github.com/go-logfmt/logfmt v0.5.0/go.mod h1:wCYkCAKZfumFQihp8CzCvQ3paCTfi41vtzG
 github.com/go-logfmt/logfmt v0.5.1/go.mod h1:WYhtIu8zTZfxdn5+rREduYbwxfcBr/Vr6KEVveWlfTs=
 github.com/go-pnp/go-pnp v0.0.4 h1:HRWjvovi9RprZ68YQBXCqp2pfdv/q6BQy1WmPerP0Qo=
 github.com/go-pnp/go-pnp v0.0.4/go.mod h1:pWuJqgVhttuOfGWc9nmQOWzhMBHJxfVUI0v2eu5JzW8=
-github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.4 h1:FeY4oXiJ9NkML1SCCby2thVQrpmQnfAAUPlo0IFuIgY=
-github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.4/go.mod h1:lWTQWReaXfDiGiKNLhV0C/EBmslystt8hKekk4Q7MqI=
-github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.4 h1:YR49a0svUnX+3SIYy2+4B6n0GdPzHL5B6dSNNlYtNew=
-github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.4/go.mod h1:zRyaLVz0fqQ3m/oHa+P3psxFVTHes3py9DhwwwLLfvI=
+github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.5 h1:gdjvr411W+9pYyKc58FKgXH4sbFa4HWU1AEVVze659s=
+github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.5/go.mod h1:ZZqujWazsQpKM4QeKxR14cvh+0WroxubyhlG14/Y2UM=
+github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.5 h1:gnqtwU8GsxiX6U3yAjJDtWviG0GAYMiTrODcYUa/hz8=
+github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.5/go.mod h1:/oCIwiQ+1TqQ8h13bPkYl9wregp0UivX5wVdbPCW9JE=
 github.com/go-sql-driver/mysql v1.7.0/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
 github.com/go-sql-driver/mysql v1.7.1 h1:lUIinVbN1DY0xBg0eMOzmmtGoHwWBbvnWubQUrtU8EI=
 github.com/go-sql-driver/mysql v1.7.1/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=

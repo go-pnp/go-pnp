@@ -4,8 +4,8 @@ go 1.22
 
 require (
 	github.com/go-pnp/go-pnp v0.0.4
-	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.4
-	github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.4
+	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.5
+	github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.5
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.18.0
 	go.uber.org/fx v1.20.1
