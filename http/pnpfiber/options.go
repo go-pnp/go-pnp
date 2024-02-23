@@ -18,6 +18,9 @@ type options struct {
 
 	// fiber config to be used
 	fiberConfig *fiber.Config
+
+	// if true, the server will be started on app start
+	startServer bool
 }
 
 func newOptions() *options {
@@ -26,6 +29,7 @@ func newOptions() *options {
 		configFromContainer: false,
 		configPrefix:        "HTTP_SERVER_",
 		fiberConfig:         nil,
+		startServer:         true,
 	}
 }
 
@@ -45,5 +49,11 @@ func WithConfigPrefix(prefix string) optionutil.Option[options] {
 func WithFiberConfig(config fiber.Config) optionutil.Option[options] {
 	return func(o *options) {
 		o.fiberConfig = &config
+	}
+}
+
+func WithStartServer(startServer bool) optionutil.Option[options] {
+	return func(o *options) {
+		o.startServer = startServer
 	}
 }

@@ -19,7 +19,9 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	moduleBuilder := &fxutil.OptionsBuilder{
 		PrivateProvides: options.fxPrivate,
 	}
+	moduleBuilder.Provide(NewFiber)
 	moduleBuilder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
+	moduleBuilder.InvokeIf(options.startServer, RegisterStartHooks)
 	if options.fiberConfig != nil {
 		moduleBuilder.Option(fx.Supply(&options.fiberConfig))
 	}
