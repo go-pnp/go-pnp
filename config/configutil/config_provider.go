@@ -2,6 +2,7 @@ package configutil
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/caarlos0/env/v10"
 	"go.uber.org/fx"
@@ -43,5 +44,29 @@ func NewConfigProvider[T any](opts Options) func() (ConfigProviderResult[T], err
 			Config:       c,
 			ConfigParams: configParams,
 		}, nil
+	}
+}
+
+type DumpConfigInDotEnvFormatParams struct {
+	ConfigParams []env.FieldParams `group:"config_fields"`
+}
+
+func DumpConfigsInDotEnvFormat(params DumpConfigInDotEnvFormatParams) {
+	for _, fieldParams := range params.ConfigParams {
+		var comments []string
+		if fieldParams.Required {
+			comments = append(comments, "required")
+		}
+		if fieldParams.NotEmpty {
+			comments = append(comments, "not empty")
+		}
+		if fieldParams.Expand {
+			comments = append(comments, "expands")
+		}
+		if fieldParams.LoadFile {
+			comments = append(comments, "loaded from file")
+		}
+
+		fmt.Printf("%s=\"%s\" #%s\n", fieldParams.Key, fieldParams.DefaultValue, strings.Join(comments, ","))
 	}
 }

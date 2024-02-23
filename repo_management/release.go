@@ -221,7 +221,7 @@ func (u *Upgrader) Release() {
 			return
 		}
 		tag = fmt.Sprintf("%s/v%s.%s.%d", updatedModule, tagParts[0], tagParts[1], minorVersion+1)
-		fmt.Println("tagging with ", updatedModule+"/"+tag)
+		fmt.Println("tagging with ", tag)
 		_, err = u.repo.CreateTag(tag, commit, &git.CreateTagOptions{
 			Message: "sync module dependencies",
 		})
