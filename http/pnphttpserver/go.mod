@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/http/pnphttpserver
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.4
+	github.com/go-pnp/go-pnp v0.0.5
 	github.com/gorilla/mux v1.8.1
 	github.com/rs/cors v1.10.1
 	go.uber.org/fx v1.20.1

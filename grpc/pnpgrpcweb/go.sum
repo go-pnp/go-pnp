@@ -81,8 +81,8 @@ github.com/go-playground/assert/v2 v2.0.1/go.mod h1:VDjEfimB/XKnb+ZQfWdccd7VUvSc
 github.com/go-playground/locales v0.13.0/go.mod h1:taPMhCMXrRLJO55olJkUXHZBHCxTMfnGwq/HNwmWNS8=
 github.com/go-playground/universal-translator v0.17.0/go.mod h1:UkSxE5sNxxRwHyU+Scu5vgOQjsIJAF8j9muTVoKLVtA=
 github.com/go-playground/validator/v10 v10.2.0/go.mod h1:uOYAAleCW8F/7oMFd6aG0GOhaH6EGOAJShg8Id5JGkI=
-github.com/go-pnp/go-pnp v0.0.4 h1:HRWjvovi9RprZ68YQBXCqp2pfdv/q6BQy1WmPerP0Qo=
-github.com/go-pnp/go-pnp v0.0.4/go.mod h1:pWuJqgVhttuOfGWc9nmQOWzhMBHJxfVUI0v2eu5JzW8=
+github.com/go-pnp/go-pnp v0.0.5 h1:LOD/ZO3LKrZoxcwMysuGkkLSHF9LdQKSK4A0taf7H3A=
+github.com/go-pnp/go-pnp v0.0.5/go.mod h1:pWuJqgVhttuOfGWc9nmQOWzhMBHJxfVUI0v2eu5JzW8=
 github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.5 h1:lxVE/OMibyFdrQgwa7VPTWHQt0QXvhI1Z+Mf8rzNRRk=
 github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.5/go.mod h1:y0AgoPFznsxYBrQ6Je1JZ/91Q9DUTXOoDaUkGS6uQ3M=
 github.com/go-sql-driver/mysql v1.4.0/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=

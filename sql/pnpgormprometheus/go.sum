@@ -80,8 +80,8 @@ github.com/go-logfmt/logfmt v0.3.0/go.mod h1:Qt1PoO58o5twSAckw1HlFXLmHsOX5/0LbT9
 github.com/go-logfmt/logfmt v0.4.0/go.mod h1:3RMwSq7FuexP4Kalkev3ejPJsZTpXXBr9+V4qmtdjCk=
 github.com/go-logfmt/logfmt v0.5.0/go.mod h1:wCYkCAKZfumFQihp8CzCvQ3paCTfi41vtzG1KdI/P7A=
 github.com/go-logfmt/logfmt v0.5.1/go.mod h1:WYhtIu8zTZfxdn5+rREduYbwxfcBr/Vr6KEVveWlfTs=
-github.com/go-pnp/go-pnp v0.0.4 h1:HRWjvovi9RprZ68YQBXCqp2pfdv/q6BQy1WmPerP0Qo=
-github.com/go-pnp/go-pnp v0.0.4/go.mod h1:pWuJqgVhttuOfGWc9nmQOWzhMBHJxfVUI0v2eu5JzW8=
+github.com/go-pnp/go-pnp v0.0.5 h1:LOD/ZO3LKrZoxcwMysuGkkLSHF9LdQKSK4A0taf7H3A=
+github.com/go-pnp/go-pnp v0.0.5/go.mod h1:pWuJqgVhttuOfGWc9nmQOWzhMBHJxfVUI0v2eu5JzW8=
 github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.5 h1:gdjvr411W+9pYyKc58FKgXH4sbFa4HWU1AEVVze659s=
 github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.5/go.mod h1:ZZqujWazsQpKM4QeKxR14cvh+0WroxubyhlG14/Y2UM=
 github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.5 h1:gnqtwU8GsxiX6U3yAjJDtWviG0GAYMiTrODcYUa/hz8=
