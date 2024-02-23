@@ -29,8 +29,14 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 
 type EndpointRegistrar func(app *fiber.App)
 
-func EndpointRegistrarProvider(target any) any {
+func OrderedEndpointRegistrarProvider(target any) any {
 	return fxutil.GroupProvider[ordering.OrderedItem[EndpointRegistrar]](
+		"pnp_fiber.ordered_endpoint_registrars",
+		target,
+	)
+}
+func EndpointRegistrarProvider(target any) any {
+	return fxutil.GroupProvider[EndpointRegistrar](
 		"pnp_fiber.endpoint_registrars",
 		target,
 	)
@@ -38,8 +44,9 @@ func EndpointRegistrarProvider(target any) any {
 
 type NewFiberParams struct {
 	fx.In
-	FiberConfig        *fiber.Config
-	EndpointsRegistrar ordering.OrderedItems[EndpointRegistrar] `group:"pnp_fiber.endpoint_registrars"`
+	FiberConfig               *fiber.Config
+	OrderedEndpointsRegistrar ordering.OrderedItems[EndpointRegistrar] `group:"pnp_fiber.ordered_endpoint_registrars"`
+	EndpointRegistrars        []EndpointRegistrar                      `group:"pnp_fiber.endpoint_registrars"`
 }
 
 func NewFiber(params NewFiberParams) (*fiber.App, error) {
@@ -50,7 +57,11 @@ func NewFiber(params NewFiberParams) (*fiber.App, error) {
 
 	app := fiber.New(configs...)
 
-	for _, registrar := range params.EndpointsRegistrar.Get() {
+	for _, registrar := range params.OrderedEndpointsRegistrar.Get() {
+		registrar(app)
+	}
+
+	for _, registrar := range params.EndpointRegistrars {
 		registrar(app)
 	}
 
