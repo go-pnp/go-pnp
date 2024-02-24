@@ -2,6 +2,7 @@ package configutil
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/caarlos0/env/v10"
@@ -53,7 +54,14 @@ type DumpConfigInDotEnvFormatParams struct {
 }
 
 func DumpConfigsInDotEnvFormat(params DumpConfigInDotEnvFormatParams) {
-	for _, fieldParams := range params.ConfigParams {
+	fieldParams := make([]env.FieldParams, len(params.ConfigParams))
+	copy(fieldParams, params.ConfigParams)
+
+	sort.Slice(fieldParams, func(i, j int) bool {
+		return fieldParams[i].Key > fieldParams[j].Key
+	})
+
+	for _, fieldParams := range fieldParams {
 		var comments []string
 		if fieldParams.Required {
 			comments = append(comments, "required")
@@ -73,6 +81,6 @@ func DumpConfigsInDotEnvFormat(params DumpConfigInDotEnvFormatParams) {
 			commentsStr = " #" + strings.Join(comments, ",")
 		}
 
-		fmt.Printf("%s=\"%s\" #%s\n", fieldParams.Key, fieldParams.DefaultValue, commentsStr)
+		fmt.Printf("%s=\"%s\" %s\n", fieldParams.Key, fieldParams.DefaultValue, commentsStr)
 	}
 }
