@@ -1,5 +1,5 @@
 package pnpsql
 
 type Config struct {
-	DSN string `env:"DSN"`
+	DSN string `env:"DSN,notEmpty"`
 }

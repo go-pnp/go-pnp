@@ -48,6 +48,7 @@ func NewConfigProvider[T any](opts Options) func() (ConfigProviderResult[T], err
 }
 
 type DumpConfigInDotEnvFormatParams struct {
+	fx.In
 	ConfigParams []env.FieldParams `group:"config_fields"`
 }
 
@@ -67,6 +68,11 @@ func DumpConfigsInDotEnvFormat(params DumpConfigInDotEnvFormatParams) {
 			comments = append(comments, "loaded from file")
 		}
 
-		fmt.Printf("%s=\"%s\" #%s\n", fieldParams.Key, fieldParams.DefaultValue, strings.Join(comments, ","))
+		commentsStr := ""
+		if len(comments) > 0 {
+			commentsStr = " #" + strings.Join(comments, ",")
+		}
+
+		fmt.Printf("%s=\"%s\" #%s\n", fieldParams.Key, fieldParams.DefaultValue, commentsStr)
 	}
 }

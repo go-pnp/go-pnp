@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/go-pnp/go-pnp v0.0.5
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.5
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.6
 	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.5
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.0.0
 	github.com/prometheus/client_golang v1.18.0

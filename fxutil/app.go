@@ -3,10 +3,11 @@ package fxutil
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"os"
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"go.uber.org/fx"
 )
 
@@ -17,9 +18,10 @@ type App struct {
 }
 
 func (a *App) Start() error {
-	systemLogger := logrus.New()
-	systemLogger.SetFormatter(&logrus.JSONFormatter{})
-	systemLogger.SetLevel(logrus.DebugLevel)
+	systemLogger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelInfo,
+	}))
 
 	runtimeErrors := make(chan error)
 
@@ -41,7 +43,7 @@ func (a *App) Start() error {
 	err := app.Start(ctx)
 	if err != nil {
 		fmt.Println(fx.VisualizeError(err))
-		systemLogger.WithError(err).Error("failed to start application. stopping...")
+		systemLogger.Error("failed to start application. stopping...", "error", err)
 		stopApp(systemLogger, app)
 
 		return errors.WithStack(err)
@@ -49,18 +51,18 @@ func (a *App) Start() error {
 
 	select {
 	case res := <-a.quitCh:
-		systemLogger.Infof("stopping application...")
+		systemLogger.Info("stopping application...")
 		stopApp(systemLogger, app)
 		res <- struct{}{}
 
 		return nil
 	case signal := <-app.Done():
-		systemLogger.Infof("received %s signal. stopping...", signal)
+		systemLogger.Info(fmt.Sprintf("received %s signal. stopping...", signal))
 		stopApp(systemLogger, app)
 
 		return nil
 	case err := <-runtimeErrors:
-		systemLogger.WithError(err).Error("failed to start application. stopping...")
+		systemLogger.Error("failed to start application. stopping...", "error", err)
 		stopApp(systemLogger, app)
 
 		return err

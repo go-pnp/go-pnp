@@ -7,8 +7,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-pnp/go-pnp v0.0.5 h1:LOD/ZO3LKrZoxcwMysuGkkLSHF9LdQKSK4A0taf7H3A=
 github.com/go-pnp/go-pnp v0.0.5/go.mod h1:pWuJqgVhttuOfGWc9nmQOWzhMBHJxfVUI0v2eu5JzW8=
-github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.5 h1:lxVE/OMibyFdrQgwa7VPTWHQt0QXvhI1Z+Mf8rzNRRk=
-github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.5/go.mod h1:y0AgoPFznsxYBrQ6Je1JZ/91Q9DUTXOoDaUkGS6uQ3M=
+github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.6 h1:8Xr+wr8XI7JsAPDNzOe436n1P+O1sEq+0eF/vcN4taA=
+github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.6/go.mod h1:CWkwLdFhcHXe17HUmPQtxRWVFlGj65kGf7zW+0wHrAQ=
 github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
 github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=

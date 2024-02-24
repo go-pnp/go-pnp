@@ -1,8 +1,6 @@
 package pnpredis
 
 import (
-	"context"
-
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/fx"
 
@@ -16,29 +14,28 @@ func Module() fx.Option {
 		logging.DecorateNamed("redis_client"),
 		fx.Provide(
 			configutil.NewPrefixedConfigProvider[Config]("REDIS_"),
-			NewRedisClient,
+			fx.Annotate(
+				NewRedisClient,
+				fx.OnStop(CloseClient),
+			),
 		),
 	)
 }
 
-func NewRedisClient(lc fx.Lifecycle, config *Config) (*redis.Client, error) {
+func NewRedisClient(config *Config) (*redis.Client, error) {
 	tls, err := config.TLS.TLSConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	client := redis.NewClient(&redis.Options{
+	return redis.NewClient(&redis.Options{
 		Addr:      config.Address,
 		Password:  config.Password,
 		DB:        config.DB,
 		TLSConfig: tls,
-	})
+	}), nil
+}
 
-	lc.Append(fx.Hook{
-		OnStop: func(ctx context.Context) error {
-			return client.Close()
-		},
-	})
-
-	return client, nil
+func CloseClient(client *redis.Client) error {
+	return client.Close()
 }

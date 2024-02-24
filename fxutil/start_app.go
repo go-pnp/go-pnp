@@ -3,11 +3,12 @@ package fxutil
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"os"
 	"time"
 
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"go.uber.org/fx"
 )
 
@@ -16,9 +17,10 @@ import (
 // The runtime errors channel is used to capture any errors that occur during runtime and propagate them
 // back to the main thread.
 func StartApp(options ...fx.Option) error {
-	systemLogger := logrus.New()
-	systemLogger.SetFormatter(&logrus.JSONFormatter{})
-	systemLogger.SetLevel(logrus.DebugLevel)
+	systemLogger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelInfo,
+	}))
 
 	runtimeErrors := make(chan error)
 
@@ -37,7 +39,7 @@ func StartApp(options ...fx.Option) error {
 	err := app.Start(ctx)
 	if err != nil {
 		fmt.Println(fx.VisualizeError(err))
-		systemLogger.WithError(err).Error("failed to start application. stopping...")
+		systemLogger.Error("failed to start application. stopping...", "error", err)
 		stopApp(systemLogger, app)
 
 		return errors.WithStack(err)
@@ -45,23 +47,23 @@ func StartApp(options ...fx.Option) error {
 
 	select {
 	case signal := <-app.Done():
-		systemLogger.Infof("received %s signal. stopping...", signal)
+		systemLogger.Info(fmt.Sprintf("received %s signal. stopping...", signal))
 		stopApp(systemLogger, app)
 
 		return nil
 	case err := <-runtimeErrors:
-		systemLogger.WithError(err).Error("failed to start application. stopping...")
+		systemLogger.Error("failed to start application. stopping...", "error", err)
 		stopApp(systemLogger, app)
 
 		return err
 	}
 }
 
-func stopApp(logger *logrus.Logger, app *fx.App) {
+func stopApp(logger *slog.Logger, app *fx.App) {
 	ctx, cancelFn := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancelFn()
 
 	if err := app.Stop(ctx); err != nil {
-		logger.WithError(err).Error("failed to stop application.")
+		logger.Error("failed to stop application.", "error", err)
 	}
 }

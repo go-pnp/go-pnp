@@ -1,12 +1,13 @@
 module github.com/go-pnp/go-pnp
 
-go 1.21.4
+go 1.22
+
+toolchain go1.22.0
 
 require (
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/joho/godotenv v1.5.1
 	github.com/pkg/errors v0.9.1
-	github.com/sirupsen/logrus v1.9.3
 	go.uber.org/fx v1.20.1
 )
 
