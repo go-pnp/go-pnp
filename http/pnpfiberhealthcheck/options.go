@@ -1,7 +1,7 @@
-package pnphttphealthcheck
+package pnpfiberhealthcheck
 
 import (
-	"net/http"
+	"github.com/gofiber/fiber/v2"
 
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
 )
@@ -11,7 +11,7 @@ type options struct {
 	method              string
 	fxPrivate           bool
 	configFromContainer bool
-	responseWriter      func(alive bool, checkResults map[string]error, w http.ResponseWriter)
+	responseWriter      func(alive bool, checkResults map[string]error, ctx *fiber.Ctx)
 	envConfigPrefix     string
 }
 
@@ -51,7 +51,7 @@ func WithEnvConfigPrefix(prefix string) optionutil.Option[options] {
 	}
 }
 
-func WithResponseWriter(writer func(alive bool, checkResults map[string]error, w http.ResponseWriter)) optionutil.Option[options] {
+func WithResponseWriter(writer func(alive bool, checkResults map[string]error, ctx *fiber.Ctx)) optionutil.Option[options] {
 	return func(o *options) {
 		o.responseWriter = writer
 	}
