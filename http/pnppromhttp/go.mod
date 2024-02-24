@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/go-pnp/go-pnp v0.0.5
-	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.5
+	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.6
 	github.com/gorilla/mux v1.8.1
 	github.com/prometheus/client_golang v1.18.0
 	go.uber.org/fx v1.20.1

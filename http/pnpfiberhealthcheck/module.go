@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/go-pnp/go-pnp/fxutil"
-	"github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck"
 	"github.com/go-pnp/go-pnp/http/pnpfiber"
-	"github.com/go-pnp/go-pnp/logging"
-	"github.com/go-pnp/go-pnp/pkg/optionutil"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/fx"
+
+	"github.com/go-pnp/go-pnp/fxutil"
+	"github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck"
+	"github.com/go-pnp/go-pnp/logging"
+	"github.com/go-pnp/go-pnp/pkg/optionutil"
 )
 
 func Module(opts ...optionutil.Option[options]) fx.Option {
@@ -38,8 +39,8 @@ func WriteResponse(alive bool, checks map[string]error, ctx *fiber.Ctx) {
 	}
 
 	_ = json.NewEncoder(ctx.Response().BodyWriter()).Encode(map[string]interface{}{
-		"alive":  alive,
-		"checks": checks,
+		"alive":       alive,
+		"checkErrors": checks,
 	})
 }
 

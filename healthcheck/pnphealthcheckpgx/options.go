@@ -1,4 +1,4 @@
-package pnphealthchecksql
+package pnphealthcheckpgx
 
 import (
 	"time"
@@ -19,7 +19,7 @@ type options struct {
 
 func newOptions(opts []optionutil.Option[options]) *options {
 	return optionutil.ApplyOptions(&options{
-		name:      "sql",
+		name:      "pgx",
 		fxPrivate: false,
 		timeout:   time.Second * 2,
 	}, opts...)
