@@ -26,8 +26,8 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 func NewHealthChecker(
 	db *sql.DB,
 	options *options,
-) *pnphealthcheck.HealthChecker {
-	return &pnphealthcheck.HealthChecker{
+) pnphealthcheck.HealthChecker {
+	return pnphealthcheck.HealthChecker{
 		Name:    options.name,
 		Timeout: options.timeout,
 		Check: func(ctx context.Context) error {
