@@ -80,12 +80,12 @@ github.com/go-logfmt/logfmt v0.3.0/go.mod h1:Qt1PoO58o5twSAckw1HlFXLmHsOX5/0LbT9
 github.com/go-logfmt/logfmt v0.4.0/go.mod h1:3RMwSq7FuexP4Kalkev3ejPJsZTpXXBr9+V4qmtdjCk=
 github.com/go-logfmt/logfmt v0.5.0/go.mod h1:wCYkCAKZfumFQihp8CzCvQ3paCTfi41vtzG1KdI/P7A=
 github.com/go-logfmt/logfmt v0.5.1/go.mod h1:WYhtIu8zTZfxdn5+rREduYbwxfcBr/Vr6KEVveWlfTs=
-github.com/go-pnp/go-pnp v0.0.5 h1:LOD/ZO3LKrZoxcwMysuGkkLSHF9LdQKSK4A0taf7H3A=
-github.com/go-pnp/go-pnp v0.0.5/go.mod h1:pWuJqgVhttuOfGWc9nmQOWzhMBHJxfVUI0v2eu5JzW8=
-github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.5 h1:gdjvr411W+9pYyKc58FKgXH4sbFa4HWU1AEVVze659s=
-github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.5/go.mod h1:ZZqujWazsQpKM4QeKxR14cvh+0WroxubyhlG14/Y2UM=
-github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.5 h1:gnqtwU8GsxiX6U3yAjJDtWviG0GAYMiTrODcYUa/hz8=
-github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.5/go.mod h1:/oCIwiQ+1TqQ8h13bPkYl9wregp0UivX5wVdbPCW9JE=
+github.com/go-pnp/go-pnp v0.0.6 h1:OczbPUkQIIBajuGTM3f02o7hxNjB8G+Wqy3F3XBsvqQ=
+github.com/go-pnp/go-pnp v0.0.6/go.mod h1:qsZhGzmA1v6glucwchcWTEPzd+SxMX7eCUOVp4Rc57w=
+github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.6 h1:uBIFjp4OTQ5rfZxUN5nCEZiWU8Jqrt1zFr4SnGBVi3c=
+github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.6/go.mod h1:a19/OzxSWACfxAfqna6K2kYFRHqXFM+PeyMvw2vbcTs=
+github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.6 h1:oAbMrKfvteFAGkWMKE2r97kp4JWF0Szeba4MXM/+1k4=
+github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.6/go.mod h1:OVPAkkPUb3+rUTHOQ/n9EKKsyVTneu3YpzVjW0oQt4Q=
 github.com/go-sql-driver/mysql v1.7.0/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
 github.com/go-sql-driver/mysql v1.7.1 h1:lUIinVbN1DY0xBg0eMOzmmtGoHwWBbvnWubQUrtU8EI=
 github.com/go-sql-driver/mysql v1.7.1/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
@@ -245,8 +245,6 @@ github.com/rogpeppe/go-internal v1.10.0/go.mod h1:UQnix2H7Ngw/k4C5ijL5+65zddjncj
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
 github.com/sirupsen/logrus v1.4.2/go.mod h1:tLMulIdttU9McNUspp0xgXVQah82FyeX6MwdIuYE2rE=
 github.com/sirupsen/logrus v1.6.0/go.mod h1:7uNnSEd1DgxDLC74fIahvMZmmYsHGZGEOFrfsX/uA88=
-github.com/sirupsen/logrus v1.9.3 h1:dueUQJ1C2q9oE3F7wvmSGAaVtTmUizReu6fjN8uqzbQ=
-github.com/sirupsen/logrus v1.9.3/go.mod h1:naHLuLoDiP4jHNo9R0sCBMtWGeIprob74mVsIT4qYEQ=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
@@ -423,7 +421,6 @@ golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220114195835-da31bd327af9/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.3.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.5.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=

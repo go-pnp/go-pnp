@@ -3,8 +3,8 @@ module github.com/go-pnp/go-pnp/http/pnpfiberprometheus
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.5
-	github.com/go-pnp/go-pnp/http/pnpfiber v0.0.7
+	github.com/go-pnp/go-pnp v0.0.6
+	github.com/go-pnp/go-pnp/http/pnpfiber v0.0.8
 	github.com/gofiber/fiber/v2 v2.52.1
 	github.com/prometheus/client_golang v1.18.0
 	go.uber.org/fx v1.20.1
@@ -27,7 +27,6 @@ require (
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.52.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect

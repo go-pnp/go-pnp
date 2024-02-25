@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/http/pnpfiber
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.5
+	github.com/go-pnp/go-pnp v0.0.6
 	github.com/gofiber/fiber/v2 v2.52.1
 	go.uber.org/fx v1.20.1
 )
@@ -19,7 +19,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
