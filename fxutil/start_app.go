@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/errors"
 	"go.uber.org/fx"
 )

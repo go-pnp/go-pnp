@@ -7,12 +7,45 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/errors"
 	"go.uber.org/fx"
 )
 
 type JobResult error
+
+func RunJob1[T any](jobFn func(context.Context, T) error, options ...fx.Option) error {
+	return RunJob(
+		fx.Options(options...),
+		fx.Invoke(func(lc fx.Lifecycle, val T, jobResult chan<- JobResult) {
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					go func() {
+						jobResult <- jobFn(ctx, val)
+					}()
+
+					return nil
+				},
+			})
+		}),
+	)
+}
+
+func RunJob2[T, N any](jobFn func(context.Context, T, N) error, options ...fx.Option) error {
+	return RunJob(
+		fx.Options(options...),
+		fx.Invoke(func(lc fx.Lifecycle, val1 T, val2 N, jobResult chan<- JobResult) {
+			lc.Append(fx.Hook{
+				OnStart: func(ctx context.Context) error {
+					go func() {
+						jobResult <- jobFn(ctx, val1, val2)
+					}()
+
+					return nil
+				},
+			})
+		}),
+	)
+}
 
 // RunJob creates and starts application and waits for JobResult. It's useful when you want to run a job like db migrations apply.
 func RunJob(options ...fx.Option) error {

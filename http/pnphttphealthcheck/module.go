@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck"
 	"github.com/go-pnp/go-pnp/http/pnphttpserver"
 	"github.com/gorilla/mux"
 	"go.uber.org/fx"
-
-	"github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck"
 
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/logging"
