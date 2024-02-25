@@ -17,7 +17,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	moduleBuilder := &fxutil.OptionsBuilder{
 		PrivateProvides: options.fxPrivate,
 	}
-	moduleBuilder.Option(fx.Supply(options))
+	fxutil.OptionsBuilderSupply(moduleBuilder, options)
 	moduleBuilder.Provide(pnpfiber.EndpointRegistrarProvider(NewPrometheusEndpointRegistrarProvider))
 
 	return moduleBuilder.Build()
