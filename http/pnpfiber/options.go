@@ -16,6 +16,9 @@ type options struct {
 	// default is HTTP_SERVER_
 	configPrefix string
 
+	// if true, the fiber config will be consumed from outside
+	fiberConfigFromContainer bool
+
 	// fiber config to be used
 	fiberConfig *fiber.Config
 

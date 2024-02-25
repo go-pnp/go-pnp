@@ -24,6 +24,10 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	moduleBuilder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
 	moduleBuilder.InvokeIf(options.startServer, RegisterStartHooks)
 	fxutil.OptionsBuilderSupply(moduleBuilder, options)
+	if !options.fiberConfigFromContainer {
+		fxutil.OptionsBuilderSupply(moduleBuilder, options.fiberConfig)
+	}
+
 	return moduleBuilder.Build()
 }
 
@@ -44,7 +48,7 @@ func EndpointRegistrarProvider(target any) any {
 
 type NewFiberParams struct {
 	fx.In
-	FiberConfig               *fiber.Config
+	FiberConfig               *fiber.Config                            `optional:"true"`
 	OrderedEndpointsRegistrar ordering.OrderedItems[EndpointRegistrar] `group:"pnp_fiber.ordered_endpoint_registrars"`
 	EndpointRegistrars        []EndpointRegistrar                      `group:"pnp_fiber.endpoint_registrars"`
 }
