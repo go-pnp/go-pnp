@@ -44,7 +44,6 @@ func WithFxPrivate() optionutil.Option[options] {
 
 func WithConfigPrefix(prefix string) optionutil.Option[options] {
 	return func(o *options) {
-		o.configFromContainer = true
 		o.configPrefix = prefix
 	}
 }
