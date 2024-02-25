@@ -12,8 +12,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-pnp/go-pnp v0.0.6 h1:OczbPUkQIIBajuGTM3f02o7hxNjB8G+Wqy3F3XBsvqQ=
 github.com/go-pnp/go-pnp v0.0.6/go.mod h1:qsZhGzmA1v6glucwchcWTEPzd+SxMX7eCUOVp4Rc57w=
-github.com/go-pnp/go-pnp/http/pnpfiber v0.0.8 h1:CarajxWcZggxNkq5T6Iv7a7z8RjcPXtvg2lzmbPMTDg=
-github.com/go-pnp/go-pnp/http/pnpfiber v0.0.8/go.mod h1:yVlMCB0w42Bvh0I2nLXn9g48rs2ZgZ2C8lBXbQuCgms=
+github.com/go-pnp/go-pnp/http/pnpfiber v0.0.9 h1:ux/aMgfG9UP/ovX4J2SJAdbSz6Zh/ujm4cklq4ZUGPo=
+github.com/go-pnp/go-pnp/http/pnpfiber v0.0.9/go.mod h1:qld33isfLoLanDyKwcGwUX/1v48PhwLPI9nQXltxx58=
 github.com/gofiber/fiber/v2 v2.52.1 h1:1RoU2NS+b98o1L77sdl5mboGPiW+0Ypsi5oLmcYlgHI=
 github.com/gofiber/fiber/v2 v2.52.1/go.mod h1:KEOE+cXMhXG0zHc9d8+E38hoX+ZN7bhOtgeF2oT6jrQ=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=

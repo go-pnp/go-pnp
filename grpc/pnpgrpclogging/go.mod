@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/go-pnp/go-pnp v0.0.6
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.6
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.7
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
 	go.uber.org/fx v1.20.1
 	google.golang.org/grpc v1.62.0

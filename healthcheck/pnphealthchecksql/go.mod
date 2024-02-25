@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/go-pnp/go-pnp v0.0.6
-	github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.1
+	github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.2
 	go.uber.org/fx v1.20.1
 )
 
