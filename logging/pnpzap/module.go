@@ -1,6 +1,7 @@
 package pnpzap
 
 import (
+	"github.com/go-pnp/go-pnp/pnpenv"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -24,8 +25,20 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	return builder.Build()
 }
 
-func NewZapLoggerConfig(config *Config) zap.Config {
-	return config.EnvironmentConfig()
+func NewZapLoggerConfig(env pnpenv.Environment, config *Config) zap.Config {
+	atomicLevel := config.ZapAtomicLevel()
+	switch {
+	case env.IsDev():
+		config := zap.NewDevelopmentConfig()
+		config.Level = atomicLevel
+
+		return config
+	default:
+		config := zap.NewProductionConfig()
+		config.Level = atomicLevel
+
+		return config
+	}
 }
 
 func ZapHookProvider(target any) any {

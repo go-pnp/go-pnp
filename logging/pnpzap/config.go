@@ -7,8 +7,7 @@ import (
 )
 
 type Config struct {
-	Environment string `env:"ENVIRONMENT" envDefault:"production"`
-	LogLevel    string `env:"LOG_LEVEL" envDefault:"info"`
+	LogLevel string `env:"LOG_LEVEL" envDefault:"info"`
 }
 
 func (c *Config) ZapAtomicLevel() zap.AtomicLevel {
@@ -24,22 +23,4 @@ func (c *Config) ZapAtomicLevel() zap.AtomicLevel {
 	}
 
 	return zap.NewAtomicLevelAt(zap.InfoLevel)
-}
-
-func (c *Config) EnvironmentConfig() zap.Config {
-	switch strings.TrimSpace(strings.ToLower(c.Environment)) {
-	case "d", "dev", "development":
-		config := zap.NewDevelopmentConfig()
-		config.Level = c.ZapAtomicLevel()
-
-		return config
-	case "p", "prod", "production":
-		config := zap.NewProductionConfig()
-		config.Level = c.ZapAtomicLevel()
-
-		return config
-
-	}
-
-	return zap.NewProductionConfig()
 }
