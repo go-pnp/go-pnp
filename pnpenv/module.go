@@ -34,7 +34,7 @@ func (e Environment) IsTest() bool {
 }
 
 type Config struct {
-	Environment string `env:"ENVIRONMENT,notEmpty" envDefault:"development"`
+	Environment Environment `env:"ENVIRONMENT,notEmpty" envDefault:"development"`
 }
 
 func Module() fx.Option {
