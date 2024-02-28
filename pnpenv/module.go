@@ -41,6 +41,11 @@ func Module() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			configutil.NewConfigProvider[Config](env.Options{}),
+			NewEnvironment,
 		),
 	)
+}
+
+func NewEnvironment(config *Config) Environment {
+	return config.Environment
 }
