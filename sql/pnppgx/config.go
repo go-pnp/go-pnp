@@ -3,7 +3,7 @@ package pnppgx
 import "time"
 
 type Config struct {
-	DSN string `env:"DSN,notEmpty"`
+	DSN string `env:"DSN,notEmpty,expand"`
 
 	MaxOpenConnections    int           `env:"MAX_OPEN_CONNECTIONS" envDefault:"5"`
 	MaxIdleConnections    int           `env:"MAX_IDLE_CONNECTIONS" envDefault:"5"`
