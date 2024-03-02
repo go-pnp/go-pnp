@@ -35,7 +35,7 @@ func (h *HealthResolver) Resolve(ctx context.Context) (map[string]error, bool) {
 		wg.Add(1)
 		go func(checker HealthChecker) {
 			defer wg.Done()
-			err := checker.Check(ctx)
+			err := checker.check(ctx)
 			if err != nil {
 				hasError = true
 			}

@@ -15,5 +15,5 @@ func (c *HealthChecker) check(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, c.Timeout)
 	defer cancel()
 
-	return c.check(ctx)
+	return c.Check(ctx)
 }
