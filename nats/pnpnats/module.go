@@ -43,7 +43,7 @@ type NewNatsClientParams struct {
 	Config        *Config
 	ClientOptions []nats.Option `group:"pnpnats.client_options"`
 	Lc            fx.Lifecycle
-	RuntimeErr    chan<- error
+	Shutdowner    fx.Shutdowner
 }
 
 func NewNatsClient(params NewNatsClientParams) (*nats.Conn, error) {

@@ -19,6 +19,7 @@ import (
 	"github.com/go-pnp/go-pnp/fxutil"
 )
 
+// Module provides *grpc.Server to fx container.
 func Module(opts ...optionutil.Option[options]) fx.Option {
 	options := optionutil.ApplyOptions(&options{
 		start:        true,
@@ -29,11 +30,17 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 
+	for _, opt := range options.serverOptions {
+		option := opt
+
+		builder.Provide(ServerOptionProvider(func() grpc.ServerOption {
+			return option
+		}))
+	}
+
 	builder.Provide(NewGRPCServer)
-	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](
-		configutil.Options{Prefix: options.configPrefix},
-	))
-	builder.ProvideIf(options.reflection, ServiceRegistrarProvider(func() ServiceRegistrar {
+	builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
+	builder.ProvideIf(options.reflection, ServiceRegistrarProvider(func() ServiceRegistrarFunc {
 		return func(server *grpc.Server) {
 			reflection.Register(server)
 		}
@@ -44,14 +51,14 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	return builder.Build()
 }
 
-type ServiceRegistrar func(server *grpc.Server)
+type ServiceRegistrar interface {
+	Register(server *grpc.Server)
+}
 
-func NewServiceRegistrarProvider[T any](registerFunc func(s grpc.ServiceRegistrar, srv T)) any {
-	return ServiceRegistrarProvider(func(handler T) ServiceRegistrar {
-		return func(server *grpc.Server) {
-			registerFunc(server, handler)
-		}
-	})
+type ServiceRegistrarFunc func(server *grpc.Server)
+
+func (f ServiceRegistrarFunc) Register(server *grpc.Server) {
+	f(server)
 }
 
 func ServiceRegistrarProvider(target any) any {
@@ -65,7 +72,7 @@ func StreamInterceptorProvider(target any) any {
 }
 
 func ServerOptionProvider(target any) any {
-	return fxutil.GroupProvider[ordering.OrderedItem[grpc.StreamServerInterceptor]]("pnpgrpcserver.server_options", target)
+	return fxutil.GroupProvider[grpc.ServerOption]("pnpgrpcserver.server_options", target)
 }
 
 type NewGRPCServerParams struct {
@@ -109,7 +116,7 @@ func NewGRPCServer(params NewGRPCServerParams) (*grpc.Server, error) {
 	params.Logger.Debug(context.Background(), "Calling %d service registrars...", len(params.ServiceRegistrars))
 	for _, reg := range params.ServiceRegistrars {
 		if reg != nil {
-			reg(server)
+			reg.Register(server)
 		}
 	}
 
@@ -118,7 +125,7 @@ func NewGRPCServer(params NewGRPCServerParams) (*grpc.Server, error) {
 
 type RegisterStartHooksParams struct {
 	fx.In
-	RuntimeErr chan<- error
+	Shutdowner fx.Shutdowner
 	Server     *grpc.Server
 	Config     *Config
 	Lc         fx.Lifecycle
@@ -137,7 +144,8 @@ func RegisterStartHooks(params RegisterStartHooksParams) {
 
 			go func() {
 				if err := params.Server.Serve(listener); err != nil {
-					params.RuntimeErr <- err
+					params.Logger.WithError(err).Error(ctx, "gRPC server serve error")
+					params.Shutdowner.Shutdown()
 				}
 			}()
 

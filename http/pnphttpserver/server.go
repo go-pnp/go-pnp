@@ -76,11 +76,11 @@ func NewMux(params NewMuxParams) http.Handler {
 
 type RegisterStartHooksParams struct {
 	fx.In
-	RuntimeErrors chan<- error
-	Lc            fx.Lifecycle
-	Logger        *logging.Logger `optional:"true"`
-	Config        *Config
-	Server        *http.Server
+	Shutdowner fx.Shutdowner
+	Lc         fx.Lifecycle
+	Logger     *logging.Logger `optional:"true"`
+	Config     *Config
+	Server     *http.Server
 }
 
 func RegisterStartHooks(params RegisterStartHooksParams) {
@@ -101,7 +101,7 @@ func RegisterStartHooks(params RegisterStartHooksParams) {
 				}
 				if err != nil && err != http.ErrServerClosed {
 					logger.WithError(err).Error(ctx, "Error starting HTTP server")
-					params.RuntimeErrors <- err
+					params.Shutdowner.Shutdown()
 				}
 			}()
 			return nil

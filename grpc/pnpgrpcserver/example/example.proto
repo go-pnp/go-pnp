@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option go_package = "github.com/go-pnp/go-pnp/grpc/pnpgrpcserver/example";
+
+service TestService{
+    rpc Test(TestRequest) returns (TestResponse);
+}
+
+message TestRequest{
+    string name = 1;
+}
+message TestResponse{
+    string message = 1;
+}

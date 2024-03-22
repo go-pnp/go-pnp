@@ -2,6 +2,7 @@ package pnpgrpcserver
 
 import (
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
+	"google.golang.org/grpc"
 )
 
 type options struct {
@@ -10,6 +11,7 @@ type options struct {
 	configFromContainer bool
 	configPrefix        string
 	reflection          bool
+	serverOptions       []grpc.ServerOption
 }
 
 func Start(start bool) optionutil.Option[options] {
@@ -40,5 +42,11 @@ func WithConfigPrefix(prefix string) optionutil.Option[options] {
 func WithReflection() optionutil.Option[options] {
 	return func(o *options) {
 		o.reflection = true
+	}
+}
+
+func WithServerOptions(opts ...grpc.ServerOption) optionutil.Option[options] {
+	return func(o *options) {
+		o.serverOptions = append(o.serverOptions, opts...)
 	}
 }

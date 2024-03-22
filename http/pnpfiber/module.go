@@ -74,11 +74,11 @@ func NewFiber(params NewFiberParams) (*fiber.App, error) {
 
 type RegisterStartHooksParams struct {
 	fx.In
-	RuntimeErrors chan<- error
-	Lc            fx.Lifecycle
-	Logger        *logging.Logger `optional:"true"`
-	Config        *Config
-	App           *fiber.App
+	Shutdowner fx.Shutdowner
+	Lc         fx.Lifecycle
+	Logger     *logging.Logger `optional:"true"`
+	Config     *Config
+	App        *fiber.App
 }
 
 func RegisterStartHooks(params RegisterStartHooksParams) {
@@ -101,7 +101,7 @@ func RegisterStartHooks(params RegisterStartHooksParams) {
 					httpListener, err := net.Listen("tcp", params.Config.Addr)
 					if err != nil {
 						logger.WithError(err).Error(ctx, "Error creating TCP listener")
-						params.RuntimeErrors <- err
+						params.Shutdowner.Shutdown()
 						return
 					}
 
@@ -112,7 +112,7 @@ func RegisterStartHooks(params RegisterStartHooksParams) {
 				}
 				if err != nil {
 					logger.WithError(err).Error(ctx, "Error starting Fiber HTTP server")
-					params.RuntimeErrors <- err
+					params.Shutdowner.Shutdown()
 				}
 			}()
 			return nil
