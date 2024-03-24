@@ -1,17 +1,15 @@
-package example
+package main
 
 import (
 	"context"
 	"fmt"
 	"os"
-	"testing"
 	"time"
 
-	"github.com/go-pnp/go-pnp/pkg/ordering"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 
-	"github.com/go-pnp/go-pnp/fxutil"
+	"github.com/go-pnp/go-pnp/pkg/ordering"
 
 	"github.com/go-pnp/go-pnp/grpc/pnpgrpcserver"
 )
@@ -28,7 +26,7 @@ func NewHandler() *Handler {
 	return &Handler{}
 }
 
-func TestApp(t *testing.T) {
+func main() {
 	os.Setenv("GRPC_LISTEN_ADDR", "localhost:50051")
 	/*
 		os.Setenv("GRPC_TLS_ENABLED", "true")
@@ -37,7 +35,7 @@ func TestApp(t *testing.T) {
 		os.Setenv("GRPC_TLS_CLIENT_AUTH", "require_and_verify_client_cert")
 		os.Setenv("GRPC_TLS_CLIENT_CA_PATHS", "ca.pem")
 	*/
-	fxutil.StartApp(
+	fx.New(
 		pnpgrpcserver.Module(
 			// Add fx.Private to all module provides
 			pnpgrpcserver.WithFxPrivate(),
@@ -73,5 +71,5 @@ func TestApp(t *testing.T) {
 			}),
 			fx.Private,
 		),
-	)
+	).Run()
 }
