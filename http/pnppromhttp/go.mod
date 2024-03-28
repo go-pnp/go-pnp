@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/http/pnppromhttp
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.6
+	github.com/go-pnp/go-pnp v0.0.12-0.20240328153645-273b2b88652f
 	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.7
 	github.com/gorilla/mux v1.8.1
 	github.com/prometheus/client_golang v1.18.0

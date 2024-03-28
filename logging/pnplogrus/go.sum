@@ -1,0 +1,6 @@
+github.com/go-pnp/go-pnp v0.0.12-0.20240328153136-a022d61fcdac h1:GqxLJDB2INPArnNpyJE72oQgFMgw5h9Elvcryawhlac=
+github.com/go-pnp/go-pnp v0.0.12-0.20240328153136-a022d61fcdac/go.mod h1:rMBKYu3MS+Wq9xukLZUTXztjDzKUynfj+hikcu8OSc0=
+github.com/go-pnp/go-pnp v0.0.12-0.20240328153501-ea455d3aed6a h1:7S6vshNyIj+SJwohVrcNkjfLzI9g6ucrJFIdPHMBrDU=
+github.com/go-pnp/go-pnp v0.0.12-0.20240328153501-ea455d3aed6a/go.mod h1:rMBKYu3MS+Wq9xukLZUTXztjDzKUynfj+hikcu8OSc0=
+github.com/go-pnp/go-pnp v0.0.12-0.20240328153645-273b2b88652f h1:t8b8Rkx9KDWkkJ5R84zmfWDlYS5LR4mNZcs2SZ/ITcc=
+github.com/go-pnp/go-pnp v0.0.12-0.20240328153645-273b2b88652f/go.mod h1:rMBKYu3MS+Wq9xukLZUTXztjDzKUynfj+hikcu8OSc0=

@@ -3,6 +3,7 @@ package pnpgorm
 import (
 	"context"
 
+	"github.com/go-pnp/go-pnp/config/configutil"
 	"go.uber.org/fx"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
@@ -10,16 +11,13 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	"github.com/go-pnp/go-pnp/config/configutil"
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/logging"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
 )
 
 func Module(driver string, opts ...optionutil.Option[options]) fx.Option {
-	options := optionutil.ApplyOptions(&options{
-		configPrefix: "DB_",
-	}, opts...)
+	options := newOptions(opts)
 
 	builder := &fxutil.OptionsBuilder{
 		PrivateProvides: options.fxPrivate,
@@ -27,17 +25,20 @@ func Module(driver string, opts ...optionutil.Option[options]) fx.Option {
 	switch driver {
 	case "mysql":
 		builder.Provide(NewMySQLDialector)
+		builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
+		builder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config](options.configPrefix))
 	case "postgres":
 		builder.Provide(NewPostgresDialector)
+		builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
+		builder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config](options.configPrefix))
 	case "sqlite":
 		builder.Provide(NewSQLiteDialector)
+		builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[SQLiteConfig](options.configPrefix))
+		builder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[SQLiteConfig](options.configPrefix))
 	default:
 		panic("unsupported driver")
 	}
 	builder.Provide(NewGormDBProvider(options))
-	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](configutil.Options{
-		Prefix: options.configPrefix,
-	}))
 
 	return builder.Build()
 }
@@ -48,8 +49,8 @@ func NewMySQLDialector(config *Config) gorm.Dialector {
 func NewPostgresDialector(config *Config) gorm.Dialector {
 	return postgres.Open(config.DSN)
 }
-func NewSQLiteDialector(config *Config) gorm.Dialector {
-	return sqlite.Open(config.SQLiteDB)
+func NewSQLiteDialector(config *SQLiteConfig) gorm.Dialector {
+	return sqlite.Open(config.Path)
 }
 func PluginProvider(target any) any {
 	return fxutil.GroupProvider[gorm.Plugin]("pnpgorm.gorm_plugins", target)

@@ -21,6 +21,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 
 	builder.ProvideIf(!options.zapConfigFromContainer, NewZapLoggerConfig)
 	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](configutil.Options{}))
+	builder.PublicProvideIf(!options.configFromContainer, configutil.NewConfigInfoProvider[Config](configutil.Options{}))
 
 	return builder.Build()
 }

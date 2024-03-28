@@ -21,9 +21,8 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	}
 	builder.Provide(NewNatsClient)
 
-	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](configutil.Options{
-		Prefix: "NATS_",
-	}))
+	builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config]("NATS_"))
+	builder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config]("NATS_"))
 	builder.ProvideIf(options.jetStream, NewJetstream)
 	builder.InvokeIf(options.jetStreamSubscribe, RegisterJetStreamSubscriptionHooks)
 

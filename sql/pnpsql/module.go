@@ -12,18 +12,15 @@ import (
 )
 
 func Module(driver string, opts ...optionutil.Option[options]) fx.Option {
-	options := optionutil.ApplyOptions(&options{
-		configPrefix: "DB_",
-	}, opts...)
+	options := newOptions(opts)
 
 	builder := &fxutil.OptionsBuilder{
 		PrivateProvides: options.fxPrivate,
 	}
 
 	builder.Provide(NewSqlDBProvider(driver, options.configPrefix))
-	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](configutil.Options{
-		Prefix: options.configPrefix,
-	}))
+	builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
+	builder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config](options.configPrefix))
 
 	return builder.Build()
 }

@@ -13,7 +13,7 @@ type options struct {
 	// if configFromContainer is true, module will not provide his config into di container
 	configFromContainer bool
 
-	configEnvPrefix string
+	configPrefix string
 
 	// if stdDB == true, module will provide *sql.DB into provider instead of *pgx.Conn
 	stdDB bool
@@ -25,7 +25,7 @@ func newOptions(opts []optionutil.Option[options]) *options {
 	result := &options{
 		fxPrivate:           false,
 		configFromContainer: false,
-		configEnvPrefix:     "DB_",
+		configPrefix:        "DB_",
 		stdDB:               false,
 		initialPingTimeout:  time.Second * 2,
 	}
@@ -50,7 +50,7 @@ func WithConfigFromContainer() optionutil.Option[options] {
 // WithEnvConfigPrefix is an option to set config env prefix for config provider.
 func WithEnvConfigPrefix(prefix string) optionutil.Option[options] {
 	return func(o *options) {
-		o.configEnvPrefix = prefix
+		o.configPrefix = prefix
 	}
 }
 

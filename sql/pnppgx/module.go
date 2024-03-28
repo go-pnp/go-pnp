@@ -23,9 +23,8 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	}
 
 	fxutil.OptionsBuilderSupply(builder, options)
-	builder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](configutil.Options{
-		Prefix: options.configEnvPrefix,
-	}))
+	builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
+	builder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config](options.configPrefix))
 
 	builder.ProvideIf(options.stdDB, fx.Annotate(
 		NewPgxStdConnection,

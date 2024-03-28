@@ -7,7 +7,6 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/go-pnp/go-pnp/config/configutil"
-	"github.com/go-pnp/go-pnp/fxutil"
 )
 
 type Config struct {
@@ -24,8 +23,6 @@ func main() {
 		fx.Provide(
 			configutil.NewPrefixedConfigProvider[Config]("TST_"),
 			configutil.NewPrefixedConfigInfoProvider[Config]("TST_"),
-			configutil.NewPrefixedConfigProvider[fxutil.Config]("TST1_"),
-			configutil.NewPrefixedConfigInfoProvider[fxutil.Config]("TST1_"),
 		),
 		// Print info about all provided configs
 		fx.Invoke(func(params configutil.ConfigsInfoIn) {

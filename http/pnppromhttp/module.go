@@ -9,7 +9,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/fx"
 
-	"github.com/go-pnp/go-pnp/config/configutil"
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/http/pnphttpserver"
 	"github.com/go-pnp/go-pnp/logging"
@@ -19,18 +18,13 @@ import (
 type MetricsHandler http.HandlerFunc
 
 func Module(opts ...optionutil.Option[options]) fx.Option {
-	options := optionutil.ApplyOptions(&options{
-		registerInMux: true,
-	}, opts...)
+	options := newOptions(opts...)
 
 	moduleBuilder := &fxutil.OptionsBuilder{
 		PrivateProvides: options.fxPrivate,
 	}
 	moduleBuilder.Provide(NewHealthcheckHandler)
-	moduleBuilder.ProvideIf(
-		!options.configFromContainer,
-		configutil.NewPrefixedConfigProvider[Config]("PROMETHEUS_HANDLER_"),
-	)
+	fxutil.OptionsBuilderSupply(moduleBuilder, options)
 	moduleBuilder.ProvideIf(options.registerInMux, pnphttpserver.MuxHandlerRegistrarProvider(NewMuxHandlerRegistrar))
 
 	return moduleBuilder.Build()
@@ -44,14 +38,19 @@ func NewHealthcheckHandler(registry *prometheus.Registry) MetricsHandler {
 
 type NewMuxHandlerRegistrarParams struct {
 	fx.In
-	Config  *Config
 	Handler MetricsHandler
 	Logger  *logging.Logger `optional:"true"`
+	Options *options
 }
 
 func NewMuxHandlerRegistrar(params NewMuxHandlerRegistrarParams) pnphttpserver.MuxHandlerRegistrar {
+	endpoint := params.Options.endpoint
 	return func(mux *mux.Router) {
-		params.Logger.Named("promhttp").Debug(context.Background(), "Registering metrics handler")
-		mux.Methods(params.Config.Method).Path(params.Config.Path).HandlerFunc(params.Handler)
+		params.Logger.Named("promhttp").WithFields(map[string]interface{}{
+			"path":   endpoint.path,
+			"method": endpoint.method,
+		}).Debug(context.Background(), "Registering metrics handler")
+
+		mux.Methods(endpoint.method).Path(endpoint.path).HandlerFunc(params.Handler)
 	}
 }

@@ -11,6 +11,12 @@ type options struct {
 	enableLogger        bool
 }
 
+func newOptions(opts []optionutil.Option[options]) *options {
+	return optionutil.ApplyOptions(&options{
+		configPrefix: "DB_",
+	}, opts...)
+}
+
 // WithFxPrivate is an option to add fx.Private to all module provides.
 func WithFxPrivate() optionutil.Option[options] {
 	return func(o *options) {

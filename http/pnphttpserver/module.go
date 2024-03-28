@@ -20,10 +20,8 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	}
 	moduleBuilder.Provide(NewServer)
 	moduleBuilder.ProvideIf(options.provideMux, NewMux)
-	moduleBuilder.ProvideIf(!options.configFromContainer, configutil.NewConfigProvider[Config](
-		configutil.Options{Prefix: options.configPrefix},
-	))
-
+	moduleBuilder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
+	moduleBuilder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config](options.configPrefix))
 	moduleBuilder.InvokeIf(options.start, RegisterStartHooks)
 
 	return moduleBuilder.Build()

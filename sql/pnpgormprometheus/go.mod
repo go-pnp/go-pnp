@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/sql/pnpgormprometheus
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.6
+	github.com/go-pnp/go-pnp v0.0.12-0.20240328153645-273b2b88652f
 	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.7
 	github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.7
 	github.com/pkg/errors v0.9.1

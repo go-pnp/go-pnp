@@ -1,8 +1,6 @@
-package pnpsql
+package pnpredis
 
-import (
-	"github.com/go-pnp/go-pnp/pkg/optionutil"
-)
+import "github.com/go-pnp/go-pnp/pkg/optionutil"
 
 type options struct {
 	fxPrivate           bool
@@ -12,7 +10,7 @@ type options struct {
 
 func newOptions(opts []optionutil.Option[options]) *options {
 	return optionutil.ApplyOptions(&options{
-		configPrefix: "DB_",
+		configPrefix: "REDIS_",
 	}, opts...)
 }
 
@@ -23,14 +21,12 @@ func WithFxPrivate() optionutil.Option[options] {
 	}
 }
 
-// WithConfigFromContainer if used, module will not provide config, but will use config already provided to fx di container.
 func WithConfigFromContainer() optionutil.Option[options] {
 	return func(o *options) {
 		o.configFromContainer = true
 	}
 }
 
-// WithConfigPrefix is an option to set config prefix for config provider.
 func WithConfigPrefix(prefix string) optionutil.Option[options] {
 	return func(o *options) {
 		o.configPrefix = prefix
