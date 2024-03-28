@@ -57,6 +57,11 @@ func (m *OptionsBuilder) Provide(fns ...interface{}) {
 func (m *OptionsBuilder) PublicProvide(fns ...interface{}) {
 	m.options = append(m.options, fx.Provide(fns...))
 }
+func (m *OptionsBuilder) PublicProvideIf(condition bool, fns ...interface{}) {
+	if condition {
+		m.options = append(m.options, fx.Provide(fns...))
+	}
+}
 
 func (m *OptionsBuilder) Option(opts ...fx.Option) {
 	m.options = append(m.options, opts...)
