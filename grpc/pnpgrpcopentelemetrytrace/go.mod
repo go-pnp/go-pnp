@@ -1,12 +1,12 @@
-module github.com/go-pnp/go-pnp/grpc/pnpgrpcopentelemetry
+module github.com/go-pnp/go-pnp/grpc/pnpgrpcopentelemetrytrace
 
 go 1.22
 
 require (
 	github.com/go-pnp/go-pnp v0.0.6
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient v0.0.0-00010101000000-000000000000
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.7
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcopentelemetry v0.0.0-00010101000000-000000000000
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.48.0
+	go.opentelemetry.io/otel/sdk v1.23.1
 	go.uber.org/fx v1.20.1
 	google.golang.org/grpc v1.62.0
 )
@@ -15,6 +15,8 @@ require (
 	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient v0.0.0-00010101000000-000000000000 // indirect
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.7 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -31,4 +33,8 @@ require (
 	google.golang.org/protobuf v1.32.0 // indirect
 )
 
-replace github.com/go-pnp/go-pnp/grpc/pnpgrpcclient => ../pnpgrpcclient
+replace (
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient => ../pnpgrpcclient
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcopentelemetry => ../pnpgrpcopentelemetry
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver => ../pnpgrpcserver
+)

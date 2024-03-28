@@ -67,26 +67,34 @@ Go PnP Framework uses the following concepts:
   functionality to the framework.
 
 ## List of Modules
-
+- [x] [Healthcheck](https://github.com/go-pnp/go-pnp/tree/master/healthcheck/pnphealthcheck)
 - [x] [HTTP Server](https://github.com/go-pnp/go-pnp/tree/master/http/pnphttpserver)
-    - [ ] HTTP middleware for logging, metrics aggregation, and tracing
+  - [ ] HTTP middleware for logging, metrics aggregation, and tracing
+- [x] [Fiber HTTP Server](https://github.com/go-pnp/go-pnp/tree/master/http/pnpfiber)
+  - Endpoints
+    - [x] [Healthcheck](https://github.com/go-pnp/go-pnp/tree/master/http/pnpfiberhealthcheck)
+    - [x] [Prometheus](https://github.com/go-pnp/go-pnp/tree/master/http/pnpfiberprometheus)
+  - Middleware
+    - [ ] Fiber opentelemetry
 - [x] [Zap logging](https://github.com/go-pnp/go-pnp/tree/master/logging/pnpzap)
-    - [ ] Zap hooks for sentry
+  - [ ] Zap hooks for sentry
 - [ ] Logrus logging
-    - [ ] Logrus hooks for sentry
+  - [ ] Logrus hooks for sentry
 - [x] [gRPC Server](https://github.com/go-pnp/go-pnp/tree/master/grpc/pnpgrpcserver)
-    - [ ] gRPC interceptors for logging, metrics aggregation, and tracing
+  - [ ] gRPC interceptors for logging, metrics aggregation, and tracing
+- [x] [gRPC Client](https://github.com/go-pnp/go-pnp/tree/master/grpc/pnpgrpcclient)
+- [x] [gRPC Web](https://github.com/go-pnp/go-pnp/tree/master/grpc/pnpgrpcweb)
 - [x] [SQL](https://github.com/go-pnp/go-pnp/tree/master/sql/pnpsql)
 - [x] [SQLx](https://github.com/go-pnp/go-pnp/tree/master/sql/pnpsqlx)
+- [x] [Gorm](https://github.com/go-pnp/go-pnp/tree/master/sql/pnpgorm)
+- [x] [Pgx](https://github.com/go-pnp/go-pnp/tree/master/sql/pnppgx)
 - [ ] Nats
-    - [x] [JetStream Subscriptions](https://github.com/go-pnp/go-pnp/tree/master/nats/pnpnats)
-    - [ ] Regular Subscriptions
-- [ ] gRPC Web
+  - [x] [JetStream Subscriptions](https://github.com/go-pnp/go-pnp/tree/master/nats/pnpnats)
+  - [ ] Regular Subscriptions
+
 - [x] [Prometheus metrics server](https://github.com/go-pnp/go-pnp/tree/master/prometheus/pnpprometheus)
-- [ ] Jaeger tracing
-- [ ] Redis
+- [x] [Redis](https://github.com/go-pnp/go-pnp/tree/master/pnpredis)
 - [ ] Sarama client
-- [ ] Redis client
 - [ ] TODO: Add more modules
 
 ## Usage Examples

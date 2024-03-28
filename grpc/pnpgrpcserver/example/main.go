@@ -18,6 +18,10 @@ type Handler struct {
 	UnimplementedTestServiceServer
 }
 
+func (h *Handler) Test(context.Context, *TestRequest) (*TestResponse, error) {
+	return &TestResponse{Message: "Hello, world!"}, nil
+}
+
 func (h *Handler) Register(server *grpc.Server) {
 	RegisterTestServiceServer(server, h)
 }

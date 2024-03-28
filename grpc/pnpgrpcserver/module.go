@@ -40,6 +40,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 
 	builder.Provide(NewGRPCServer)
 	builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
+	builder.ProvideIf(options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config]())
 	builder.ProvideIf(options.reflection, ServiceRegistrarProvider(func() ServiceRegistrarFunc {
 		return func(server *grpc.Server) {
 			reflection.Register(server)

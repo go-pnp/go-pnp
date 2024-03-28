@@ -1,4 +1,4 @@
-module github.com/go-pnp/go-pnp/tracing/pnpopentelemetry
+module github.com/go-pnp/go-pnp/opentelemetry/pnpopentelemetry
 
 go 1.22
 

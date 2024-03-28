@@ -42,7 +42,15 @@ func NewServer(params NewServerParams) (*http.Server, error) {
 	}, nil
 }
 
-type MuxHandlerRegistrar func(mux *mux.Router)
+type MuxHandlerRegistrar interface {
+	Register(mux *mux.Router)
+}
+
+type MuxHandlerRegistrarFunc func(mux *mux.Router)
+
+func (f MuxHandlerRegistrarFunc) Register(mux *mux.Router) {
+	f(mux)
+}
 
 func MuxHandlerRegistrarProvider(target any) any {
 	return fxutil.GroupProvider[MuxHandlerRegistrar](
@@ -68,7 +76,7 @@ func NewMux(params NewMuxParams) http.Handler {
 	result.Use(params.Middlewares...)
 
 	for _, handlerRegistrar := range params.HandlerRegistrars {
-		handlerRegistrar(result)
+		handlerRegistrar.Register(result)
 	}
 
 	return result

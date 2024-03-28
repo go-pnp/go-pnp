@@ -2,14 +2,14 @@ package pnpgrpcopentelemetry
 
 import (
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/sdk/trace"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
+
+	"github.com/go-pnp/go-pnp/grpc/pnpgrpcclient"
 
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/grpc/pnpgrpcserver"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
-	"github.com/go-pnp/go-pnp/pkg/ordering"
 )
 
 func Module(opts ...optionutil.Option[options]) fx.Option {
@@ -19,54 +19,48 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 
+	fxutil.OptionsBuilderSupply(builder, options)
 	builder.Provide(
-		pnpgrpcserver.UnaryInterceptorProvider(NewOpenTelemetryUnaryServerInterceptorProvider(options)),
-		pnpgrpcserver.StreamInterceptorProvider(NewOpenTelemetryStreamServerInterceptorProvider(options)),
-
-		//NewOpenTelemetryUnaryClientInterceptorProvider,
-		//NewOpenTelemetryStreamClientInterceptorProvider,
+		pnpgrpcserver.ServerOptionProvider(NewOpenTelemetryStatsHandlerServerOption),
+		pnpgrpcclient.DialOptionProvider(NewOpenTelemetryStatsHandlerClientOption),
 	)
 
 	return builder.Build()
 }
 
-type NewTracerInterceptorParams struct {
+func ServerHandlerOptionsProvider(target any) any {
+	return fxutil.GroupProvider[otelgrpc.Option](
+		"pnpgrpcopentelemetry.server_handler_options",
+		target,
+	)
+}
+func ClientHandlerOptionsProvider(target any) any {
+	return fxutil.GroupProvider[otelgrpc.Option](
+		"pnpgrpcopentelemetry.server_handler_options",
+		target,
+	)
+}
+
+type NewOpenTelemetryStatsHandlerServerOptionParams struct {
 	fx.In
-	TraceProvider *trace.TracerProvider
+	ServerHandlerOptions []otelgrpc.Option `group:"pnpgrpcopentelemetry.server_handler_options"`
+	Options              *options
 }
 
-func NewOpenTelemetryUnaryServerInterceptorProvider(opts *options) func(params NewTracerInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
-	return func(params NewTracerInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
-		return ordering.OrderedItem[grpc.UnaryServerInterceptor]{
-			Order: opts.getServerOrder(),
-			Value: otelgrpc.UnaryServerInterceptor(otelgrpc.WithTracerProvider(params.TraceProvider)),
-		}
-	}
-}
-func NewOpenTelemetryStreamServerInterceptorProvider(opts *options) func(params NewTracerInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
-	return func(params NewTracerInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
-		return ordering.OrderedItem[grpc.StreamServerInterceptor]{
-			Order: opts.getServerOrder(),
-			Value: otelgrpc.StreamServerInterceptor(otelgrpc.WithTracerProvider(params.TraceProvider)),
-		}
-	}
+func NewOpenTelemetryStatsHandlerServerOption(params NewOpenTelemetryStatsHandlerServerOptionParams) grpc.ServerOption {
+	return grpc.StatsHandler(otelgrpc.NewServerHandler(
+		params.ServerHandlerOptions...,
+	))
 }
 
-func NewOpenTelemetryUnaryClientInterceptorProvider(opts *options) func(params NewTracerInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
-	return func(params NewTracerInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
-
-		return ordering.OrderedItem[grpc.StreamClientInterceptor]{
-			Order: opts.getClientOrder(),
-			Value: otelgrpc.StreamClientInterceptor(otelgrpc.WithTracerProvider(params.TraceProvider)),
-		}
-	}
+type NewOpenTelemetryStatsHandlerClientOptionParams struct {
+	fx.In
+	ClientHandlerOptions []otelgrpc.Option `group:"pnpgrpcopentelemetry.client_handler_options"`
+	Options              *options
 }
 
-func NewOpenTelemetryStreamClientInterceptorProvider(opts *options) func(params NewTracerInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
-	return func(params NewTracerInterceptorParams) ordering.OrderedItem[grpc.StreamClientInterceptor] {
-		return ordering.OrderedItem[grpc.StreamClientInterceptor]{
-			Order: opts.getClientOrder(),
-			Value: otelgrpc.StreamClientInterceptor(otelgrpc.WithTracerProvider(params.TraceProvider)),
-		}
-	}
+func NewOpenTelemetryStatsHandlerClientOption(params NewOpenTelemetryStatsHandlerClientOptionParams) grpc.DialOption {
+	return grpc.WithStatsHandler(otelgrpc.NewClientHandler(
+		params.ClientHandlerOptions...,
+	))
 }

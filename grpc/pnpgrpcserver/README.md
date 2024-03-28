@@ -8,7 +8,7 @@ Install pnpgrpcserver package:
 go get github.com/go-pnp/go-pnp/grpc/pnpgrpcserver
 ````
 
-Add pnpgrpc.Module() to your fx application options and provide your gRPC service registrar to fx container:
+Add pnpgrpcserver.Module() to your fx application options and provide your gRPC service registrar to fx container:
 ```go
 package main
 import "github.com/go-pnp/go-pnp/grpc/pnpgrpcserver"
