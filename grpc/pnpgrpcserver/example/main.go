@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/pkg/errors"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
 
@@ -19,7 +20,7 @@ type Handler struct {
 }
 
 func (h *Handler) Test(context.Context, *TestRequest) (*TestResponse, error) {
-	return &TestResponse{Message: "Hello, world!"}, nil
+	return nil, errors.New("not implemented")
 }
 
 func (h *Handler) Register(server *grpc.Server) {
