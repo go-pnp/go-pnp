@@ -3,10 +3,10 @@ module github.com/go-pnp/go-pnp/grpc/pnpgrpcopentelemetry
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.12-0.20240328153645-273b2b88652f
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient v0.0.0-00010101000000-000000000000
+	github.com/go-pnp/go-pnp v0.0.12
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.7
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.48.0
+	go.opentelemetry.io/otel/sdk v1.23.1
 	go.uber.org/fx v1.20.1
 	google.golang.org/grpc v1.62.0
 )
@@ -30,5 +30,3 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240221002015-b0ce06bbee7c // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
 )
-
-replace github.com/go-pnp/go-pnp/grpc/pnpgrpcclient => ../pnpgrpcclient

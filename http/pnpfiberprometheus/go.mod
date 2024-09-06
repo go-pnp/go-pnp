@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/http/pnpfiberprometheus
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v0.0.12-0.20240328153645-273b2b88652f
+	github.com/go-pnp/go-pnp v0.0.12
 	github.com/go-pnp/go-pnp/http/pnpfiber v0.0.9
 	github.com/gofiber/fiber/v2 v2.52.1
 	github.com/prometheus/client_golang v1.18.0
@@ -15,8 +15,8 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/go-pnp/jobber v1.0.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.17.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -27,6 +27,7 @@ require (
 	github.com/prometheus/common v0.45.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.52.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect

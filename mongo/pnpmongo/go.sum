@@ -1,8 +1,9 @@
+github.com/caarlos0/env/v10 v10.0.0 h1:yIHUBZGsyqCnpTkbjk8asUlx6RFhhEs+h7TOBdgdzXA=
+github.com/caarlos0/env/v10 v10.0.0/go.mod h1:ZfulV76NvVPw3tm591U4SwL3Xx9ldzBP9aGxzeN7G18=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/go-pnp/go-pnp v0.0.11 h1:CFLEsPtKRhdLXztzHnOOGuEbb2wpspZTxUQkHfiuENk=
-github.com/go-pnp/go-pnp v0.0.11/go.mod h1:shxZ4y1dLShvC7DrEF+Pu8A4u56thp9AOBlYTGK9RjY=
-github.com/go-pnp/go-pnp v0.0.12-0.20240328153645-273b2b88652f/go.mod h1:rMBKYu3MS+Wq9xukLZUTXztjDzKUynfj+hikcu8OSc0=
+github.com/go-pnp/go-pnp v0.0.12 h1:mWLRdlN79Wkkd5sjFO7FkWcVYo1UpltEdRgmotREuvw=
+github.com/go-pnp/go-pnp v0.0.12/go.mod h1:rMBKYu3MS+Wq9xukLZUTXztjDzKUynfj+hikcu8OSc0=
 github.com/go-pnp/jobber v1.0.0 h1:fcKweP45EtgG9kdci/NiUDr9FfSMVb22HdcdjNdJb9M=
 github.com/go-pnp/jobber v1.0.0/go.mod h1:pRYKlXWHjOPoTXG+Zs/UUylkrtkSI9u523NemK2I80s=
 github.com/golang/snappy v0.0.1 h1:Qgr9rKW7uDUkrbSmQeiDsGa8SjGyCOGtuasMWwvp2P4=

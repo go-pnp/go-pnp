@@ -3,12 +3,13 @@ module github.com/go-pnp/go-pnp/mongo/pnpmongo
 go 1.22.0
 
 require (
-	github.com/go-pnp/go-pnp v0.0.12-0.20240328153645-273b2b88652f
+	github.com/go-pnp/go-pnp v0.0.12
 	go.mongodb.org/mongo-driver/v2 v2.0.0-beta1
 	go.uber.org/fx v1.22.2
 )
 
 require (
+	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/go-pnp/jobber v1.0.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
