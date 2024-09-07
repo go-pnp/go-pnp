@@ -10,26 +10,25 @@ import (
 	"github.com/go-pnp/go-pnp/logging"
 )
 
-type invokeParams struct {
-	fx.In
-	Lc         fx.Lifecycle
-	Shutdowner fx.Shutdowner
-	Job        jobber.Job
-	Logger     *logging.Logger `optional:"true"`
-}
+// InvokeJob returns jobber.Job start/stop hooks registration options for fx
+func InvokeJob[T jobber.Job](jobName string, jobProvider any, jobberOptions ...jobber.OptionFunc) fx.Option {
+	type invokeJobParams[T jobber.Job] struct {
+		fx.In
+		Lc         fx.Lifecycle
+		Shutdowner fx.Shutdowner
+		Job        T
+		Logger     *logging.Logger `optional:"true"`
+	}
 
-// InvokeWorker runs worker provided via jobProvider,
-// One of the result of jobProvider should be jobber.Job
-func InvokeWorker(workerName string, workerProvider any, workerOptions ...jobber.OptionFunc) fx.Option {
 	return fx.Module(
-		workerName,
+		jobName,
 		fx.Provide(
-			workerProvider,
+			jobProvider,
 			fx.Private,
 		),
-		logging.DecorateNamed(fmt.Sprintf("%s_worker", workerName)),
-		fx.Invoke(func(params invokeParams) {
-			workerRunner := jobber.NewRunner(params.Job, workerOptions...)
+		logging.DecorateNamed(fmt.Sprintf("%s_job", jobName)),
+		fx.Invoke(func(params invokeJobParams[T]) {
+			workerRunner := jobber.NewRunner(params.Job, jobberOptions...)
 			params.Lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
 					params.Logger.Info(ctx, "Starting worker")
@@ -56,10 +55,11 @@ func InvokeWorker(workerName string, workerProvider any, workerOptions ...jobber
 	)
 }
 
-func InvokeWorkerIf(condition bool, workerName string, workerProvider any, workerOptions ...jobber.OptionFunc) fx.Option {
+// InvokeJobIf is the same as InvokeJob but with condition
+func InvokeJobIf[T jobber.Job](condition bool, workerName string, workerProvider any, workerOptions ...jobber.OptionFunc) fx.Option {
 	if !condition {
 		return fx.Options()
 	}
 
-	return InvokeWorker(workerName, workerProvider, workerOptions...)
+	return InvokeJob[T](workerName, workerProvider, workerOptions...)
 }

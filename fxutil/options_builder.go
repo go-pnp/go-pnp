@@ -9,55 +9,66 @@ type OptionsBuilder struct {
 	PrivateProvides bool
 }
 
-func (m *OptionsBuilder) InvokeIf(condition bool, fns ...interface{}) {
+func (m *OptionsBuilder) InvokeIf(condition bool, fns ...any) {
 	if condition {
 		m.options = append(m.options, fx.Invoke(fns...))
 	}
 }
 
-func (m *OptionsBuilder) Invoke(fns ...interface{}) {
+func (m *OptionsBuilder) Invoke(fns ...any) {
 	m.options = append(m.options, fx.Invoke(fns...))
 }
 
-func (m *OptionsBuilder) ProvideIf(condition bool, fns ...interface{}) {
+func (m *OptionsBuilder) ProvideIf(condition bool, fns ...any) {
 	if !condition {
 		return
 	}
 	if m.PrivateProvides {
-		fns = append([]interface{}{}, fns...)
+		fns = append([]any{}, fns...)
 		fns = append(fns, fx.Private)
 	}
 
 	m.options = append(m.options, fx.Provide(fns...))
 }
 
-// OptionsBuilderSupply is a helper to supply a value using Provide. It's required to supply a value privately.
-func OptionsBuilderSupply[T any](m *OptionsBuilder, val T) {
-	m.Provide(func() T {
-		return val
-	})
-}
-
-// OptionsBuilderGroupSupply is a helper to supply a value using Provide. It's required to supply a value privately.
-func OptionsBuilderGroupSupply[T any](m *OptionsBuilder, group string, val T) {
-	m.Provide(fx.Annotated{
-		Group:  group,
-		Target: func() T { return val },
-	})
-}
-
-func (m *OptionsBuilder) Provide(fns ...interface{}) {
+func (m *OptionsBuilder) Supply(fns ...any) {
 	if m.PrivateProvides {
-		fns = append([]interface{}{}, fns...)
+		fns = append([]any{}, fns...)
+		fns = append(fns, fx.Private)
+	}
+	m.options = append(m.options, fx.Supply(fns...))
+}
+
+func (m *OptionsBuilder) SupplyIf(condition bool, fns ...any) {
+	if condition {
+		m.Supply(fns...)
+	}
+}
+
+func (m *OptionsBuilder) GroupSupply(group string, value any) {
+	supplyArgs := []any{
+		fx.Annotate(value, fx.ResultTags(`group:"`+group+`"`)),
+	}
+	if m.PrivateProvides {
+		supplyArgs = append(supplyArgs, fx.Private)
+	}
+
+	m.options = append(m.options, fx.Supply(supplyArgs...))
+}
+
+func (m *OptionsBuilder) Provide(fns ...any) {
+	if m.PrivateProvides {
+		fns = append([]any{}, fns...)
 		fns = append(fns, fx.Private)
 	}
 	m.options = append(m.options, fx.Provide(fns...))
 }
 
-func (m *OptionsBuilder) PublicProvide(fns ...interface{}) {
+func (m *OptionsBuilder) PublicProvide(fns ...any) {
 	m.options = append(m.options, fx.Provide(fns...))
 }
-func (m *OptionsBuilder) PublicProvideIf(condition bool, fns ...interface{}) {
+
+func (m *OptionsBuilder) PublicProvideIf(condition bool, fns ...any) {
 	if condition {
 		m.options = append(m.options, fx.Provide(fns...))
 	}
@@ -67,11 +78,9 @@ func (m *OptionsBuilder) Option(opts ...fx.Option) {
 	m.options = append(m.options, opts...)
 }
 
-func (m *OptionsBuilder) Decorate(fns ...interface{}) {
+func (m *OptionsBuilder) Decorate(fns ...any) {
 	m.options = append(m.options, fx.Decorate(fns...))
 }
-
-// We don't use Supply as it do not support fx.PrivateProvides yet
 
 func (m *OptionsBuilder) Build() fx.Option {
 	return fx.Options(

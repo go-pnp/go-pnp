@@ -6,6 +6,7 @@ import (
 	"go.uber.org/fx"
 )
 
+// RunJob1 runs some job function inside fx.Application with one argument and returns job result
 func RunJob1[T any](jobFn func(context.Context, T) error, options ...fx.Option) error {
 	var jobErr error
 	app := fx.New(
@@ -31,6 +32,7 @@ func RunJob1[T any](jobFn func(context.Context, T) error, options ...fx.Option) 
 	return jobErr
 }
 
+// RunJob2 runs some job function inside fx.Application with two arguments and returns job result
 func RunJob2[T, K any](jobFn func(context.Context, T, K) error, options ...fx.Option) error {
 	var jobErr error
 	app := fx.New(
