@@ -1,10 +1,11 @@
 package pnpgrpcclient
 
 import (
-	"github.com/go-pnp/go-pnp/pkg/optionutil"
-	"github.com/go-pnp/go-pnp/pkg/ordering"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
+
+	"github.com/go-pnp/go-pnp/pkg/optionutil"
+	"github.com/go-pnp/go-pnp/pkg/ordering"
 
 	"github.com/go-pnp/go-pnp/fxutil"
 )
@@ -18,19 +19,19 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	}
 
 	for _, dialOption := range options.dialOptions {
-		fxutil.OptionsBuilderGroupSupply(builder, "pnpgrpcclient.dial_options", dialOption)
+		builder.GroupSupply("pnpgrpcclient.dial_options", dialOption)
 	}
 
 	for _, interceptor := range options.unaryInterceptors {
-		fxutil.OptionsBuilderGroupSupply(builder, "pnpgrpcclient.unary_interceptors", interceptor)
+		builder.GroupSupply("pnpgrpcclient.unary_interceptors", interceptor)
 	}
 
 	for _, interceptor := range options.streamInterceptors {
-		fxutil.OptionsBuilderGroupSupply(builder, "pnpgrpcclient.stream_interceptors", interceptor)
+		builder.GroupSupply("pnpgrpcclient.stream_interceptors", interceptor)
 	}
 
 	for _, interceptor := range options.streamInterceptors {
-		fxutil.OptionsBuilderSupply(builder, interceptor)
+		builder.Supply(interceptor)
 	}
 
 	builder.Provide(NewDialer)

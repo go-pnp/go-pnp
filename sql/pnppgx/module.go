@@ -5,14 +5,15 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/go-pnp/go-pnp/config/configutil"
-	"github.com/go-pnp/go-pnp/fxutil"
-	"github.com/go-pnp/go-pnp/logging"
-	"github.com/go-pnp/go-pnp/pkg/optionutil"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/fx"
+
+	"github.com/go-pnp/go-pnp/config/configutil"
+	"github.com/go-pnp/go-pnp/fxutil"
+	"github.com/go-pnp/go-pnp/logging"
+	"github.com/go-pnp/go-pnp/pkg/optionutil"
 )
 
 func Module(opts ...optionutil.Option[options]) fx.Option {
@@ -22,7 +23,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 
-	fxutil.OptionsBuilderSupply(builder, options)
+	builder.Supply(options)
 	builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
 	builder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config](options.configPrefix))
 

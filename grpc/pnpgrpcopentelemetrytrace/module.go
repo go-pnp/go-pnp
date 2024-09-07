@@ -19,7 +19,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 
-	fxutil.OptionsBuilderSupply(builder, options)
+	builder.Supply(options)
 	builder.Provide(
 		pnpgrpcopentelemetry.ServerHandlerOptionsProvider(NewOpenTelemetryStatsHandlerServerOption),
 		pnpgrpcopentelemetry.ClientHandlerOptionsProvider(NewOpenTelemetryStatsHandlerClientOption),
