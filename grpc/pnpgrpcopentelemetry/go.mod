@@ -4,8 +4,8 @@ go 1.22
 
 require (
 	github.com/go-pnp/go-pnp v1.0.0
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient v0.1.1
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.7
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient v0.1.2
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.9
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.48.0
 	go.uber.org/fx v1.22.2
 	google.golang.org/grpc v1.62.0
