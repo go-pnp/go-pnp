@@ -17,7 +17,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	moduleOptions := newOptions(opts)
 
 	builder := fxutil.OptionsBuilder{}
-	builder.Provide(moduleOptions)
+	builder.Supply(moduleOptions)
 	builder.ProvideIf(!moduleOptions.configFromContainer, configutil.NewPrefixedConfigProvider[Config](moduleOptions.configPrefix))
 	builder.PublicProvideIf(!moduleOptions.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config](moduleOptions.configPrefix))
 	builder.Provide(fx.Annotate(NewMongoClient, fx.OnStop(DisconnectClient)))
