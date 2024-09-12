@@ -24,9 +24,9 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	moduleBuilder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
 	moduleBuilder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config](options.configPrefix))
 	moduleBuilder.InvokeIf(options.startServer, RegisterStartHooks)
-	fxutil.OptionsBuilderSupply(moduleBuilder, options)
+	moduleBuilder.Supply(options)
 	if !options.fiberConfigFromContainer {
-		fxutil.OptionsBuilderSupply(moduleBuilder, options.fiberConfig)
+		moduleBuilder.Supply(options.fiberConfig)
 	}
 
 	return moduleBuilder.Build()

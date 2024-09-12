@@ -24,7 +24,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 	moduleBuilder.Provide(NewHealthcheckHandler)
-	fxutil.OptionsBuilderSupply(moduleBuilder, options)
+	moduleBuilder.Supply(options)
 	moduleBuilder.ProvideIf(options.registerInMux, pnphttpserver.MuxHandlerRegistrarProvider(NewMuxHandlerRegistrar))
 
 	return moduleBuilder.Build()

@@ -22,7 +22,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 
-	fxutil.OptionsBuilderSupply(moduleBuilder, options)
+	moduleBuilder.Supply(options)
 	moduleBuilder.Provide(NewHealthcheckHandler)
 	moduleBuilder.Provide(pnpfiber.EndpointRegistrarProvider(NewMuxHandlerRegistrar))
 
