@@ -73,8 +73,8 @@ type NewMuxHandlerRegistrarParams struct {
 }
 
 func NewMuxHandlerRegistrar(params NewMuxHandlerRegistrarParams) pnphttpserver.MuxHandlerRegistrar {
-	return func(mux *mux.Router) {
+	return pnphttpserver.MuxHandlerRegistrarFunc(func(mux *mux.Router) {
 		params.Logger.Named("http-healthchecks").Debug(context.Background(), "Registering healthcheck handler")
 		mux.Methods(params.Options.method).Path(params.Options.path).HandlerFunc(params.Handler)
-	}
+	})
 }

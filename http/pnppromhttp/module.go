@@ -45,12 +45,12 @@ type NewMuxHandlerRegistrarParams struct {
 
 func NewMuxHandlerRegistrar(params NewMuxHandlerRegistrarParams) pnphttpserver.MuxHandlerRegistrar {
 	endpoint := params.Options.endpoint
-	return func(mux *mux.Router) {
+	return pnphttpserver.MuxHandlerRegistrarFunc(func(mux *mux.Router) {
 		params.Logger.Named("promhttp").WithFields(map[string]interface{}{
 			"path":   endpoint.path,
 			"method": endpoint.method,
 		}).Debug(context.Background(), "Registering metrics handler")
 
 		mux.Methods(endpoint.method).Path(endpoint.path).HandlerFunc(params.Handler)
-	}
+	})
 }

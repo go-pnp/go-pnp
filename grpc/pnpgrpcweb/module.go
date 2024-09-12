@@ -57,9 +57,9 @@ func NewMuxHandlerRegistrarProvider(options *options) func(*grpc.Server, *grpcwe
 	return func(server *grpc.Server, wrappedServer *grpcweb.WrappedGrpcServer) pnphttpserver.MuxHandlerRegistrar {
 		handler := NewHTTPHandler(server, wrappedServer, options.serveGRPC)
 
-		return func(mux *mux.Router) {
+		return pnphttpserver.MuxHandlerRegistrarFunc(func(mux *mux.Router) {
 			mux.PathPrefix(options.muxPrefix).Handler(handler)
-		}
+		})
 	}
 }
 
