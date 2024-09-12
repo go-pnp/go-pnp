@@ -15,7 +15,7 @@ require (
 	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient v0.1.1 // indirect
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient v0.1.2 // indirect
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.7 // indirect
 	github.com/go-pnp/jobber v1.0.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
