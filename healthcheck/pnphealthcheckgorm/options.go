@@ -19,7 +19,7 @@ type options struct {
 
 func newOptions(opts []optionutil.Option[options]) *options {
 	return optionutil.ApplyOptions(&options{
-		name:      "sql",
+		name:      "gorm",
 		fxPrivate: false,
 		timeout:   time.Second * 2,
 	}, opts...)
