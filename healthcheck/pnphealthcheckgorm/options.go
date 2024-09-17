@@ -1,4 +1,4 @@
-package pnphealthchecksql
+package pnphealthcheckgorm
 
 import (
 	"time"
