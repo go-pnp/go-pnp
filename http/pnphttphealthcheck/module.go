@@ -31,10 +31,11 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 
 func WriteResponse(alive bool, checks map[string]error, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
 	if !alive {
 		w.WriteHeader(http.StatusServiceUnavailable)
+	} else {
+		w.WriteHeader(http.StatusOK)
 	}
 
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{

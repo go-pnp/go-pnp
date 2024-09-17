@@ -12,15 +12,13 @@ type options struct {
 	fxPrivate           bool
 	configFromContainer bool
 	responseWriter      func(alive bool, checkResults map[string]error, w http.ResponseWriter)
-	envConfigPrefix     string
 }
 
 func newOptions(opts []optionutil.Option[options]) *options {
 	return optionutil.ApplyOptions(&options{
-		path:            "/health",
-		method:          "GET",
-		responseWriter:  WriteResponse,
-		envConfigPrefix: "HTTP_HEALTHCHECK_",
+		path:           "/health",
+		method:         "GET",
+		responseWriter: WriteResponse,
 	}, opts...)
 }
 
@@ -42,12 +40,6 @@ func WithFxPrivate() optionutil.Option[options] {
 func WithConfigFromContainer() optionutil.Option[options] {
 	return func(o *options) {
 		o.configFromContainer = true
-	}
-}
-
-func WithEnvConfigPrefix(prefix string) optionutil.Option[options] {
-	return func(o *options) {
-		o.envConfigPrefix = prefix
 	}
 }
 
