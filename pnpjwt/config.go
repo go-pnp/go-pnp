@@ -1,4 +1,4 @@
-package pnpjwttoken
+package pnpjwt
 
 type Config struct {
 	SigningMethod string `env:"SIGNING_METHOD,notEmpty"`

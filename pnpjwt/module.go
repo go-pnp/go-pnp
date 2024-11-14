@@ -1,4 +1,4 @@
-package pnpjwttoken
+package pnpjwt
 
 import (
 	"crypto/ecdsa"
@@ -15,11 +15,12 @@ import (
 	"go.uber.org/fx"
 )
 
-type JWTSignParams struct {
+type SignParams struct {
 	Method     jwt.SigningMethod
 	SigningKey any
 }
 
+// Module is an fx module that provides SignParams to fx DI container.
 func Module(opts ...optionutil.Option[options]) fx.Option {
 	options := newOptions(opts...)
 
@@ -36,7 +37,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 
 }
 
-func newJWTTokensManager(config *Config) (*JWTSignParams, error) {
+func newJWTTokensManager(config *Config) (*SignParams, error) {
 	signingMethod := jwt.GetSigningMethod(config.SigningMethod)
 	if signingMethod == nil {
 		return nil, fmt.Errorf("unsupported signing method: %s", config.SigningMethod)
@@ -74,7 +75,7 @@ func newJWTTokensManager(config *Config) (*JWTSignParams, error) {
 		return nil, fmt.Errorf("unsupported signing method: %s", config.SigningMethod)
 	}
 
-	return &JWTSignParams{Method: signingMethod, SigningKey: key}, nil
+	return &SignParams{Method: signingMethod, SigningKey: key}, nil
 }
 
 func loadRSAPrivateKey(secret string) (*rsa.PrivateKey, error) {

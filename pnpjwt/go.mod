@@ -1,4 +1,4 @@
-module github.com/go-pnp/go-pnp/http/pnpjwttoken
+module github.com/go-pnp/go-pnp/http/pnpjwt
 
 go 1.22
 
