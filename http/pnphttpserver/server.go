@@ -2,22 +2,34 @@ package pnphttpserver
 
 import (
 	"context"
+	"fmt"
+	"net"
 	"net/http"
 
+	"github.com/go-pnp/go-pnp/pkg/ordering"
 	"github.com/gorilla/mux"
-	"github.com/rs/cors"
+	"github.com/pkg/errors"
 	"go.uber.org/fx"
 
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/logging"
 )
 
+type HandlerMiddleware func(http.Handler) http.Handler
+
+func HandlerMiddlewareProvider(target any) any {
+	return fxutil.GroupProvider[ordering.OrderedItem[HandlerMiddleware]](
+		"pnp_http_server.handler_middlewares",
+		target,
+	)
+}
+
 type NewServerParams struct {
 	fx.In
 
-	Config  *Config
-	Handler http.Handler
-	CORS    *cors.Cors `optional:"true"`
+	Config             *Config
+	Handler            http.Handler
+	HandlerMiddlewares ordering.OrderedItems[HandlerMiddleware] `group:"pnp_http_server.handler_middlewares"`
 }
 
 func NewServer(params NewServerParams) (*http.Server, error) {
@@ -25,10 +37,9 @@ func NewServer(params NewServerParams) (*http.Server, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	handler := params.Handler
-	if params.CORS != nil {
-		handler = params.CORS.Handler(handler)
+	for _, middleware := range params.HandlerMiddlewares.Get() {
+		handler = middleware(handler)
 	}
 
 	return &http.Server{
@@ -93,7 +104,6 @@ type RegisterStartHooksParams struct {
 
 func RegisterStartHooks(params RegisterStartHooksParams) {
 	logger := params.Logger.WithFields(map[string]interface{}{
-		"addr":        params.Config.Addr,
 		"tls_enabled": params.Config.TLS.Enabled,
 	})
 
@@ -102,12 +112,21 @@ func RegisterStartHooks(params RegisterStartHooksParams) {
 			go func() {
 				logger.Info(ctx, "Starting HTTP server...")
 				var err error
-				if params.Server.TLSConfig != nil {
-					err = params.Server.ListenAndServeTLS(params.Config.TLS.CertPath, params.Config.TLS.KeyPath)
-				} else {
-					err = params.Server.ListenAndServe()
+				listener, err := net.Listen("tcp", params.Config.Addr)
+				if err != nil {
+					logger.WithError(err).Error(ctx, "Error creating listener for HTTP server")
+					params.Shutdowner.Shutdown()
+					return
 				}
-				if err != nil && err != http.ErrServerClosed {
+				logger = logger.WithField("addr", fmt.Sprint(listener.Addr()))
+				logger.Info(ctx, "Started listener for HTTP server")
+
+				if params.Server.TLSConfig != nil {
+					err = params.Server.ServeTLS(listener, params.Config.TLS.CertPath, params.Config.TLS.KeyPath)
+				} else {
+					err = params.Server.Serve(listener)
+				}
+				if err != nil && !errors.Is(err, http.ErrServerClosed) {
 					logger.WithError(err).Error(ctx, "Error starting HTTP server")
 					params.Shutdowner.Shutdown()
 				}

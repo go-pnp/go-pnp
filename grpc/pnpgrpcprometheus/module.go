@@ -21,13 +21,15 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	}
 
 	builder.Provide(
+		options,
+
 		intPrometheus.NewServerMetrics,
 		intPrometheus.NewClientMetrics,
 		pnpprometheus.MetricsCollectorProvider(NewServerPrometheusCollector),
 		pnpprometheus.MetricsCollectorProvider(NewClientPrometheusCollector),
 
-		pnpgrpcserver.UnaryInterceptorProvider(NewPrometheusUnaryServerInterceptorProvider(options)),
-		pnpgrpcserver.StreamInterceptorProvider(NewPrometheusStreamServerInterceptorProvider(options)),
+		pnpgrpcserver.UnaryInterceptorProvider(newPrometheusUnaryServerInterceptorProvider),
+		pnpgrpcserver.StreamInterceptorProvider(newPrometheusStreamServerInterceptorProvider),
 		//NewLoggerUnaryClientInterceptorProvider,
 		//NewLoggerStreamClientInterceptorProvider,
 	)
@@ -48,21 +50,17 @@ type NewServerPrometheusInterceptorParams struct {
 	ServerMetrics *intPrometheus.ServerMetrics
 }
 
-func NewPrometheusUnaryServerInterceptorProvider(opts *options) func(params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
-	return func(params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
-		return ordering.OrderedItem[grpc.UnaryServerInterceptor]{
-			Order: opts.getServerOrder(),
-			Value: params.ServerMetrics.UnaryServerInterceptor(),
-		}
+func newPrometheusUnaryServerInterceptorProvider(opts *options, params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.UnaryServerInterceptor] {
+	return ordering.OrderedItem[grpc.UnaryServerInterceptor]{
+		Order: opts.getServerOrder(),
+		Value: params.ServerMetrics.UnaryServerInterceptor(),
 	}
 }
 
-func NewPrometheusStreamServerInterceptorProvider(opts *options) func(params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
-	return func(params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
-		return ordering.OrderedItem[grpc.StreamServerInterceptor]{
-			Order: opts.getServerOrder(),
-			Value: params.ServerMetrics.StreamServerInterceptor(),
-		}
+func newPrometheusStreamServerInterceptorProvider(opts *options, params NewServerPrometheusInterceptorParams) ordering.OrderedItem[grpc.StreamServerInterceptor] {
+	return ordering.OrderedItem[grpc.StreamServerInterceptor]{
+		Order: opts.getServerOrder(),
+		Value: params.ServerMetrics.StreamServerInterceptor(),
 	}
 }
 
