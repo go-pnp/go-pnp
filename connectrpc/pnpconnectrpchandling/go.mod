@@ -1,4 +1,4 @@
-module github.com/go-pnp/go-pnp/grpc/pnpconnectrpchandling
+module github.com/go-pnp/go-pnp/connectrpc/pnpconnectrpchandling
 
 go 1.22
 

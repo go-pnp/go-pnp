@@ -3,7 +3,7 @@ managed:
   enabled: true
   override:
     - file_option: go_package_prefix
-      value: github.com/go-pnp/go-pnp/grpc/pnpconnectrpchandling/example/gen
+      value: github.com/go-pnp/go-pnp/connectrpc/pnpconnectrpchandling/example/gen
 plugins:
   - remote: buf.build/protocolbuffers/go:v1.31.0
     out: gen

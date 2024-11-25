@@ -10,9 +10,9 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/fx"
 
-	"github.com/go-pnp/go-pnp/grpc/pnpconnectrpchandling"
-	"github.com/go-pnp/go-pnp/grpc/pnpconnectrpchandling/example/gen"
-	"github.com/go-pnp/go-pnp/grpc/pnpconnectrpchandling/example/gen/genconnect"
+	"github.com/go-pnp/go-pnp/connectrpc/pnpconnectrpchandling"
+	"github.com/go-pnp/go-pnp/connectrpc/pnpconnectrpchandling/example/gen"
+	"github.com/go-pnp/go-pnp/connectrpc/pnpconnectrpchandling/example/gen/genconnect"
 )
 
 type Handler struct {

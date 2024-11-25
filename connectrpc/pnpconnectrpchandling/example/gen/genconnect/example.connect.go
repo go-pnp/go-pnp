@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	gen "github.com/go-pnp/go-pnp/grpc/pnpconnectrpchandling/example/gen"
+	gen "github.com/go-pnp/go-pnp/connectrpc/pnpconnectrpchandling/example/gen"
 	http "net/http"
 	strings "strings"
 )
