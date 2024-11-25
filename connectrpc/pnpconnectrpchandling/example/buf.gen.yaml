@@ -1,0 +1,13 @@
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/go-pnp/go-pnp/grpc/pnpconnectrpchandling/example/gen
+plugins:
+  - remote: buf.build/protocolbuffers/go:v1.31.0
+    out: gen
+    opt: paths=source_relative
+  - remote: buf.build/connectrpc/go:v1.16.2
+    out: gen
+    opt: paths=source_relative
