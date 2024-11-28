@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/opentelemetry/pnpopentelemetry
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v1.1.2
+	github.com/go-pnp/go-pnp v1.1.3
 	go.opentelemetry.io/otel v1.32.0
 	go.opentelemetry.io/otel/sdk v1.32.0
 	go.opentelemetry.io/otel/trace v1.32.0

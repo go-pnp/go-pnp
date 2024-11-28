@@ -5,9 +5,9 @@ go 1.22.7
 toolchain go1.23.1
 
 require (
-	github.com/go-pnp/go-pnp v1.1.2
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient v0.1.2
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.9
+	github.com/go-pnp/go-pnp v1.1.3
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient v0.1.3
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.10
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.57.0
 	go.uber.org/fx v1.23.0
 	google.golang.org/grpc v1.68.0
@@ -17,7 +17,6 @@ require (
 	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	go.opentelemetry.io/otel v1.32.0 // indirect
 	go.opentelemetry.io/otel/metric v1.32.0 // indirect

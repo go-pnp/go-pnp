@@ -2,10 +2,10 @@ github.com/caarlos0/env/v10 v10.0.0 h1:yIHUBZGsyqCnpTkbjk8asUlx6RFhhEs+h7TOBdgdz
 github.com/caarlos0/env/v10 v10.0.0/go.mod h1:ZfulV76NvVPw3tm591U4SwL3Xx9ldzBP9aGxzeN7G18=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/go-pnp/go-pnp v1.1.2 h1:DYO8BccUOyuWU+RVMGblIb5GizdpWXrOoJZXo6NsOfg=
-github.com/go-pnp/go-pnp v1.1.2/go.mod h1:dqN2ItJgqDnM8+V5uF3sBBFcyFNLUDjdIuHdVqN6Ttc=
-github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.10 h1:JrREukmmMz7HE5qOuoYXNGKOoLADWRdcra4GNvbDpwk=
-github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.10/go.mod h1:lWrL5qeSJHuVLJQBnbRt2Hnk9JXDTGbcRk3NGkl6ta8=
+github.com/go-pnp/go-pnp v1.1.3 h1:Syf1pJ3hppTA/WOmfeP8uyYxb25GtlPhDySK2U1Q9SA=
+github.com/go-pnp/go-pnp v1.1.3/go.mod h1:dqN2ItJgqDnM8+V5uF3sBBFcyFNLUDjdIuHdVqN6Ttc=
+github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.11 h1:ESDgt/ppXh01LRksclPJKkf8BGa/KeEG8bBIPpW9uOQ=
+github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.11/go.mod h1:1rVN+NNbsr2zhhP2eUoTsk7+h53+gDGQRjyRJ6ZffBQ=
 github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
 github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=

@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/pnpjwt
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v1.1.2
+	github.com/go-pnp/go-pnp v1.1.3
 	github.com/golang-jwt/jwt/v4 v4.5.1
 	go.uber.org/fx v1.23.0
 )

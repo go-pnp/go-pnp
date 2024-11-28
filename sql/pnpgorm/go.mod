@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/sql/pnpgorm
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v1.1.2
+	github.com/go-pnp/go-pnp v1.1.3
 	go.uber.org/fx v1.23.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/driver/postgres v1.5.10

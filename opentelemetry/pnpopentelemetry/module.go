@@ -41,7 +41,7 @@ type NewTracerProviderParams struct {
 }
 
 func NewTracerProvider(params NewTracerProviderParams) (*sdkTrace.TracerProvider, error) {
-	sdkTrace.NewTracerProvider()
+	return sdkTrace.NewTracerProvider(), nil
 }
 
 func ResourceOptionProvider(target any) any {
@@ -91,8 +91,8 @@ func NewResourceFromSchemaURL(params NewResourceFromSchemaURLParams) (*resource.
 		resource.WithHost(),
 		resource.WithAttributes(params.Attributes...),
 	}, params.Options...)
-	res, err := resource.NewWithAttributes(
-
+	res, err := resource.New(
+		context.Background(),
 		resourceOptions...,
 	)
 	if err != nil && !errors.Is(err, resource.ErrPartialResource) && !errors.Is(err, resource.ErrSchemaURLConflict) {

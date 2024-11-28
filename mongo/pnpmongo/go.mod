@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/mongo/pnpmongo
 go 1.22.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.2
+	github.com/go-pnp/go-pnp v1.1.3
 	go.mongodb.org/mongo-driver/v2 v2.0.0-beta2
 	go.uber.org/fx v1.23.0
 )

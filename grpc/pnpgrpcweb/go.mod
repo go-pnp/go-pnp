@@ -5,8 +5,8 @@ go 1.22.7
 toolchain go1.23.1
 
 require (
-	github.com/go-pnp/go-pnp v1.1.2
-	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.10
+	github.com/go-pnp/go-pnp v1.1.3
+	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.11
 	github.com/gorilla/mux v1.8.1
 	github.com/improbable-eng/grpc-web v0.15.0
 	go.uber.org/fx v1.23.0
@@ -17,7 +17,6 @@ require (
 	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/desertbit/timer v1.0.1 // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rs/cors v1.11.1 // indirect
 	go.uber.org/dig v1.18.0 // indirect
