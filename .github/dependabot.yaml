@@ -1,0 +1,38 @@
+version: 2
+updates:
+  - package-ecosystem: gomod
+    directories:
+      - /
+      - /tracing/pnpopentelemetry/
+      - /tracing/pnpopentelemetryzapfield/
+      - /grpc/pnpgrpcweb/
+      - /grpc/pnpgrpcopentelemetry/
+      - /grpc/pnpgrpclogging/
+      - /grpc/pnpgrpcrecovery/
+      - /grpc/pnpgrpcserver/
+      - /grpc/pnpgrpcprometheus/
+      - /healthcheck/pnphealthcheck/
+      - /healthcheck/pnphealthcheckpgx/
+      - /healthcheck/pnphealthchecksql/
+      - /pnpenv/
+      - /pnpredis/
+      - /pnpjobber/
+      - /nats/pnpnats/
+      - /http/pnpfiberhealthcheck/
+      - /http/pnphttpserver/
+      - /http/pnppromhttp/
+      - /http/pnphttphealthcheck/
+      - /http/pnpfiberprometheus/
+      - /http/pnpfiber/
+      - /prometheus/pnpprometheus/
+      - /repo_management/
+      - /logging/pnplogrus/
+      - /logging/pnpzap/
+      - /sql/pnpsqlx/
+      - /sql/pnppgx/
+      - /sql/pnpsql/
+      - /sql/pnpgormprometheus/
+      - /sql/pnpgorm/
+
+    schedule:
+      interval: daily
