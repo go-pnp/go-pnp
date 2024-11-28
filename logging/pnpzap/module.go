@@ -26,10 +26,17 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	return builder.Build()
 }
 
-func NewZapLoggerConfig(env pnpenv.Environment, config *Config) zap.Config {
-	atomicLevel := config.ZapAtomicLevel()
+type NewZapLoggerConfigParams struct {
+	fx.In
+
+	Config *Config
+	Env    pnpenv.Environment `optional:"true"`
+}
+
+func NewZapLoggerConfig(params NewZapLoggerConfigParams) zap.Config {
+	atomicLevel := params.Config.ZapAtomicLevel()
 	switch {
-	case env.IsDev():
+	case params.Env.IsDev():
 		config := zap.NewDevelopmentConfig()
 		config.Level = atomicLevel
 
