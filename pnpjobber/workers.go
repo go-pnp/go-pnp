@@ -1,4 +1,4 @@
-package fxutil
+package pnpjobber
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 	"github.com/go-pnp/go-pnp/logging"
 )
 
-type invokeParams struct {
+type invokeJobberRunnerParams struct {
 	fx.In
 	Lc         fx.Lifecycle
 	Shutdowner fx.Shutdowner
@@ -18,9 +18,9 @@ type invokeParams struct {
 	Logger     *logging.Logger `optional:"true"`
 }
 
-// InvokeWorker runs worker provided via jobProvider,
+// Module runs worker provided via jobProvider,
 // One of the result of jobProvider should be jobber.Job
-func InvokeWorker(workerName string, workerProvider any, workerOptions ...jobber.OptionFunc) fx.Option {
+func Module(workerName string, workerProvider any, workerOptions ...jobber.OptionFunc) fx.Option {
 	return fx.Module(
 		workerName,
 		fx.Provide(
@@ -28,7 +28,7 @@ func InvokeWorker(workerName string, workerProvider any, workerOptions ...jobber
 			fx.Private,
 		),
 		logging.DecorateNamed(fmt.Sprintf("%s_worker", workerName)),
-		fx.Invoke(func(params invokeParams) {
+		fx.Invoke(func(params invokeJobberRunnerParams) {
 			workerRunner := jobber.NewRunner(params.Job, workerOptions...)
 			params.Lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
@@ -54,12 +54,4 @@ func InvokeWorker(workerName string, workerProvider any, workerOptions ...jobber
 			})
 		}),
 	)
-}
-
-func InvokeWorkerIf(condition bool, workerName string, workerProvider any, workerOptions ...jobber.OptionFunc) fx.Option {
-	if !condition {
-		return fx.Options()
-	}
-
-	return InvokeWorker(workerName, workerProvider, workerOptions...)
 }
