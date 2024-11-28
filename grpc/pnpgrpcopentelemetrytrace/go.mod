@@ -6,7 +6,7 @@ toolchain go1.23.1
 
 require (
 	github.com/go-pnp/go-pnp v1.1.3
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcopentelemetry v0.0.15
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcopentelemetry v0.0.16
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.57.0
 	go.opentelemetry.io/otel/trace v1.32.0
 	go.uber.org/fx v1.23.0
