@@ -8,10 +8,10 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-pnp/go-pnp v1.1.3 h1:Syf1pJ3hppTA/WOmfeP8uyYxb25GtlPhDySK2U1Q9SA=
 github.com/go-pnp/go-pnp v1.1.3/go.mod h1:dqN2ItJgqDnM8+V5uF3sBBFcyFNLUDjdIuHdVqN6Ttc=
-github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.10 h1:WPNoQQiydPdSvM0pmDtb1HQndYwvOohvbk/O+ZWFkDI=
-github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.10/go.mod h1:B+IR5xbFWAm+iMPA+05Tl5+PoUR2mMhqMnKLq1vok+w=
-github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.10 h1:WzOPrxneDzYg056WSEy6Odeftk6T4SUSPX/Q5wtrwhc=
-github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.10/go.mod h1:i/9NvDRuFQgNc5PMxgjSMabtSQZWad0l2zcKvQrRsJk=
+github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.11 h1:bEzN8yzSs9G9nWyBfx4bpfrJoZoxBfdQL3dw3XYt2WY=
+github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.11/go.mod h1:DtLaHG6B8NLPFV+0lsPv0EvGzOe2Ey96K3cEKb3I6jE=
+github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.11 h1:lnwqbaxxLu06D6gvIBfQUwpXSdlwf59g+Gfm/wRtf+Y=
+github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.11/go.mod h1:SihAWa6NzQsGSthaNy+pDFT2h5WzCzgCvzB4H/ZJZto=
 github.com/golang/protobuf v1.5.4 h1:i7eJL8qZTpSEXOPTxNKhASYpMn+8e5Q6AdndVa1dWek=
 github.com/golang/protobuf v1.5.4/go.mod h1:lnTiLA8Wa4RWRcIUkrtSVa5nRhsEGBg48fD6rSs7xps=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=

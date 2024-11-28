@@ -6,7 +6,7 @@ toolchain go1.23.1
 
 require (
 	github.com/go-pnp/go-pnp v1.1.3
-	github.com/go-pnp/go-pnp/pnpenv v1.0.2
+	github.com/go-pnp/go-pnp/pnpenv v1.0.3
 	go.uber.org/fx v1.23.0
 	go.uber.org/zap v1.27.0
 )

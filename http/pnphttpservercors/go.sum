@@ -4,8 +4,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-pnp/go-pnp v1.1.3 h1:Syf1pJ3hppTA/WOmfeP8uyYxb25GtlPhDySK2U1Q9SA=
 github.com/go-pnp/go-pnp v1.1.3/go.mod h1:dqN2ItJgqDnM8+V5uF3sBBFcyFNLUDjdIuHdVqN6Ttc=
-github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.11 h1:ESDgt/ppXh01LRksclPJKkf8BGa/KeEG8bBIPpW9uOQ=
-github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.11/go.mod h1:1rVN+NNbsr2zhhP2eUoTsk7+h53+gDGQRjyRJ6ZffBQ=
+github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.12 h1:+D8mJ9dM+wZQ+dVp1Zo4sqqljjvOmtXijkMl5aoxNXA=
+github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.12/go.mod h1:9kWdS8Zg1mSPQQI47orkNGn/Z0bKyV3DWEOvRUwrVNM=
 github.com/gobwas/glob v0.2.3 h1:A4xDbljILXROh+kObIiy5kIaPYD8e96x1tgBhUI5J+Y=
 github.com/gobwas/glob v0.2.3/go.mod h1:d3Ez4x06l9bZtSvzIay5+Yzi0fmZzPgnTbPcKjJAkT8=
 github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=

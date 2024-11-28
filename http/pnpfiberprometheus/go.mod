@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/go-pnp/go-pnp v1.1.3
-	github.com/go-pnp/go-pnp/http/pnpfiber v0.0.15
+	github.com/go-pnp/go-pnp/http/pnpfiber v0.0.16
 	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/prometheus/client_golang v1.20.5
 	go.uber.org/fx v1.23.0

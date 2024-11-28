@@ -4,8 +4,8 @@ go 1.22
 
 require (
 	github.com/go-pnp/go-pnp v1.1.3
-	github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.6
-	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.11
+	github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.7
+	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.12
 	github.com/gorilla/mux v1.8.1
 	go.uber.org/fx v1.23.0
 )

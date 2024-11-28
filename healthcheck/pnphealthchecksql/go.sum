@@ -2,8 +2,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-pnp/go-pnp v1.1.3 h1:Syf1pJ3hppTA/WOmfeP8uyYxb25GtlPhDySK2U1Q9SA=
 github.com/go-pnp/go-pnp v1.1.3/go.mod h1:dqN2ItJgqDnM8+V5uF3sBBFcyFNLUDjdIuHdVqN6Ttc=
-github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.6 h1:q4i/lVcOGECSlZgAomlpSnNtfYtmHYDtD5zcXFJEYQw=
-github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.6/go.mod h1:mPBmT2up3EeeIecSHoJdWj+pHXmDZ3ktpSq0bvaISdE=
+github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.7 h1:+Qyz72Qf87oRtGWyZf4tPlSA6jdllbEsgchmh01/mpw=
+github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.7/go.mod h1:dwii2a81RC4ly4l2WseKNdcYwo+G/NMvv3RrBufZHqU=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
