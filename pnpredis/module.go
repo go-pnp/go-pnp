@@ -13,7 +13,6 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	options := newOptions(opts)
 
 	builder := fxutil.OptionsBuilder{}
-	builder.Provide(NewRedisOptions)
 	builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
 	builder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config](options.configPrefix))
 	builder.Provide(fx.Annotate(NewRedisClient, fx.OnStop(CloseClient)))
@@ -21,22 +20,30 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	return builder.Build()
 }
 
-func NewRedisOptions(config *Config) (*redis.Options, error) {
+func NewRedisClient(config *Config) (redis.Cmdable, error) {
 	tls, err := config.TLS.TLSConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	return &redis.Options{
+	if config.Sentinel.Enabled {
+		return redis.NewFailoverClient(&redis.FailoverOptions{
+			MasterName:       config.Sentinel.Master,
+			SentinelAddrs:    config.Sentinel.Addrs,
+			SentinelUsername: config.Sentinel.Username,
+			SentinelPassword: config.Sentinel.Password,
+			Username:         config.Username,
+			Password:         config.Password,
+			DB:               config.DB,
+		}), nil
+	}
+
+	return redis.NewClient(&redis.Options{
 		Addr:      config.Address,
 		Password:  config.Password,
 		DB:        config.DB,
 		TLSConfig: tls,
-	}, nil
-}
-
-func NewRedisClient(options *redis.Options) (*redis.Client, error) {
-	return redis.NewClient(options), nil
+	}), nil
 }
 
 func CloseClient(client *redis.Client) error {
