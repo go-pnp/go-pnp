@@ -15,7 +15,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	builder := fxutil.OptionsBuilder{}
 	builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
 	builder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config](options.configPrefix))
-	builder.Provide(NewRedisClient, fx.OnStop(CloseClient))
+	builder.Provide(fx.Annotate(NewRedisClient, fx.OnStop(CloseClient)))
 
 	return builder.Build()
 }
