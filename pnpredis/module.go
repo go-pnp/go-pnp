@@ -46,6 +46,6 @@ func NewRedisClient(config *Config) (redis.UniversalClient, error) {
 	}), nil
 }
 
-func CloseClient(client *redis.Client) error {
+func CloseClient(client redis.UniversalClient) error {
 	return client.Close()
 }
