@@ -20,7 +20,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	return builder.Build()
 }
 
-func NewRedisClient(config *Config) (redis.Cmdable, error) {
+func NewRedisClient(config *Config) (redis.UniversalClient, error) {
 	tls, err := config.TLS.TLSConfig()
 	if err != nil {
 		return nil, err
