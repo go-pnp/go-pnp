@@ -1,6 +1,8 @@
 package pnpredis
 
 import (
+	"errors"
+
 	"github.com/go-pnp/go-pnp/fxutil"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
 	"github.com/redis/go-redis/v9"
@@ -47,5 +49,9 @@ func NewRedisClient(config *Config) (redis.UniversalClient, error) {
 }
 
 func CloseClient(client redis.UniversalClient) error {
-	return client.Close()
+	if err := client.Close(); err != nil && errors.Is(redis.ErrClosed, err) {
+		return err
+	}
+
+	return nil
 }
