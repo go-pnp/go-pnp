@@ -49,7 +49,7 @@ func NewRedisClient(config *Config) (redis.UniversalClient, error) {
 }
 
 func CloseClient(client redis.UniversalClient) error {
-	if err := client.Close(); err != nil && errors.Is(redis.ErrClosed, err) {
+	if err := client.Close(); err != nil && !errors.Is(redis.ErrClosed, err) {
 		return err
 	}
 
