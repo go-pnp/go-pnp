@@ -43,7 +43,7 @@ func ConnectHandlerConstructorProvider[T any](
 type ConnectHandlerConstructor func(opt ...connect.HandlerOption) (string, http.Handler)
 
 func InterceptorProvider(target any) any {
-	return fxutil.GroupProvider[connect.Interceptor]("pnpconnectrpchandling.interceptors", target)
+	return fxutil.GroupProvider[ordering.OrderedItem[connect.Interceptor]]("pnpconnectrpchandling.interceptors", target)
 }
 
 func HandlerOptionProvider(target any) any {
