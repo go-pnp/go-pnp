@@ -6,6 +6,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/go-pnp/go-pnp/http/pnphttpserver"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
+	"github.com/go-pnp/go-pnp/pkg/ordering"
 	"github.com/gorilla/mux"
 	"go.uber.org/fx"
 
@@ -51,9 +52,9 @@ func HandlerOptionProvider(target any) any {
 
 type NewMuxHandlersRegistrarParams struct {
 	fx.In
-	Interceptors        []connect.Interceptor       `group:"pnpconnectrpchandling.interceptors"`
-	Options             []connect.HandlerOption     `group:"pnpconnectrpchandling.handler_options"`
-	HandlerConstructors []ConnectHandlerConstructor `group:"pnpconnectrpchandling.handler_constructors"`
+	Interceptors        ordering.OrderedItems[connect.Interceptor] `group:"pnpconnectrpchandling.interceptors"`
+	Options             []connect.HandlerOption                    `group:"pnpconnectrpchandling.handler_options"`
+	HandlerConstructors []ConnectHandlerConstructor                `group:"pnpconnectrpchandling.handler_constructors"`
 }
 
 func NewMuxHandlersRegistrar(params NewMuxHandlersRegistrarParams) pnphttpserver.MuxHandlerRegistrar {
@@ -61,7 +62,7 @@ func NewMuxHandlersRegistrar(params NewMuxHandlersRegistrarParams) pnphttpserver
 		for _, constructor := range params.HandlerConstructors {
 			handlerOpts := make([]connect.HandlerOption, 0, len(params.Options))
 			handlerOpts = append(handlerOpts, params.Options...)
-			handlerOpts = append(handlerOpts, connect.WithInterceptors(params.Interceptors...))
+			handlerOpts = append(handlerOpts, connect.WithInterceptors(params.Interceptors.Get()...))
 
 			path, handler := constructor(handlerOpts...)
 			mux.PathPrefix(path).Handler(handler)
