@@ -9,12 +9,14 @@ type options struct {
 	fxPrivate   bool
 	namespace   string
 	subsystem   string
+	order       int
 	constLabels prometheus.Labels
 }
 
 func newOptions(opts ...optionutil.Option[options]) *options {
 	return optionutil.ApplyOptions(&options{
 		subsystem: "http",
+		order:     1,
 	}, opts...)
 }
 
@@ -40,5 +42,11 @@ func WithSubsystem(subsystem string) optionutil.Option[options] {
 func WithConstLabels(constLabels prometheus.Labels) optionutil.Option[options] {
 	return func(o *options) {
 		o.constLabels = constLabels
+	}
+}
+
+func WithOrder(order int) optionutil.Option[options] {
+	return func(o *options) {
+		o.order = order
 	}
 }

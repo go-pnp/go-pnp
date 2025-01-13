@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/go-pnp/go-pnp/pkg/ordering"
 	"github.com/go-pnp/go-pnp/prometheus/pnpprometheus"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
@@ -26,7 +27,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	moduleBuilder.Supply(options)
 	moduleBuilder.Provide(NewMetricsCollector)
 	moduleBuilder.PublicProvide(pnpprometheus.MetricsCollectorProvider(newPrometheusCollector))
-	moduleBuilder.Provide(pnphttpserver.MuxHandlerRegistrarProvider(NewMuxHandlerRegistrar))
+	moduleBuilder.Provide(pnphttpserver.MuxMiddlewareFuncProvider(NewMiddleware))
 
 	return moduleBuilder.Build()
 }
@@ -43,26 +44,30 @@ type NewMuxHandlerRegistrarParams struct {
 	Options *options
 }
 
-func NewMuxHandlerRegistrar(params NewMuxHandlerRegistrarParams) pnphttpserver.MuxHandlerRegistrar {
-	return pnphttpserver.MuxHandlerRegistrarFunc(func(router *mux.Router) {
-		router.Use(func(handler http.Handler) http.Handler {
+func NewMiddleware(params NewMuxHandlerRegistrarParams) ordering.OrderedItem[mux.MiddlewareFunc] {
+	return ordering.OrderedItem[mux.MiddlewareFunc]{
+		Value: func(handler http.Handler) http.Handler {
 			return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
-				path, err := mux.CurrentRoute(request).GetPathTemplate()
-				if err != nil {
-					path = "<unknown>"
+				currentRoute := mux.CurrentRoute(request)
+				path := "<unknown>"
+				if currentRoute != nil {
+					if pathTemplate, err := currentRoute.GetPathTemplate(); err == nil {
+						path = pathTemplate
+					}
 				}
 				requestObserver := params.MetricsCollector.trackRequest(request.Method, path)
 
 				responseWriter := &httpResponseWriterTracker{ResponseWriter: writer}
-				bodySizeTracker := &requestBodyReaderTracker{}
+				bodySizeTracker := &requestBodyReaderTracker{ReadCloser: request.Body}
 				request.Body = bodySizeTracker
 				handler.ServeHTTP(responseWriter, request)
 
 				requestObserver.Observe(bodySizeTracker.size, responseWriter.bodySize, responseWriter.status)
 
 			})
-		})
-	})
+		},
+		Order: params.Options.order,
+	}
 }
 
 type httpResponseWriterTracker struct {
