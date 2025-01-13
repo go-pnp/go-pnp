@@ -1,4 +1,4 @@
-package pnppromhttp
+package pnphttpservermetrics
 
 import (
 	"fmt"
