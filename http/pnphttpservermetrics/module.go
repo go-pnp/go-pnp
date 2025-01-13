@@ -25,7 +25,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	}
 	moduleBuilder.Supply(options)
 	moduleBuilder.Provide(NewMetricsCollector)
-	moduleBuilder.Provide(pnpprometheus.MetricsCollectorProvider(newPrometheusCollector))
+	moduleBuilder.PublicProvide(pnpprometheus.MetricsCollectorProvider(newPrometheusCollector))
 	moduleBuilder.Provide(pnphttpserver.MuxHandlerRegistrarProvider(NewMuxHandlerRegistrar))
 
 	return moduleBuilder.Build()
