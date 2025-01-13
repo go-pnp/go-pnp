@@ -72,7 +72,7 @@ func NewMuxHandlerRegistrar(params NewMuxHandlerRegistrarParams) pnphttpserver.M
 				responseWriter := &httpResponseWriterTracker{ResponseWriter: writer}
 				bodySizeTracker := &requestBodyReaderTracker{}
 				request.Body = bodySizeTracker
-				handler.ServeHTTP(writer, request)
+				handler.ServeHTTP(responseWriter, request)
 
 				requestObserver.Observe(bodySizeTracker.size, responseWriter.bodySize, responseWriter.status)
 
