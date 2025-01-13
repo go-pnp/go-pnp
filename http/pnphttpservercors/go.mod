@@ -4,7 +4,7 @@ go 1.22.0
 
 require (
 	github.com/go-pnp/go-pnp v1.1.3
-	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.12
+	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.13
 	github.com/gobwas/glob v0.2.3
 	github.com/gorilla/mux v1.8.1
 	github.com/rs/cors v1.11.1
@@ -17,5 +17,5 @@ require (
 	go.uber.org/dig v1.18.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/sys v0.27.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
 )
