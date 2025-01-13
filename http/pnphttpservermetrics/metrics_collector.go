@@ -15,30 +15,42 @@ type MetricsCollector struct {
 }
 
 // NewMetricsCollector returns an instance of the Client decorated with prometheus summary metric
-func NewMetricsCollector() *MetricsCollector {
+func NewMetricsCollector(options *options) *MetricsCollector {
 	return &MetricsCollector{
 		callsTotal: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: "http_requests_total",
+				Namespace:   options.namespace,
+				Subsystem:   options.subsystem,
+				Name:        "requests_total",
+				ConstLabels: options.constLabels,
 			},
 			[]string{"method", "path", "code"},
 		),
 		durationHistogramVec: prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{
-				Name:    "http_request_duration_seconds",
-				Buckets: []float64{0.05, .1, .25, .5, 1, 2.5, 5, 10},
+				Namespace:   options.namespace,
+				Subsystem:   options.subsystem,
+				Name:        "request_duration_seconds",
+				Buckets:     []float64{0.05, .1, .25, .5, 1, 2.5, 5, 10},
+				ConstLabels: options.constLabels,
 			},
 			[]string{"method", "path"},
 		),
 		requestBodySizeBytes: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: "http_request_body_size_bytes",
+				Namespace:   options.namespace,
+				Subsystem:   options.subsystem,
+				Name:        "request_body_size_bytes",
+				ConstLabels: options.constLabels,
 			},
 			[]string{"method", "path"},
 		),
 		responseBodySizeBytes: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: "http_response_body_size_bytes",
+				Namespace:   options.namespace,
+				Subsystem:   options.subsystem,
+				Name:        "response_body_size_bytes",
+				ConstLabels: options.constLabels,
 			},
 			[]string{"method", "path"},
 		),
