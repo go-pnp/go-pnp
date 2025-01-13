@@ -27,7 +27,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 
 	builder.Supply(options)
 	builder.Provide(NewInterceptor)
-	builder.Provide(pnpprometheus.MetricsCollectorProvider(newPrometheusCollector))
+	builder.PublicProvide(pnpprometheus.MetricsCollectorProvider(newPrometheusCollector))
 	builder.Provide(pnpconnectrpchandling.InterceptorProvider(newConnectInterceptor))
 
 	return builder.Build()
