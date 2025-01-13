@@ -70,7 +70,7 @@ func MuxHandlerRegistrarProvider(target any) any {
 	)
 }
 func MuxMiddlewareFuncProvider(target any) any {
-	return fxutil.GroupProvider[mux.MiddlewareFunc](
+	return fxutil.GroupProvider[ordering.OrderedItem[mux.MiddlewareFunc]](
 		"pnp_http_server.mux_middleware_funcs",
 		target,
 	)
@@ -78,13 +78,13 @@ func MuxMiddlewareFuncProvider(target any) any {
 
 type NewMuxParams struct {
 	fx.In
-	Middlewares       []mux.MiddlewareFunc  `group:"pnp_http_server.mux_middleware_funcs"`
-	HandlerRegistrars []MuxHandlerRegistrar `group:"pnp_http_server.mux_handler_registrars"`
+	Middlewares       ordering.OrderedItems[mux.MiddlewareFunc] `group:"pnp_http_server.mux_middleware_funcs"`
+	HandlerRegistrars []MuxHandlerRegistrar                     `group:"pnp_http_server.mux_handler_registrars"`
 }
 
 func NewMux(params NewMuxParams) http.Handler {
 	result := mux.NewRouter()
-	result.Use(params.Middlewares...)
+	result.Use(params.Middlewares.Get()...)
 
 	for _, handlerRegistrar := range params.HandlerRegistrars {
 		handlerRegistrar.Register(result)
