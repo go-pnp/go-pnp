@@ -55,6 +55,7 @@ func ZapHookProvider(target any) any {
 		target,
 	)
 }
+
 func ZapOptionProvider(target any) any {
 	return fxutil.GroupProvider[zap.Option](
 		"pnpzap.zap_options",
@@ -89,6 +90,7 @@ func (n NewLoggerParams) BuildOptions() []zap.Option {
 	if len(n.Hooks) > 0 {
 		result = append(result, zap.Hooks(n.Hooks...))
 	}
+
 	return append(result, n.Options...)
 }
 

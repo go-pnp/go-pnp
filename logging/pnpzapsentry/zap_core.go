@@ -86,9 +86,6 @@ func (z ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		zapcore.FatalLevel:  sentry.LevelFatal,
 	}[entry.Level]
 	levelValue := sentryLevelValues[level]
-	//pc := make([]uintptr, 50)
-	//callers := runtime.Callers(0, pc)
-	//frames := runtime.CallersFrames(pc[:callers])
 	trace := sentry.NewStacktrace()
 
 	for i, frame := range trace.Frames {
@@ -101,24 +98,27 @@ func (z ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 	if levelValue >= z.reportLevelValue {
 		go func() {
-			extra := make(map[string]interface{})
-			for _, field := range fields {
-				extra[field.Key] = field.Interface
+			contexts := map[string]sentry.Context{
+				"fields": make(sentry.Context),
 			}
+			for _, field := range fields {
+				contexts["fields"][field.Key] = field.Interface
+			}
+
 			hub := z.hub
 			if hub == nil {
 				hub = sentry.NewHub(z.client, sentry.NewScope())
 			}
-			//frames := runtime.CallersFrames([]uintptr{entry.Caller.PC})
 
 			event := &sentry.Event{
 				Level:     level,
 				Message:   entry.Message,
-				Extra:     extra,
+				Contexts:  contexts,
 				Logger:    entry.LoggerName,
 				Timestamp: entry.Time,
 			}
 			if z.err != nil {
+				event.Fingerprint = []string{"{{ default }}", z.err.Error()}
 				event.Exception = []sentry.Exception{
 					{
 						Value:      z.err.Error(),
