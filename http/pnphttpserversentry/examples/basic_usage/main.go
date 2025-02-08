@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"go.uber.org/fx"
 
-	"github.com/go-pnp/go-pnp/http/pnphttpservercors"
+	"github.com/go-pnp/go-pnp/http/pnphttpserversentry"
 )
 
 func main() {

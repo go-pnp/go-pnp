@@ -1,4 +1,4 @@
-module github.com/go-pnp/go-pnp/http/pnphttpservercors
+module github.com/go-pnp/go-pnp/http/pnphttpserversentry
 
 go 1.23.1
 
