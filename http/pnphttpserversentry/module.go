@@ -46,32 +46,9 @@ func newMiddleware(options *options, client *sentry.Client) ordering.OrderedItem
 				scope.SetSpan(span)
 				scope.SetRequest(request)
 
-				wrapHandler(handler, client, "nested smth").ServeHTTP(writer, request)
+				handler.ServeHTTP(writer, request)
 			})
 		},
 		Order: options.order,
 	}
-}
-
-func wrapHandler(handler http.Handler, sentryClient *sentry.Client, op string) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		hub := sentry.GetHubFromContext(r.Context())
-		var scope *sentry.Scope
-		if hub == nil {
-			scope = sentry.NewScope()
-			hub = sentry.NewHub(sentryClient, scope)
-			r = r.WithContext(sentry.SetHubOnContext(r.Context(), hub))
-		} else {
-			scope = hub.PushScope()
-			defer hub.PopScope()
-		}
-		span := sentry.StartSpan(r.Context(), op)
-		defer span.Finish()
-
-		r = r.WithContext(span.Context())
-
-		scope.SetSpan(span)
-
-		handler.ServeHTTP(w, r)
-	})
 }
