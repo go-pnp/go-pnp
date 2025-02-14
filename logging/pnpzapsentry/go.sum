@@ -14,6 +14,7 @@ github.com/go-pnp/go-pnp/pnpenv v1.0.3 h1:QZ1kwHcpIaDOjm6RhdEtPgf5naXsLvI6UuxQha
 github.com/go-pnp/go-pnp/pnpenv v1.0.3/go.mod h1:pDX0GDQhylKtfnTZer5oAMvrB3nzkdCu5MZmKUUVDmA=
 github.com/go-pnp/go-pnp/pnpsentry v0.0.1 h1:lmgRMjSiR/jhDiHlTmCVYz1pWDdmLlFTZYtsKb4It74=
 github.com/go-pnp/go-pnp/pnpsentry v0.0.1/go.mod h1:CwmClNCcoe9FXXND8slUPk7kah65o4Ea+7QR5n79fyQ=
+github.com/go-pnp/go-pnp/pnpsentry v0.0.3 h1:f8BPP4n7puSb9fqM+CRfk1xAGF3eR+m5mcMfhf27n6Q=
 github.com/go-pnp/go-pnp/pnpsentry v0.0.3/go.mod h1:CwmClNCcoe9FXXND8slUPk7kah65o4Ea+7QR5n79fyQ=
 github.com/google/go-cmp v0.5.9 h1:O2Tfq5qg4qc4AmwVlvv0oLiVAGB7enBSJ2x2DqQFi38=
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=

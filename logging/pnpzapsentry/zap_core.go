@@ -98,39 +98,23 @@ func (z ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 	if levelValue >= z.reportLevelValue {
 		go func() {
-			contexts := map[string]sentry.Context{
-				"fields": make(sentry.Context),
-			}
-			for _, field := range fields {
-				contexts["fields"][field.Key] = field.Interface
-			}
 
 			hub := z.hub
 			if hub == nil {
 				hub = sentry.NewHub(z.client, sentry.NewScope())
 			}
 
-			event := &sentry.Event{
-				Level:     level,
-				Message:   entry.Message,
-				Contexts:  contexts,
-				Logger:    entry.LoggerName,
-				Timestamp: entry.Time,
-			}
+			var event *sentry.Event
 			if z.err != nil {
-				event.Fingerprint = []string{"{{ default }}", z.err.Error()}
-				event.Exception = []sentry.Exception{
-					{
-						Value:      z.err.Error(),
-						Stacktrace: trace,
-					},
-				}
+				event = z.client.EventFromException(z.err, level)
+				event.Message = entry.Message
+				event.Logger = entry.LoggerName
 			} else {
-				event.Exception = []sentry.Exception{
-					{
-						Value:      entry.Message,
-						Stacktrace: trace,
-					},
+				event = &sentry.Event{
+					Level:     level,
+					Message:   entry.Message,
+					Logger:    entry.LoggerName,
+					Timestamp: entry.Time,
 				}
 			}
 
