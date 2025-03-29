@@ -5,7 +5,7 @@ import "github.com/getsentry/sentry-go"
 type Config struct {
 	// The DSN to use. If the DSN is not set, the client is effectively
 	// disabled.
-	DSN string `env:"DSN,notEmpty"`
+	DSN string `env:"DSN"`
 	// In debug mode, the debug information is printed to stdout to help you
 	// understand what sentry is doing.
 	Debug bool `env:"DEBUG"`
