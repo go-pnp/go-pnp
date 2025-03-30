@@ -21,13 +21,18 @@ import (
 	"go.uber.org/fx"
 )
 
-type subscriberFactory interface {
-	NewSubscriber(handler string) (message.Subscriber, error)
+type SubscriberConfig struct {
+	GcloudPubSubHandlerSubscriberConfigOption []optionutil.Option[googlecloud.SubscriberConfig]
+	RedisHandlerSubscriberConfigOption        []optionutil.Option[redisstream.SubscriberConfig]
 }
-type subscriberFactoryFn func(handler string) (message.Subscriber, error)
 
-func (f subscriberFactoryFn) NewSubscriber(handler string) (message.Subscriber, error) {
-	return f(handler)
+type subscriberFactory interface {
+	NewSubscriber(handler string, config *SubscriberConfig) (message.Subscriber, error)
+}
+type subscriberFactoryFn func(handler string, config *SubscriberConfig) (message.Subscriber, error)
+
+func (f subscriberFactoryFn) NewSubscriber(handler string, config *SubscriberConfig) (message.Subscriber, error) {
+	return f(handler, config)
 }
 
 type GCloudPubSubPublisherConfigOption = optionutil.Option[googlecloud.PublisherConfig]
@@ -86,7 +91,10 @@ func NewTransport(params newTransportParams) (message.Publisher, subscriberFacto
 	case "channel":
 		publisher, subscriberFactory, err = newChannelTransport()
 	case "gcloudpubsub":
-		publisher, subscriberFactory, err = newGCloudPubSubTransport(params.Config, params.GCloudPubSubPublisherConfigOptions...)
+		publisher, subscriberFactory, err = newGCloudPubSubTransport(newGCloudPubSubTransportParams{
+			Config:                 params.Config,
+			PublisherConfigOptions: params.GCloudPubSubPublisherConfigOptions,
+		})
 	case "redis":
 		publisher, subscriberFactory, err = newRedisTransport(params.RedisClient, params.Config)
 	default:
@@ -102,8 +110,8 @@ func NewTransport(params newTransportParams) (message.Publisher, subscriberFacto
 		},
 	})
 
-	return decoratePublisher(publisher), subscriberFactoryFn(func(handler string) (message.Subscriber, error) {
-		subscriber, err := subscriberFactory.NewSubscriber(handler)
+	return decoratePublisher(publisher), subscriberFactoryFn(func(handler string, config *SubscriberConfig) (message.Subscriber, error) {
+		subscriber, err := subscriberFactory.NewSubscriber(handler, config)
 		if err != nil {
 			return nil, err
 		}
@@ -126,23 +134,29 @@ func newChannelTransport() (message.Publisher, subscriberFactory, error) {
 		watermill.NopLogger{},
 	)
 
-	return result, subscriberFactoryFn(func(handler string) (message.Subscriber, error) {
+	return result, subscriberFactoryFn(func(handler string, config *SubscriberConfig) (message.Subscriber, error) {
 		return result, nil
 	}), nil
 }
 
-func newGCloudPubSubTransport(config *Config, publisherConfigOptions ...optionutil.Option[googlecloud.PublisherConfig]) (message.Publisher, subscriberFactory, error) {
+type newGCloudPubSubTransportParams struct {
+	Config *Config
+
+	PublisherConfigOptions []optionutil.Option[googlecloud.PublisherConfig]
+}
+
+func newGCloudPubSubTransport(params newGCloudPubSubTransportParams) (message.Publisher, subscriberFactory, error) {
 	publisherConfig := optionutil.ApplyOptions(&googlecloud.PublisherConfig{
-		ProjectID: config.GCloudPubSub.ProjectID,
-	}, publisherConfigOptions...)
+		ProjectID: params.Config.GCloudPubSub.ProjectID,
+	}, params.PublisherConfigOptions...)
 	result, err := googlecloud.NewPublisher(*publisherConfig, watermill.NopLogger{})
 	if err != nil {
 		return nil, nil, fmt.Errorf("create gcloud pubsub publisher: %w", err)
 	}
 
-	return result, subscriberFactoryFn(func(handler string) (message.Subscriber, error) {
-		subscriber, err := googlecloud.NewSubscriber(googlecloud.SubscriberConfig{
-			ProjectID: config.GCloudPubSub.ProjectID,
+	return result, subscriberFactoryFn(func(handler string, subConfig *SubscriberConfig) (message.Subscriber, error) {
+		subscriberConfig := optionutil.ApplyOptions(&googlecloud.SubscriberConfig{
+			ProjectID: params.Config.GCloudPubSub.ProjectID,
 			SubscriptionConfig: pubsub.SubscriptionConfig{
 				EnableMessageOrdering: true,
 				RetryPolicy: &pubsub.RetryPolicy{
@@ -151,9 +165,11 @@ func newGCloudPubSubTransport(config *Config, publisherConfigOptions ...optionut
 				},
 			},
 			GenerateSubscriptionName: func(topic string) string {
-				return config.GCloudPubSub.SubscriptionNamePrefix + topic + "_" + handler
+				return params.Config.GCloudPubSub.SubscriptionNamePrefix + topic + "_" + handler
 			},
-		}, watermill.NopLogger{})
+		}, subConfig.GcloudPubSubHandlerSubscriberConfigOption...)
+
+		subscriber, err := googlecloud.NewSubscriber(*subscriberConfig, watermill.NopLogger{})
 		if err != nil {
 			return nil, fmt.Errorf("create subscriber")
 		}
@@ -177,13 +193,14 @@ func newRedisTransport(client redis.UniversalClient, config *Config) (message.Pu
 		return nil, nil, fmt.Errorf("create redis publisher: %w", err)
 	}
 
-	return publisher, subscriberFactoryFn(func(handler string) (message.Subscriber, error) {
+	return publisher, subscriberFactoryFn(func(handler string, subscriberConfig *SubscriberConfig) (message.Subscriber, error) {
+		redisSubscriberConfig := optionutil.ApplyOptions(&redisstream.SubscriberConfig{
+			Client:        client,
+			Consumer:      uuid.New().String(),
+			ConsumerGroup: config.Redis.ConsumerGroup,
+		}, subscriberConfig.RedisHandlerSubscriberConfigOption...)
 		subscriber, err := redisstream.NewSubscriber(
-			redisstream.SubscriberConfig{
-				Client:        client,
-				Consumer:      uuid.New().String(),
-				ConsumerGroup: config.Redis.ConsumerGroup,
-			},
+			*redisSubscriberConfig,
 			watermill.NopLogger{},
 		)
 		if err != nil {

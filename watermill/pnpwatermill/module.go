@@ -36,6 +36,10 @@ func HandlerMiddlewareProvider(target any) any {
 	return fxutil.GroupProvider[ordering.OrderedItem[message.HandlerMiddleware]]("pnpwatermill.handler_middlewares", target)
 }
 
+type SubscriberConfigProvider interface {
+	Config() *SubscriberConfig
+}
+
 type newRouterParams struct {
 	fx.In
 	Lc                fx.Lifecycle
@@ -52,8 +56,14 @@ func newRouter(params newRouterParams) (*message.Router, error) {
 	}
 
 	for _, handler := range params.Handlers {
+		subscriberConfig := new(SubscriberConfig)
+
+		if handler, ok := handler.(SubscriberConfigProvider); ok {
+			subscriberConfig = handler.Config()
+		}
+
 		params.Logger.Info(context.Background(), "creating subscriber for '%s' handler", handler.Name())
-		subscriber, err := params.SubscriberFactory.NewSubscriber(handler.Name())
+		subscriber, err := params.SubscriberFactory.NewSubscriber(handler.Name(), subscriberConfig)
 		if err != nil {
 			return nil, fmt.Errorf("create subscriber: %w", err)
 		}
