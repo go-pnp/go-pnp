@@ -167,6 +167,7 @@ func newGCloudPubSubTransport(params newGCloudPubSubTransportParams) (message.Pu
 			GenerateSubscriptionName: func(topic string) string {
 				return params.Config.GCloudPubSub.SubscriptionNamePrefix + topic + "_" + handler
 			},
+			Unmarshaler: NewGCloudPubSubUnmarshaler(googlecloud.DefaultMarshalerUnmarshaler{}),
 		}, subConfig.GcloudPubSubHandlerSubscriberConfigOption...)
 
 		subscriber, err := googlecloud.NewSubscriber(*subscriberConfig, watermill.NopLogger{})
