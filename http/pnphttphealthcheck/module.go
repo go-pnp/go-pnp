@@ -38,9 +38,25 @@ func WriteResponse(alive bool, checks map[string]error, w http.ResponseWriter) {
 		w.WriteHeader(http.StatusOK)
 	}
 
+	errInfo := make(map[string]any, len(checks))
+	for name, err := range checks {
+		multiErr, ok := err.(interface {
+			Unwrap() []error
+		})
+		if ok {
+			errStrings := make([]string, 0, len(multiErr.Unwrap()))
+			for _, err := range multiErr.Unwrap() {
+				errStrings = append(errStrings, err.Error())
+			}
+			errInfo[name] = errStrings
+		} else {
+			errInfo[name] = err.Error()
+		}
+	}
+
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"alive":       alive,
-		"checkErrors": checks,
+		"checkErrors": errInfo,
 	})
 }
 
