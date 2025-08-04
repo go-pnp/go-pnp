@@ -40,6 +40,10 @@ func WriteResponse(alive bool, checks map[string]error, w http.ResponseWriter) {
 
 	errInfo := make(map[string]any, len(checks))
 	for name, err := range checks {
+		if err == nil {
+			errInfo[name] = nil
+			continue
+		}
 		multiErr, ok := err.(interface {
 			Unwrap() []error
 		})
