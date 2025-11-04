@@ -4,6 +4,7 @@ import "go.uber.org/fx"
 
 type DecorateNamedParams struct {
 	fx.In
+
 	Logger *Logger `optional:"true"`
 }
 
