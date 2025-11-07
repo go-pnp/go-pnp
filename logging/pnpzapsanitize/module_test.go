@@ -303,3 +303,44 @@ func TestSanitizer_UnexportedNonSensitiveField(t *testing.T) {
 	}
 	require.Equal(t, expected, res)
 }
+
+type structWithUnexportedMap struct {
+	sensitive map[string]string
+}
+
+func TestSanitizer_UnexportedMap(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	data := structWithUnexportedMap{sensitive: map[string]string{"password": "secret"}}
+	logger.Info("test", zap.Reflect("data", data))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+}
+
+type circularMap map[string]interface{}
+
+func TestSanitizer_CircularMap(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	m := make(circularMap)
+	m["self"] = m
+	m["other"] = "ok"
+	logger.Info("test", zap.Any("data", m))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+}
+
+func TestSanitizer_CircularSlice(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	var s []interface{}
+
+	s = append(s, "ok", s)
+	logger.Info("test", zap.Any("data", s))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+}
