@@ -27,6 +27,7 @@ func (o *Logger) Info(ctx context.Context, msg string, args ...interface{}) {
 	if o == nil {
 		return
 	}
+
 	o.Delegate.SkipCallers(2).Info(ctx, msg, args...)
 }
 
@@ -34,6 +35,7 @@ func (o *Logger) Warn(ctx context.Context, msg string, args ...interface{}) {
 	if o == nil {
 		return
 	}
+
 	o.Delegate.SkipCallers(2).Warn(ctx, msg, args...)
 }
 
@@ -41,6 +43,7 @@ func (o *Logger) Debug(ctx context.Context, msg string, args ...interface{}) {
 	if o == nil {
 		return
 	}
+
 	o.Delegate.SkipCallers(2).Debug(ctx, msg, args...)
 }
 
@@ -48,6 +51,7 @@ func (o *Logger) Error(ctx context.Context, msg string, args ...interface{}) {
 	if o == nil {
 		return
 	}
+
 	o.Delegate.SkipCallers(2).Error(ctx, msg, args...)
 }
 
@@ -55,6 +59,7 @@ func (o *Logger) WithFields(fields map[string]interface{}) *Logger {
 	if o == nil {
 		return nil
 	}
+
 	return &Logger{Delegate: o.Delegate.WithFields(fields)}
 }
 
@@ -62,6 +67,7 @@ func (o *Logger) WithField(key string, value interface{}) *Logger {
 	if o == nil {
 		return nil
 	}
+
 	return &Logger{Delegate: o.Delegate.WithField(key, value)}
 }
 
@@ -69,6 +75,7 @@ func (o *Logger) Named(component string) *Logger {
 	if o == nil {
 		return nil
 	}
+
 	return &Logger{Delegate: o.Delegate.Named(component)}
 }
 
@@ -76,6 +83,7 @@ func (o *Logger) SkipCallers(count int) *Logger {
 	if o == nil {
 		return nil
 	}
+
 	return &Logger{Delegate: o.Delegate.SkipCallers(count)}
 }
 

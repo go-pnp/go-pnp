@@ -22,7 +22,7 @@ func (e Environment) IsOneOfCI(values ...string) bool {
 	return false
 }
 func (e Environment) IsDev() bool {
-	return e.IsOneOfCI("dev", "deveopment", "d")
+	return e.IsOneOfCI("dev", "development", "d")
 }
 
 func (e Environment) IsProd() bool {

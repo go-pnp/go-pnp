@@ -26,7 +26,7 @@ func GroupProvider[T any](groupName string, target any) any {
 		fx.ResultTags(fmt.Sprintf(`group:"%s"`, groupName)),
 	}
 	var foundRequiredType bool
-	for i := 0; i < targetType.NumOut(); i++ {
+	for i := range targetType.NumOut() {
 		outType := targetType.Out(i)
 		if outType == requiredType {
 			foundRequiredType = true
@@ -40,7 +40,7 @@ func GroupProvider[T any](groupName string, target any) any {
 	}
 
 	if !foundRequiredType {
-		panic(errors.Errorf("provider should return at least one value of type %v", zeroT))
+		panic(errors.Errorf("provider should return at least one value of type %v", *zeroT))
 	}
 
 	return fx.Annotate(
