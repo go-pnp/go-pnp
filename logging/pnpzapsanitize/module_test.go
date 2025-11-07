@@ -316,6 +316,15 @@ func TestSanitizer_UnexportedMap(t *testing.T) {
 
 	var res map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": map[string]interface{}{
+			"sensitive": nil, // unexported fields cannot be accessed
+		},
+	}
+	require.Equal(t, expected, res)
 }
 
 type circularMap map[string]interface{}
@@ -330,6 +339,16 @@ func TestSanitizer_CircularMap(t *testing.T) {
 
 	var res map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": map[string]interface{}{
+			"self":  "[CIRCULAR_REFERENCE]",
+			"other": "ok",
+		},
+	}
+	require.Equal(t, expected, res)
 }
 
 func TestSanitizer_CircularSlice(t *testing.T) {
@@ -337,10 +356,22 @@ func TestSanitizer_CircularSlice(t *testing.T) {
 
 	var s []interface{}
 
-	s = append(s, "ok", s)
+	s = append(s, "ok", nil)
+	s[1] = s
+
 	logger.Info("test", zap.Any("data", s))
 	require.NoError(t, logger.Sync())
 
 	var res map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": []interface{}{
+			"ok",
+			"[CIRCULAR_REFERENCE]",
+		},
+	}
+	require.Equal(t, expected, res)
 }
