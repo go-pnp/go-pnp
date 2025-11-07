@@ -53,6 +53,11 @@ type derivedStruct struct {
 	Other string `json:"other"`
 }
 
+type unexportedNonSensitive struct {
+	internal string
+	User     string `json:"user"`
+}
+
 func TestSanitizer_DefaultRedactSimpleFields(t *testing.T) {
 	logger, buf := newSanitizedLogger()
 	logger.Info("test", zap.String("password", "secret"), zap.String("user", "ok"), zap.String("Password", "secret2"))
@@ -275,6 +280,26 @@ func TestSanitizer_WithContextualFields(t *testing.T) {
 		"msg":   "test",
 		"token": "[REDACTED]",
 		"info":  "ok",
+	}
+	require.Equal(t, expected, res)
+}
+
+func TestSanitizer_UnexportedNonSensitiveField(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	data := unexportedNonSensitive{internal: "secret-data", User: "ok"}
+	logger.Info("test", zap.Reflect("data", data))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": map[string]interface{}{
+			"internal": nil, // nil since unexported
+			"user":     "ok",
+		},
 	}
 	require.Equal(t, expected, res)
 }

@@ -99,6 +99,10 @@ func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool
 	switch val.Kind() { //nolint:exhaustive
 	case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
 	default:
+		if !val.IsValid() || !val.CanInterface() {
+			return nil
+		}
+
 		return val.Interface()
 	}
 
