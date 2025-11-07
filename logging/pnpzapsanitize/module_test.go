@@ -60,10 +60,15 @@ func TestSanitizer_DefaultRedactSimpleFields(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
-	require.Equal(t, "[REDACTED]", m["password"])
-	require.Equal(t, "[REDACTED]", m["Password"])
-	require.Equal(t, "ok", m["user"])
+
+	expected := map[string]interface{}{
+		"level":    "info",
+		"msg":      "test",
+		"password": "[REDACTED]",
+		"Password": "[REDACTED]",
+		"user":     "ok",
+	}
+	require.Equal(t, expected, m)
 }
 
 func TestSanitizer_RedactStruct(t *testing.T) {
@@ -73,10 +78,16 @@ func TestSanitizer_RedactStruct(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
-	data := m["data"].(map[string]interface{})
-	require.Equal(t, "[REDACTED]", data["password"])
-	require.Equal(t, "ok", data["user"])
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": map[string]interface{}{
+			"password": "[REDACTED]",
+			"user":     "ok",
+		},
+	}
+	require.Equal(t, expected, m)
 }
 
 func TestSanitizer_RedactNestedStruct(t *testing.T) {
@@ -86,11 +97,18 @@ func TestSanitizer_RedactNestedStruct(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
-	data := m["data"].(map[string]interface{})
-	nest := data["nest"].(map[string]interface{})
-	require.Equal(t, "[REDACTED]", nest["api_key"])
-	require.Equal(t, "ok", nest["other"])
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": map[string]interface{}{
+			"nest": map[string]interface{}{
+				"api_key": "[REDACTED]",
+				"other":   "ok",
+			},
+		},
+	}
+	require.Equal(t, expected, m)
 }
 
 func TestSanitizer_RedactMap(t *testing.T) {
@@ -100,12 +118,17 @@ func TestSanitizer_RedactMap(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
-	data := m["data"].(map[string]interface{})
-	require.Equal(t, "[REDACTED]", data["token"])
-	require.Equal(t, "ok", data["user"])
-	nested := data["nested"].(map[string]interface{})
-	require.Equal(t, "[REDACTED]", nested["client_secret"])
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": map[string]interface{}{
+			"token":  "[REDACTED]",
+			"user":   "ok",
+			"nested": map[string]interface{}{"client_secret": "[REDACTED]"},
+		},
+	}
+	require.Equal(t, expected, m)
 }
 
 func TestSanitizer_RedactSlice(t *testing.T) {
@@ -115,11 +138,16 @@ func TestSanitizer_RedactSlice(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
-	data := m["data"].([]interface{})
-	require.Equal(t, "ok", data[0])
-	item := data[1].(map[string]interface{})
-	require.Equal(t, "[REDACTED]", item["api_key"])
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": []interface{}{
+			"ok",
+			map[string]interface{}{"api_key": "[REDACTED]"},
+		},
+	}
+	require.Equal(t, expected, m)
 }
 
 func TestSanitizer_RedactCircular(t *testing.T) {
@@ -131,10 +159,16 @@ func TestSanitizer_RedactCircular(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
-	data := m["data"].(map[string]interface{})
-	require.Equal(t, "a", data["name"])
-	require.Equal(t, "[CIRCULAR_REFERENCE]", data["self"])
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": map[string]interface{}{
+			"name": "a",
+			"self": "[CIRCULAR_REFERENCE]",
+		},
+	}
+	require.Equal(t, expected, m)
 }
 
 func TestSanitizer_RedactInlineStruct(t *testing.T) {
@@ -144,10 +178,16 @@ func TestSanitizer_RedactInlineStruct(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
-	data := m["data"].(map[string]interface{})
-	require.Equal(t, "[REDACTED]", data["password"])
-	require.Equal(t, "ok", data["other"])
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": map[string]interface{}{
+			"password": "[REDACTED]",
+			"other":    "ok",
+		},
+	}
+	require.Equal(t, expected, m)
 }
 
 func TestSanitizer_RedactFieldInsideNamespace(t *testing.T) {
@@ -159,12 +199,15 @@ func TestSanitizer_RedactFieldInsideNamespace(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
 
-	require.Contains(t, m, "user_data")
-	ns := m["user_data"].(map[string]interface{})
-
-	require.Equal(t, "[REDACTED]", ns["api_key"])
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"user_data": map[string]interface{}{
+			"api_key": "[REDACTED]",
+		},
+	}
+	require.Equal(t, expected, m)
 }
 
 func TestSanitizer_RedactNonStringField(t *testing.T) {
@@ -174,9 +217,14 @@ func TestSanitizer_RedactNonStringField(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
-	require.Equal(t, "[REDACTED]", m["client_id"])
-	require.Equal(t, 8080, int(m["port"].(float64)))
+
+	expected := map[string]interface{}{
+		"level":     "info",
+		"msg":       "test",
+		"client_id": "[REDACTED]",
+		"port":      float64(8080),
+	}
+	require.Equal(t, expected, m)
 }
 
 func TestSanitizer_CustomRegex(t *testing.T) {
@@ -187,9 +235,14 @@ func TestSanitizer_CustomRegex(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
-	require.Equal(t, "[REDACTED]", m["user"])
-	require.Equal(t, "secret", m["password"])
+
+	expected := map[string]interface{}{
+		"level":    "info",
+		"msg":      "test",
+		"user":     "[REDACTED]",
+		"password": "secret",
+	}
+	require.Equal(t, expected, m)
 }
 
 func TestSanitizer_CustomRedacted(t *testing.T) {
@@ -199,8 +252,13 @@ func TestSanitizer_CustomRedacted(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
-	require.Equal(t, "***", m["password"])
+
+	expected := map[string]interface{}{
+		"level":    "info",
+		"msg":      "test",
+		"password": "***",
+	}
+	require.Equal(t, expected, m)
 }
 
 func TestSanitizer_WithContextualFields(t *testing.T) {
@@ -211,7 +269,12 @@ func TestSanitizer_WithContextualFields(t *testing.T) {
 
 	var m map[string]interface{}
 	require.NoError(t, json.Unmarshal(buf.Bytes(), &m))
-	require.Equal(t, "test", m["msg"])
-	require.Equal(t, "[REDACTED]", m["token"])
-	require.Equal(t, "ok", m["info"])
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"token": "[REDACTED]",
+		"info":  "ok",
+	}
+	require.Equal(t, expected, m)
 }
