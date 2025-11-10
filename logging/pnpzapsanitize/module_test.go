@@ -292,7 +292,7 @@ type unexportedNonSensitive struct {
 
 func TestSanitizer_UnexportedNonSensitiveField(t *testing.T) {
 	logger, buf := newSanitizedLogger()
-	data := unexportedNonSensitive{internal: "secret-data", User: "ok"}
+	data := unexportedNonSensitive{internal: "unexported-data", User: "ok"}
 	logger.Info("test", zap.Reflect("data", data))
 	require.NoError(t, logger.Sync())
 
@@ -302,21 +302,24 @@ func TestSanitizer_UnexportedNonSensitiveField(t *testing.T) {
 	expected := map[string]interface{}{
 		"level": "info",
 		"msg":   "test",
-		"data": map[string]interface{}{
-			"internal": nil, // nil since unexported
-			"user":     "ok",
+		"data": map[string]interface{}{ // 'internal' field skipped
+			"user": "ok",
 		},
 	}
 	require.Equal(t, expected, res)
 }
 
 type structWithUnexportedMap struct {
-	sensitive map[string]string
+	internal map[string]string
+	Exported string `json:"exported"`
 }
 
 func TestSanitizer_UnexportedMap(t *testing.T) {
 	logger, buf := newSanitizedLogger()
-	data := structWithUnexportedMap{sensitive: map[string]string{"password": "secret"}}
+	data := structWithUnexportedMap{
+		internal: map[string]string{"password": "secret"},
+		Exported: "exported-string",
+	}
 	logger.Info("test", zap.Reflect("data", data))
 	require.NoError(t, logger.Sync())
 
@@ -326,8 +329,8 @@ func TestSanitizer_UnexportedMap(t *testing.T) {
 	expected := map[string]interface{}{
 		"level": "info",
 		"msg":   "test",
-		"data": map[string]interface{}{
-			"sensitive": nil, // unexported fields cannot be accessed
+		"data": map[string]interface{}{ // 'internal' field skipped
+			"exported": "exported-string",
 		},
 	}
 	require.Equal(t, expected, res)

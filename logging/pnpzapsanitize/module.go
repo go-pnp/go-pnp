@@ -199,8 +199,14 @@ func (c *fieldHidingCore) sanitizeStruct(val reflect.Value, seen map[uintptr]boo
 		var sanitizedVal interface{}
 		if isInline {
 			sanitizedVal = c.sanitizeStruct(fieldVal, seen)
-		} else if fieldVal.IsValid() {
-			sanitizedVal = c.sanitizeValue(fieldVal, seen)
+		} else {
+			if field.PkgPath != "" {
+				continue
+			}
+
+			if fieldVal.IsValid() {
+				sanitizedVal = c.sanitizeValue(fieldVal, seen)
+			}
 		}
 
 		if isInline {
