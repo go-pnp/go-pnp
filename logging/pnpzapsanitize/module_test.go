@@ -24,35 +24,6 @@ func newSanitizedLogger(opts ...pnpzapsanitize.Option) (*zap.Logger, *bytes.Buff
 	return zap.New(core, pnpzapsanitize.Module(opts...)), buf
 }
 
-type testStruct struct {
-	Password string `json:"password"`
-	User     string `json:"user"`
-}
-
-type nestedStruct struct {
-	APIKey string `json:"api_key"`
-	Other  string `json:"other"`
-}
-
-type outerStruct struct {
-	Nest nestedStruct `json:"nest"`
-}
-
-type circStruct struct {
-	Name string      `json:"name"`
-	Self *circStruct `json:"self"`
-}
-
-type baseStruct struct {
-	Password string `json:"password"`
-}
-
-type derivedStruct struct {
-	baseStruct
-
-	Other string `json:"other"`
-}
-
 func TestSanitizer_DefaultRedactSimpleFields(t *testing.T) {
 	logger, buf := newSanitizedLogger()
 	logger.Info("test", zap.String("password", "secret"), zap.String("user", "ok"), zap.String("Password", "secret2"))
@@ -69,6 +40,11 @@ func TestSanitizer_DefaultRedactSimpleFields(t *testing.T) {
 		"user":     "ok",
 	}
 	require.Equal(t, expected, res)
+}
+
+type testStruct struct {
+	Password string `json:"password"`
+	User     string `json:"user"`
 }
 
 func TestSanitizer_RedactStruct(t *testing.T) {
@@ -90,9 +66,20 @@ func TestSanitizer_RedactStruct(t *testing.T) {
 	require.Equal(t, expected, res)
 }
 
+type nestedStruct struct {
+	APIKey string `json:"api_key"`
+	Other  string `json:"other"`
+}
+
+type outerStruct struct {
+	Nest nestedStruct `json:"nest"`
+}
+
 func TestSanitizer_RedactNestedStruct(t *testing.T) {
 	logger, buf := newSanitizedLogger()
-	logger.Info("test", zap.Reflect("data", outerStruct{Nest: nestedStruct{APIKey: "secret", Other: "ok"}}))
+	logger.Info("test", zap.Reflect("data", outerStruct{
+		Nest: nestedStruct{APIKey: "secret", Other: "ok"},
+	}))
 	require.NoError(t, logger.Sync())
 
 	var res map[string]interface{}
@@ -113,7 +100,11 @@ func TestSanitizer_RedactNestedStruct(t *testing.T) {
 
 func TestSanitizer_RedactMap(t *testing.T) {
 	logger, buf := newSanitizedLogger()
-	logger.Info("test", zap.Any("data", map[string]interface{}{"token": "secret", "user": "ok", "nested": map[string]string{"client_secret": "secret2"}}))
+	logger.Info("test", zap.Any("data", map[string]interface{}{
+		"token":  "secret",
+		"user":   "ok",
+		"nested": map[string]string{"client_secret": "secret2"},
+	}))
 	require.NoError(t, logger.Sync())
 
 	var res map[string]interface{}
@@ -150,6 +141,11 @@ func TestSanitizer_RedactSlice(t *testing.T) {
 	require.Equal(t, expected, res)
 }
 
+type circStruct struct {
+	Name string      `json:"name"`
+	Self *circStruct `json:"self"`
+}
+
 func TestSanitizer_RedactCircular(t *testing.T) {
 	c := &circStruct{Name: "a"}
 	c.Self = c
@@ -169,6 +165,16 @@ func TestSanitizer_RedactCircular(t *testing.T) {
 		},
 	}
 	require.Equal(t, expected, res)
+}
+
+type baseStruct struct {
+	Password string `json:"password"`
+}
+
+type derivedStruct struct {
+	baseStruct
+
+	Other string `json:"other"`
 }
 
 func TestSanitizer_RedactInlineStruct(t *testing.T) {
@@ -275,6 +281,106 @@ func TestSanitizer_WithContextualFields(t *testing.T) {
 		"msg":   "test",
 		"token": "[REDACTED]",
 		"info":  "ok",
+	}
+	require.Equal(t, expected, res)
+}
+
+type unexportedNonSensitive struct {
+	internal string
+	User     string `json:"user"`
+}
+
+func TestSanitizer_UnexportedNonSensitiveField(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	data := unexportedNonSensitive{internal: "unexported-data", User: "ok"}
+	logger.Info("test", zap.Reflect("data", data))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": map[string]interface{}{ // 'internal' field skipped
+			"user": "ok",
+		},
+	}
+	require.Equal(t, expected, res)
+}
+
+type structWithUnexportedMap struct {
+	internal map[string]string
+	Exported string `json:"exported"`
+}
+
+func TestSanitizer_UnexportedMap(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	data := structWithUnexportedMap{
+		internal: map[string]string{"password": "secret"},
+		Exported: "exported-string",
+	}
+	logger.Info("test", zap.Reflect("data", data))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": map[string]interface{}{ // 'internal' field skipped
+			"exported": "exported-string",
+		},
+	}
+	require.Equal(t, expected, res)
+}
+
+type circularMap map[string]interface{}
+
+func TestSanitizer_CircularMap(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	m := make(circularMap)
+	m["self"] = m
+	m["other"] = "ok"
+	logger.Info("test", zap.Any("data", m))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": map[string]interface{}{
+			"self":  "[CIRCULAR_REFERENCE]",
+			"other": "ok",
+		},
+	}
+	require.Equal(t, expected, res)
+}
+
+func TestSanitizer_CircularSlice(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	var s []interface{}
+
+	s = append(s, "ok", nil)
+	s[1] = s
+
+	logger.Info("test", zap.Any("data", s))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	expected := map[string]interface{}{
+		"level": "info",
+		"msg":   "test",
+		"data": []interface{}{
+			"ok",
+			"[CIRCULAR_REFERENCE]",
+		},
 	}
 	require.Equal(t, expected, res)
 }

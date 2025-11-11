@@ -96,18 +96,21 @@ func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool
 		val = val.Elem()
 	}
 
-	switch val.Kind() { //nolint:exhaustive
-	case reflect.Struct, reflect.Map, reflect.Slice, reflect.Array:
-	default:
-		return val.Interface()
+	if !val.IsValid() || !val.CanInterface() {
+		return nil
 	}
 
 	var ptr uintptr
 
 	addrMarked := false
 
-	if val.CanAddr() {
+	if val.Kind() == reflect.Map || val.Kind() == reflect.Slice {
+		ptr = val.Pointer()
+	} else if val.Kind() == reflect.Struct && val.CanAddr() {
 		ptr = val.Addr().Pointer()
+	}
+
+	if ptr != 0 {
 		if seen[ptr] {
 			return circularRefPlaceholder
 		}
@@ -125,6 +128,8 @@ func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool
 		result = c.sanitizeMap(val, seen)
 	case reflect.Slice, reflect.Array:
 		result = c.sanitizeSlice(val, seen)
+	default:
+		result = val.Interface()
 	}
 
 	if addrMarked {
@@ -139,7 +144,12 @@ func (c *fieldHidingCore) sanitizeMap(val reflect.Value, seen map[uintptr]bool) 
 	mapRange := val.MapRange()
 
 	for mapRange.Next() {
-		keyI := mapRange.Key().Interface()
+		keyVal := mapRange.Key()
+		if !keyVal.IsValid() || !keyVal.CanInterface() {
+			continue
+		}
+
+		keyI := keyVal.Interface()
 
 		keyStr, ok := keyI.(string)
 		if !ok {
@@ -187,8 +197,16 @@ func (c *fieldHidingCore) sanitizeStruct(val reflect.Value, seen map[uintptr]boo
 		isInline := (key == "" && field.Anonymous && fieldVal.Kind() == reflect.Struct)
 
 		var sanitizedVal interface{}
-		if fieldVal.IsValid() {
-			sanitizedVal = c.sanitizeValue(fieldVal, seen)
+		if isInline {
+			sanitizedVal = c.sanitizeStruct(fieldVal, seen)
+		} else {
+			if field.PkgPath != "" {
+				continue
+			}
+
+			if fieldVal.IsValid() {
+				sanitizedVal = c.sanitizeValue(fieldVal, seen)
+			}
 		}
 
 		if isInline {
