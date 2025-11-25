@@ -1,243 +1,30 @@
 package pnpzapsanitize
 
 import (
-	"fmt"
-	"reflect"
-	"regexp"
-	"strings"
-
+	"github.com/go-pnp/go-pnp/fxutil"
+	"github.com/go-pnp/go-pnp/logging/pnpzap"
+	"github.com/go-pnp/go-pnp/pkg/optionutil"
+	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-var defaultSensitiveKeysRegex = regexp.MustCompile(`(?i)password|api_?key|token|client_(id|secret|key)`)
+func Module(opts ...optionutil.Option[options]) fx.Option {
+	options := newOptions(opts)
 
-const defaultRedactedValue = "[REDACTED]"
-const circularRefPlaceholder = "[CIRCULAR_REFERENCE]"
+	builder := fxutil.OptionsBuilder{}
+	builder.Supply(options)
+	builder.Provide(pnpzap.ZapOptionProvider(NewZapOption))
 
-type fieldHidingCore struct {
-	zapcore.Core
-
-	regex    *regexp.Regexp
-	redacted string
+	return builder.Build()
 }
 
-func Module(opts ...Option) zap.Option {
-	cfg := &options{
-		regex:    defaultSensitiveKeysRegex,
-		redacted: defaultRedactedValue,
-	}
-
-	for _, opt := range opts {
-		opt(cfg)
-	}
-
+func NewZapOption(options *options) zap.Option {
 	return zap.WrapCore(func(core zapcore.Core) zapcore.Core {
 		return &fieldHidingCore{
 			Core:     core,
-			regex:    cfg.regex,
-			redacted: cfg.redacted,
+			regex:    options.regex,
+			redacted: options.redacted,
 		}
 	})
-}
-
-func (c *fieldHidingCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
-	sanitizedFields := c.sanitizeFields(fields)
-
-	return c.Core.Write(entry, sanitizedFields)
-}
-
-func (c *fieldHidingCore) With(fields []zapcore.Field) zapcore.Core {
-	sanitizedFields := c.sanitizeFields(fields)
-
-	return &fieldHidingCore{
-		Core:     c.Core.With(sanitizedFields),
-		regex:    c.regex,
-		redacted: c.redacted,
-	}
-}
-
-func (c *fieldHidingCore) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
-	if c.Enabled(ent.Level) {
-		return ce.AddCore(ent, c)
-	}
-
-	return ce
-}
-
-func (c *fieldHidingCore) sanitizeFields(fields []zapcore.Field) []zapcore.Field {
-	sanitizedFields := make([]zapcore.Field, 0, len(fields))
-	for i := range fields {
-		sanitizedFields = append(sanitizedFields, c.sanitizeField(fields[i]))
-	}
-
-	return sanitizedFields
-}
-
-func (c *fieldHidingCore) sanitizeField(field zapcore.Field) zapcore.Field {
-	if c.regex.MatchString(field.Key) {
-		return zap.String(field.Key, c.redacted)
-	}
-
-	switch field.Type { //nolint:exhaustive
-	case zapcore.ReflectType, zapcore.ObjectMarshalerType, zapcore.ArrayMarshalerType:
-		return zap.Any(field.Key, c.sanitizeInterface(field.Interface))
-	default:
-		return field
-	}
-}
-
-func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool) interface{} {
-	for val.Kind() == reflect.Ptr || val.Kind() == reflect.Interface {
-		if val.IsNil() {
-			return nil
-		}
-
-		val = val.Elem()
-	}
-
-	if !val.IsValid() || !val.CanInterface() {
-		return nil
-	}
-
-	var ptr uintptr
-
-	addrMarked := false
-
-	if val.Kind() == reflect.Map || val.Kind() == reflect.Slice {
-		ptr = val.Pointer()
-	} else if val.Kind() == reflect.Struct && val.CanAddr() {
-		ptr = val.Addr().Pointer()
-	}
-
-	if ptr != 0 {
-		if seen[ptr] {
-			return circularRefPlaceholder
-		}
-
-		seen[ptr] = true
-		addrMarked = true
-	}
-
-	var result interface{}
-
-	switch val.Kind() { //nolint:exhaustive
-	case reflect.Struct:
-		result = c.sanitizeStruct(val, seen)
-	case reflect.Map:
-		result = c.sanitizeMap(val, seen)
-	case reflect.Slice, reflect.Array:
-		result = c.sanitizeSlice(val, seen)
-	default:
-		result = val.Interface()
-	}
-
-	if addrMarked {
-		delete(seen, ptr)
-	}
-
-	return result
-}
-
-func (c *fieldHidingCore) sanitizeMap(val reflect.Value, seen map[uintptr]bool) interface{} {
-	sanitizedMap := make(map[string]interface{}, val.Len())
-	mapRange := val.MapRange()
-
-	for mapRange.Next() {
-		keyVal := mapRange.Key()
-		if !keyVal.IsValid() || !keyVal.CanInterface() {
-			continue
-		}
-
-		keyI := keyVal.Interface()
-
-		keyStr, ok := keyI.(string)
-		if !ok {
-			keyStr = fmt.Sprint(keyI)
-		}
-
-		if c.regex.MatchString(keyStr) {
-			sanitizedMap[keyStr] = c.redacted
-
-			continue
-		}
-
-		valueI := c.sanitizeValue(mapRange.Value(), seen)
-		sanitizedMap[keyStr] = valueI
-	}
-
-	return sanitizedMap
-}
-
-func (c *fieldHidingCore) sanitizeInterface(data interface{}) interface{} {
-	if data == nil {
-		return nil
-	}
-
-	return c.sanitizeValue(reflect.ValueOf(data), make(map[uintptr]bool))
-}
-
-func (c *fieldHidingCore) sanitizeStruct(val reflect.Value, seen map[uintptr]bool) interface{} {
-	sanitizedMap := make(map[string]interface{}, val.NumField())
-
-	valType := val.Type()
-	for i := range val.NumField() {
-		field := valType.Field(i)
-		fieldVal := val.Field(i)
-
-		key := field.Tag.Get("json")
-		if keyTagParts := strings.Split(key, ","); len(keyTagParts) > 0 {
-			key = keyTagParts[0]
-		}
-
-		if key == "-" {
-			continue
-		}
-
-		isInline := (key == "" && field.Anonymous && fieldVal.Kind() == reflect.Struct)
-
-		var sanitizedVal interface{}
-		if isInline {
-			sanitizedVal = c.sanitizeStruct(fieldVal, seen)
-		} else {
-			if field.PkgPath != "" {
-				continue
-			}
-
-			if fieldVal.IsValid() {
-				sanitizedVal = c.sanitizeValue(fieldVal, seen)
-			}
-		}
-
-		if isInline {
-			if subMap, ok := sanitizedVal.(map[string]interface{}); ok {
-				for k, v := range subMap {
-					sanitizedMap[k] = v
-				}
-
-				continue
-			}
-		}
-
-		if key == "" {
-			key = field.Name
-		}
-
-		if c.regex.MatchString(key) {
-			sanitizedMap[key] = c.redacted
-		} else {
-			sanitizedMap[key] = sanitizedVal
-		}
-	}
-
-	return sanitizedMap
-}
-
-func (c *fieldHidingCore) sanitizeSlice(val reflect.Value, seen map[uintptr]bool) interface{} {
-	sanitizedSlice := make([]interface{}, val.Len())
-	for i := range val.Len() {
-		sanitizedSlice[i] = c.sanitizeValue(val.Index(i), seen)
-	}
-
-	return sanitizedSlice
 }
