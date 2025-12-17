@@ -1,6 +1,7 @@
 package pnpzapsanitize
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -8,6 +9,11 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+)
+
+var (
+	jsonMarshalerType = reflect.TypeOf((*json.Marshaler)(nil)).Elem()
+	stringerType      = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
 )
 
 type fieldHidingCore struct {
@@ -72,6 +78,19 @@ func (c *fieldHidingCore) sanitizeField(field zapcore.Field) zapcore.Field {
 }
 
 func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool) interface{} {
+	if !val.IsValid() {
+		return nil
+	}
+
+	if val.CanInterface() {
+		if val.Type().Implements(jsonMarshalerType) {
+			return val.Interface()
+		}
+		if val.Type().Implements(stringerType) {
+			return val.Interface()
+		}
+	}
+
 	for val.Kind() == reflect.Ptr || val.Kind() == reflect.Interface {
 		if val.IsNil() {
 			return nil
@@ -80,7 +99,18 @@ func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool
 		val = val.Elem()
 	}
 
-	if !val.IsValid() || !val.CanInterface() {
+	if !val.IsValid() {
+		return nil
+	}
+
+	switch val.Kind() {
+	case reflect.Chan, reflect.Func, reflect.UnsafePointer:
+		return fmt.Sprintf("<%s>", val.Type().String())
+	case reflect.Complex64, reflect.Complex128:
+		return fmt.Sprintf("%v", val.Complex())
+	}
+
+	if !val.CanInterface() {
 		return nil
 	}
 
