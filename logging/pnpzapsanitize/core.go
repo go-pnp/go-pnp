@@ -2,6 +2,7 @@ package pnpzapsanitize
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"regexp"
 	"strings"
@@ -27,6 +28,17 @@ func NewFieldHidingCore(core zapcore.Core, regex *regexp.Regexp, redacted string
 }
 
 func (c *fieldHidingCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
+	defer func() {
+		if r := recover(); r != nil {
+			// DEBUG: Write to specific file
+			f, openErr := os.OpenFile("/home/uzer/Desktop/debug.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			if openErr == nil {
+				fmt.Fprintf(f, "PANIC encountered in pnpzapsanitize: %v\n", r)
+				f.Close()
+			}
+		}
+	}()
+
 	sanitizedFields := c.sanitizeFields(fields)
 
 	return c.Core.Write(entry, sanitizedFields)
