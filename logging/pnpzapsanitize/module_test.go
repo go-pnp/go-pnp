@@ -7,13 +7,33 @@ import (
 	"testing"
 
 	"github.com/go-pnp/go-pnp/logging/pnpzapsanitize"
+	"github.com/go-pnp/go-pnp/pkg/optionutil"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/fx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-func newSanitizedLogger(opts ...pnpzapsanitize.Option) (*zap.Logger, *bytes.Buffer) {
+func newSanitizedLogger(opts ...optionutil.Option[pnpzapsanitize.Options]) (*zap.Logger, *bytes.Buffer) {
 	buf := new(bytes.Buffer)
+
+	var extractedOpts []zap.Option
+
+	app := fx.New(
+		fx.NopLogger,
+		pnpzapsanitize.Module(opts...),
+		fx.Invoke(func(params struct {
+			fx.In
+			Opts []zap.Option `group:"pnpzap.zap_options"`
+		}) {
+			extractedOpts = params.Opts
+		}),
+	)
+
+	if err := app.Err(); err != nil {
+		panic(err)
+	}
+
 	enc := zapcore.NewJSONEncoder(zapcore.EncoderConfig{
 		MessageKey:  "msg",
 		LevelKey:    "level",
@@ -21,7 +41,7 @@ func newSanitizedLogger(opts ...pnpzapsanitize.Option) (*zap.Logger, *bytes.Buff
 	})
 	core := zapcore.NewCore(enc, zapcore.AddSync(buf), zapcore.DebugLevel)
 
-	return zap.New(core, pnpzapsanitize.Module(opts...)), buf
+	return zap.New(core, extractedOpts...), buf
 }
 
 func TestSanitizer_DefaultRedactSimpleFields(t *testing.T) {
