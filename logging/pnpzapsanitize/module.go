@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-func Module(opts ...optionutil.Option[options]) fx.Option {
+func Module(opts ...optionutil.Option[Options]) fx.Option {
 	options := newOptions(opts)
 
 	builder := fxutil.OptionsBuilder{}
@@ -19,7 +19,7 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	return builder.Build()
 }
 
-func NewZapOption(options *options) zap.Option {
+func NewZapOption(options *Options) zap.Option {
 	return zap.WrapCore(func(core zapcore.Core) zapcore.Core {
 		return &fieldHidingCore{
 			Core:     core,
