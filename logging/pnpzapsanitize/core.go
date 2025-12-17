@@ -1,19 +1,14 @@
 package pnpzapsanitize
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-)
-
-var (
-	jsonMarshalerType = reflect.TypeOf((*json.Marshaler)(nil)).Elem()
-	stringerType      = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
 )
 
 type fieldHidingCore struct {
@@ -69,26 +64,44 @@ func (c *fieldHidingCore) sanitizeField(field zapcore.Field) zapcore.Field {
 		return zap.String(field.Key, c.redacted)
 	}
 
-	switch field.Type { //nolint:exhaustive
-	case zapcore.ReflectType, zapcore.ObjectMarshalerType, zapcore.ArrayMarshalerType:
-		return zap.Any(field.Key, c.sanitizeInterface(field.Interface))
+	switch field.Type {
+	case zapcore.ReflectType:
+		return zap.Reflect(field.Key, sanitizeInterface(field.Interface, c.regex, c.redacted, make(map[uintptr]bool), 0))
+	case zapcore.ObjectMarshalerType:
+		om, ok := field.Interface.(zapcore.ObjectMarshaler)
+		if !ok {
+			return field
+		}
+		return zap.Object(field.Key, zapcore.ObjectMarshalerFunc(func(enc zapcore.ObjectEncoder) error {
+			return om.MarshalLogObject(NewSanitizingObjectEncoder(enc, c.regex, c.redacted, 0))
+		}))
+	case zapcore.ArrayMarshalerType:
+		am, ok := field.Interface.(zapcore.ArrayMarshaler)
+		if !ok {
+			return field
+		}
+		return zap.Array(field.Key, zapcore.ArrayMarshalerFunc(func(enc zapcore.ArrayEncoder) error {
+			return am.MarshalLogArray(NewSanitizingArrayEncoder(enc, c.regex, c.redacted, 0))
+		}))
 	default:
 		return field
 	}
 }
 
-func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool) interface{} {
-	if !val.IsValid() {
+const maxDepth = 100
+const depthLimitPlaceholder = "[DEPTH_LIMIT_EXCEEDED]"
+
+func sanitizeInterface(data interface{}, re *regexp.Regexp, redacted string, seen map[uintptr]bool, depth int) interface{} {
+	if data == nil {
 		return nil
 	}
 
-	if val.CanInterface() {
-		if val.Type().Implements(jsonMarshalerType) {
-			return val.Interface()
-		}
-		if val.Type().Implements(stringerType) {
-			return val.Interface()
-		}
+	return sanitizeValue(reflect.ValueOf(data), re, redacted, seen, depth)
+}
+
+func sanitizeValue(val reflect.Value, re *regexp.Regexp, redacted string, seen map[uintptr]bool, depth int) interface{} {
+	if depth > maxDepth {
+		return depthLimitPlaceholder
 	}
 
 	for val.Kind() == reflect.Ptr || val.Kind() == reflect.Interface {
@@ -99,23 +112,11 @@ func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool
 		val = val.Elem()
 	}
 
-	if !val.IsValid() {
-		return nil
-	}
-
-	switch val.Kind() {
-	case reflect.Chan, reflect.Func, reflect.UnsafePointer:
-		return fmt.Sprintf("<%s>", val.Type().String())
-	case reflect.Complex64, reflect.Complex128:
-		return fmt.Sprintf("%v", val.Complex())
-	}
-
-	if !val.CanInterface() {
+	if !val.IsValid() || !val.CanInterface() {
 		return nil
 	}
 
 	var ptr uintptr
-
 	addrMarked := false
 
 	if val.Kind() == reflect.Map || val.Kind() == reflect.Slice {
@@ -135,13 +136,13 @@ func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool
 
 	var result interface{}
 
-	switch val.Kind() { //nolint:exhaustive
+	switch val.Kind() {
 	case reflect.Struct:
-		result = c.sanitizeStruct(val, seen)
+		result = sanitizeStruct(val, re, redacted, seen, depth+1)
 	case reflect.Map:
-		result = c.sanitizeMap(val, seen)
+		result = sanitizeMap(val, re, redacted, seen, depth+1)
 	case reflect.Slice, reflect.Array:
-		result = c.sanitizeSlice(val, seen)
+		result = sanitizeSlice(val, re, redacted, seen, depth+1)
 	default:
 		result = val.Interface()
 	}
@@ -153,7 +154,7 @@ func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool
 	return result
 }
 
-func (c *fieldHidingCore) sanitizeMap(val reflect.Value, seen map[uintptr]bool) interface{} {
+func sanitizeMap(val reflect.Value, re *regexp.Regexp, redacted string, seen map[uintptr]bool, depth int) interface{} {
 	sanitizedMap := make(map[string]interface{}, val.Len())
 	mapRange := val.MapRange()
 
@@ -170,28 +171,19 @@ func (c *fieldHidingCore) sanitizeMap(val reflect.Value, seen map[uintptr]bool) 
 			keyStr = fmt.Sprint(keyI)
 		}
 
-		if c.regex.MatchString(keyStr) {
-			sanitizedMap[keyStr] = c.redacted
-
+		if re.MatchString(keyStr) {
+			sanitizedMap[keyStr] = redacted
 			continue
 		}
 
-		valueI := c.sanitizeValue(mapRange.Value(), seen)
+		valueI := sanitizeValue(mapRange.Value(), re, redacted, seen, depth+1)
 		sanitizedMap[keyStr] = valueI
 	}
 
 	return sanitizedMap
 }
 
-func (c *fieldHidingCore) sanitizeInterface(data interface{}) interface{} {
-	if data == nil {
-		return nil
-	}
-
-	return c.sanitizeValue(reflect.ValueOf(data), make(map[uintptr]bool))
-}
-
-func (c *fieldHidingCore) sanitizeStruct(val reflect.Value, seen map[uintptr]bool) interface{} {
+func sanitizeStruct(val reflect.Value, re *regexp.Regexp, redacted string, seen map[uintptr]bool, depth int) interface{} {
 	sanitizedMap := make(map[string]interface{}, val.NumField())
 
 	valType := val.Type()
@@ -212,14 +204,14 @@ func (c *fieldHidingCore) sanitizeStruct(val reflect.Value, seen map[uintptr]boo
 
 		var sanitizedVal interface{}
 		if isInline {
-			sanitizedVal = c.sanitizeStruct(fieldVal, seen)
+			sanitizedVal = sanitizeStruct(fieldVal, re, redacted, seen, depth+1)
 		} else {
 			if field.PkgPath != "" {
 				continue
 			}
 
 			if fieldVal.IsValid() {
-				sanitizedVal = c.sanitizeValue(fieldVal, seen)
+				sanitizedVal = sanitizeValue(fieldVal, re, redacted, seen, depth+1)
 			}
 		}
 
@@ -228,7 +220,6 @@ func (c *fieldHidingCore) sanitizeStruct(val reflect.Value, seen map[uintptr]boo
 				for k, v := range subMap {
 					sanitizedMap[k] = v
 				}
-
 				continue
 			}
 		}
@@ -237,8 +228,8 @@ func (c *fieldHidingCore) sanitizeStruct(val reflect.Value, seen map[uintptr]boo
 			key = field.Name
 		}
 
-		if c.regex.MatchString(key) {
-			sanitizedMap[key] = c.redacted
+		if re.MatchString(key) {
+			sanitizedMap[key] = redacted
 		} else {
 			sanitizedMap[key] = sanitizedVal
 		}
@@ -247,11 +238,357 @@ func (c *fieldHidingCore) sanitizeStruct(val reflect.Value, seen map[uintptr]boo
 	return sanitizedMap
 }
 
-func (c *fieldHidingCore) sanitizeSlice(val reflect.Value, seen map[uintptr]bool) interface{} {
+func sanitizeSlice(val reflect.Value, re *regexp.Regexp, redacted string, seen map[uintptr]bool, depth int) interface{} {
 	sanitizedSlice := make([]interface{}, val.Len())
 	for i := range val.Len() {
-		sanitizedSlice[i] = c.sanitizeValue(val.Index(i), seen)
+		sanitizedSlice[i] = sanitizeValue(val.Index(i), re, redacted, seen, depth+1)
 	}
 
 	return sanitizedSlice
+}
+
+type sanitizingObjectEncoder struct {
+	zapcore.ObjectEncoder
+	regex    *regexp.Regexp
+	redacted string
+	depth    int
+}
+
+func NewSanitizingObjectEncoder(enc zapcore.ObjectEncoder, re *regexp.Regexp, redacted string, depth int) zapcore.ObjectEncoder {
+	return &sanitizingObjectEncoder{
+		ObjectEncoder: enc,
+		regex:         re,
+		redacted:      redacted,
+		depth:         depth,
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddBool(key string, value bool) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddBool(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddByteString(key string, value []byte) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddByteString(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddComplex128(key string, value complex128) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddComplex128(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddComplex64(key string, value complex64) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddComplex64(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddDuration(key string, value time.Duration) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddDuration(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddFloat64(key string, value float64) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddFloat64(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddFloat32(key string, value float32) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddFloat32(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddInt(key string, value int) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddInt(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddInt64(key string, value int64) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddInt64(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddInt32(key string, value int32) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddInt32(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddInt16(key string, value int16) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddInt16(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddInt8(key string, value int8) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddInt8(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddString(key, value string) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddString(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddTime(key string, value time.Time) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddTime(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddUint(key string, value uint) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddUint(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddUint64(key string, value uint64) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddUint64(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddUint32(key string, value uint32) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddUint32(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddUint16(key string, value uint16) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddUint16(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddUint8(key string, value uint8) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddUint8(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddUintptr(key string, value uintptr) {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+	} else {
+		s.ObjectEncoder.AddUintptr(key, value)
+	}
+}
+
+func (s *sanitizingObjectEncoder) AddArray(key string, marshaler zapcore.ArrayMarshaler) error {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+		return nil
+	}
+	if s.depth >= maxDepth {
+		s.ObjectEncoder.AddString(key, depthLimitPlaceholder)
+		return nil
+	}
+	return s.ObjectEncoder.AddArray(key, zapcore.ArrayMarshalerFunc(func(enc zapcore.ArrayEncoder) error {
+		return marshaler.MarshalLogArray(NewSanitizingArrayEncoder(enc, s.regex, s.redacted, s.depth+1))
+	}))
+}
+
+func (s *sanitizingObjectEncoder) AddObject(key string, marshaler zapcore.ObjectMarshaler) error {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+		return nil
+	}
+	if s.depth >= maxDepth {
+		s.ObjectEncoder.AddString(key, depthLimitPlaceholder)
+		return nil
+	}
+	return s.ObjectEncoder.AddObject(key, zapcore.ObjectMarshalerFunc(func(enc zapcore.ObjectEncoder) error {
+		return marshaler.MarshalLogObject(NewSanitizingObjectEncoder(enc, s.regex, s.redacted, s.depth+1))
+	}))
+}
+
+func (s *sanitizingObjectEncoder) AddReflected(key string, value interface{}) error {
+	if s.regex.MatchString(key) {
+		s.ObjectEncoder.AddString(key, s.redacted)
+		return nil
+	}
+	if s.depth >= maxDepth {
+		s.ObjectEncoder.AddString(key, depthLimitPlaceholder)
+		return nil
+	}
+	sanitized := sanitizeInterface(value, s.regex, s.redacted, make(map[uintptr]bool), s.depth+1)
+	return s.ObjectEncoder.AddReflected(key, sanitized)
+}
+
+func (s *sanitizingObjectEncoder) OpenNamespace(key string) {
+	s.ObjectEncoder.OpenNamespace(key)
+}
+
+type sanitizingArrayEncoder struct {
+	zapcore.ArrayEncoder
+	regex    *regexp.Regexp
+	redacted string
+	depth    int
+}
+
+func NewSanitizingArrayEncoder(enc zapcore.ArrayEncoder, re *regexp.Regexp, redacted string, depth int) zapcore.ArrayEncoder {
+	return &sanitizingArrayEncoder{
+		ArrayEncoder: enc,
+		regex:        re,
+		redacted:     redacted,
+		depth:        depth,
+	}
+}
+
+func (s *sanitizingArrayEncoder) AppendBool(value bool) {
+	s.ArrayEncoder.AppendBool(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendByteString(value []byte) {
+	s.ArrayEncoder.AppendByteString(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendComplex128(value complex128) {
+	s.ArrayEncoder.AppendComplex128(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendComplex64(value complex64) {
+	s.ArrayEncoder.AppendComplex64(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendDuration(value time.Duration) {
+	s.ArrayEncoder.AppendDuration(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendFloat64(value float64) {
+	s.ArrayEncoder.AppendFloat64(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendFloat32(value float32) {
+	s.ArrayEncoder.AppendFloat32(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendInt(value int) {
+	s.ArrayEncoder.AppendInt(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendInt64(value int64) {
+	s.ArrayEncoder.AppendInt64(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendInt32(value int32) {
+	s.ArrayEncoder.AppendInt32(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendInt16(value int16) {
+	s.ArrayEncoder.AppendInt16(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendInt8(value int8) {
+	s.ArrayEncoder.AppendInt8(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendString(value string) {
+	s.ArrayEncoder.AppendString(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendTime(value time.Time) {
+	s.ArrayEncoder.AppendTime(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendUint(value uint) {
+	s.ArrayEncoder.AppendUint(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendUint64(value uint64) {
+	s.ArrayEncoder.AppendUint64(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendUint32(value uint32) {
+	s.ArrayEncoder.AppendUint32(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendUint16(value uint16) {
+	s.ArrayEncoder.AppendUint16(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendUint8(value uint8) {
+	s.ArrayEncoder.AppendUint8(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendUintptr(value uintptr) {
+	s.ArrayEncoder.AppendUintptr(value)
+}
+
+func (s *sanitizingArrayEncoder) AppendArray(marshaler zapcore.ArrayMarshaler) error {
+	if s.depth >= maxDepth {
+		s.ArrayEncoder.AppendString(depthLimitPlaceholder)
+		return nil
+	}
+	return s.ArrayEncoder.AppendArray(zapcore.ArrayMarshalerFunc(func(enc zapcore.ArrayEncoder) error {
+		return marshaler.MarshalLogArray(NewSanitizingArrayEncoder(enc, s.regex, s.redacted, s.depth+1))
+	}))
+}
+
+func (s *sanitizingArrayEncoder) AppendObject(marshaler zapcore.ObjectMarshaler) error {
+	if s.depth >= maxDepth {
+		s.ArrayEncoder.AppendString(depthLimitPlaceholder)
+		return nil
+	}
+	return s.ArrayEncoder.AppendObject(zapcore.ObjectMarshalerFunc(func(enc zapcore.ObjectEncoder) error {
+		return marshaler.MarshalLogObject(NewSanitizingObjectEncoder(enc, s.regex, s.redacted, s.depth+1))
+	}))
+}
+
+func (s *sanitizingArrayEncoder) AppendReflected(value interface{}) error {
+	if s.depth >= maxDepth {
+		s.ArrayEncoder.AppendString(depthLimitPlaceholder)
+		return nil
+	}
+	sanitized := sanitizeInterface(value, s.regex, s.redacted, make(map[uintptr]bool), s.depth+1)
+	return s.ArrayEncoder.AppendReflected(sanitized)
 }
