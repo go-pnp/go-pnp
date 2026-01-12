@@ -11,22 +11,22 @@ var defaultSensitiveKeysRegex = regexp.MustCompile(`(?i)password|api_?key|token|
 const defaultRedactedValue = "[REDACTED]"
 const circularRefPlaceholder = "[CIRCULAR_REFERENCE]"
 
-type options struct {
+type Options struct {
 	regex    *regexp.Regexp
 	redacted string
 }
 
-func newOptions(opts []optionutil.Option[options]) *options {
-	return optionutil.ApplyOptions(&options{
+func newOptions(opts []optionutil.Option[Options]) *Options {
+	return optionutil.ApplyOptions(&Options{
 		regex:    defaultSensitiveKeysRegex,
 		redacted: defaultRedactedValue,
 	}, opts...)
 }
 
-type Option = optionutil.Option[options]
+type Option = optionutil.Option[Options]
 
 func WithRegex(re *regexp.Regexp) Option {
-	return func(c *options) {
+	return func(c *Options) {
 		if re != nil {
 			c.regex = re
 		}
@@ -34,7 +34,7 @@ func WithRegex(re *regexp.Regexp) Option {
 }
 
 func WithRedacted(redacted string) Option {
-	return func(c *options) {
+	return func(c *Options) {
 		if redacted != "" {
 			c.redacted = redacted
 		}
