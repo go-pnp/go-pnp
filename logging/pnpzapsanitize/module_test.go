@@ -3,6 +3,7 @@ package pnpzapsanitize_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"regexp"
 	"testing"
 
@@ -1141,4 +1142,265 @@ func TestSanitizer_SliceOfMixedInterfaces(t *testing.T) {
 		},
 	}
 	require.Equal(t, expected, res)
+}
+
+// Test []byte is preserved as base64, not converted to int array
+func TestSanitizer_ByteSlice(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	data := []byte(`{"user_id":18,"value":"test"}`)
+	logger.Info("test", zap.Any("data", data))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	// []byte should be base64 encoded, not an array of integers
+	dataStr, ok := res["data"].(string)
+	require.True(t, ok, "data should be a string (base64), got %T", res["data"])
+	require.Equal(t, "eyJ1c2VyX2lkIjoxOCwidmFsdWUiOiJ0ZXN0In0=", dataStr)
+}
+
+func TestSanitizer_ByteSliceInStruct(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	type messageStruct struct {
+		ID   int    `json:"id"`
+		Data []byte `json:"data"`
+	}
+
+	msg := messageStruct{ID: 1, Data: []byte("hello")}
+	logger.Info("test", zap.Any("message", msg))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	message := res["message"].(map[string]interface{})
+	// Data should be base64 encoded string
+	dataStr, ok := message["data"].(string)
+	require.True(t, ok, "data should be a string (base64), got %T", message["data"])
+	require.Equal(t, "aGVsbG8=", dataStr) // base64 of "hello"
+}
+
+// Test encoding.TextMarshaler is preserved
+type customTextMarshaler struct {
+	Password string
+	Value    string
+}
+
+func (c customTextMarshaler) MarshalText() ([]byte, error) {
+	return []byte("text:" + c.Value), nil
+}
+
+func TestSanitizer_TextMarshaler(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	c := customTextMarshaler{Password: "should-not-appear", Value: "marshaled-value"}
+	logger.Info("test", zap.Any("data", c))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	// encoding.TextMarshaler is passed through - zap will use MarshalText() method
+	require.Equal(t, "text:marshaled-value", res["data"])
+}
+
+// Test error interface is preserved
+type customError struct {
+	Code    int
+	Message string
+}
+
+func (e customError) Error() string {
+	return e.Message
+}
+
+func TestSanitizer_ErrorInterface(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	err := customError{Code: 500, Message: "something went wrong"}
+	logger.Info("test", zap.Any("error", err))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	// error interface is passed through - zap will use Error() method
+	require.Equal(t, "something went wrong", res["error"])
+}
+
+func TestSanitizer_ErrorInStruct(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	type response struct {
+		Success bool  `json:"success"`
+		Error   error `json:"error"`
+	}
+
+	resp := response{Success: false, Error: customError{Code: 404, Message: "not found"}}
+	logger.Info("test", zap.Any("response", resp))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	respData := res["response"].(map[string]interface{})
+	require.Equal(t, "not found", respData["error"])
+}
+
+func TestSanitizer_StringerInStruct(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	type wrapper struct {
+		Value fmt.Stringer `json:"value"`
+		Name  string       `json:"name"`
+	}
+
+	w := wrapper{Value: customStringer{Password: "secret", Value: "stringer-val"}, Name: "test"}
+	logger.Info("test", zap.Any("data", w))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].(map[string]interface{})
+	require.Equal(t, "stringer:stringer-val", data["value"])
+	require.Equal(t, "test", data["name"])
+}
+
+func TestSanitizer_ErrorInMap(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	m := map[string]interface{}{
+		"error": customError{Code: 500, Message: "internal error"},
+		"other": "ok",
+	}
+	logger.Info("test", zap.Any("data", m))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].(map[string]interface{})
+	require.Equal(t, "internal error", data["error"])
+	require.Equal(t, "ok", data["other"])
+}
+
+func TestSanitizer_StringerInMap(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	m := map[string]interface{}{
+		"stringer": customStringer{Password: "secret", Value: "map-val"},
+		"other":    "ok",
+	}
+	logger.Info("test", zap.Any("data", m))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].(map[string]interface{})
+	require.Equal(t, "stringer:map-val", data["stringer"])
+	require.Equal(t, "ok", data["other"])
+}
+
+func TestSanitizer_ErrorInSlice(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	s := []interface{}{
+		"ok",
+		customError{Code: 400, Message: "bad request"},
+	}
+	logger.Info("test", zap.Any("data", s))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].([]interface{})
+	require.Equal(t, "ok", data[0])
+	require.Equal(t, "bad request", data[1])
+}
+
+func TestSanitizer_StringerInSlice(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	s := []interface{}{
+		"ok",
+		customStringer{Password: "secret", Value: "slice-val"},
+	}
+	logger.Info("test", zap.Any("data", s))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].([]interface{})
+	require.Equal(t, "ok", data[0])
+	require.Equal(t, "stringer:slice-val", data[1])
+}
+
+func TestSanitizer_PointerReceiverStringerInStruct(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	type wrapper struct {
+		Value fmt.Stringer `json:"value"`
+	}
+
+	w := wrapper{Value: &pointerReceiverStringer{Password: "secret", Value: "ptr-stringer-val"}}
+	logger.Info("test", zap.Any("data", w))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].(map[string]interface{})
+	require.Equal(t, "ptr_stringer:ptr-stringer-val", data["value"])
+}
+
+// Test pointer receiver implementations
+type pointerReceiverMarshaler struct {
+	Password string
+	Value    string
+}
+
+func (c *pointerReceiverMarshaler) MarshalJSON() ([]byte, error) {
+	return json.Marshal(map[string]string{"ptr_value": c.Value})
+}
+
+func TestSanitizer_PointerReceiverMarshaler(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	// Pass by value, but the type implements json.Marshaler with pointer receiver
+	c := pointerReceiverMarshaler{Password: "should-not-appear", Value: "pointer-value"}
+	logger.Info("test", zap.Any("data", c))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	// Should use the pointer receiver MarshalJSON method
+	data := res["data"].(map[string]interface{})
+	require.Equal(t, "pointer-value", data["ptr_value"])
+	require.Nil(t, data["Password"])
+}
+
+type pointerReceiverStringer struct {
+	Password string
+	Value    string
+}
+
+func (c *pointerReceiverStringer) String() string {
+	return "ptr_stringer:" + c.Value
+}
+
+func TestSanitizer_PointerReceiverStringer(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	c := pointerReceiverStringer{Password: "should-not-appear", Value: "stringer-value"}
+	logger.Info("test", zap.Any("data", c))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	// Should use the pointer receiver String() method
+	require.Equal(t, "ptr_stringer:stringer-value", res["data"])
 }
