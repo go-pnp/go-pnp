@@ -867,18 +867,18 @@ func TestSanitizer_JSONMarshaler(t *testing.T) {
 	require.Nil(t, data["Password"])
 }
 
-type customStringer struct {
+type valueReceiverStringer struct {
 	Password string
 	Value    string
 }
 
-func (c customStringer) String() string {
+func (c valueReceiverStringer) String() string {
 	return "stringer:" + c.Value
 }
 
 func TestSanitizer_FmtStringer(t *testing.T) {
 	logger, buf := newSanitizedLogger()
-	c := customStringer{Password: "should-not-appear", Value: "stringer-value"}
+	c := valueReceiverStringer{Password: "should-not-appear", Value: "stringer-value"}
 	logger.Info("test", zap.Any("data", c))
 	require.NoError(t, logger.Sync())
 
@@ -1255,7 +1255,7 @@ func TestSanitizer_StringerInStruct(t *testing.T) {
 		Name  string       `json:"name"`
 	}
 
-	w := wrapper{Value: customStringer{Password: "secret", Value: "stringer-val"}, Name: "test"}
+	w := wrapper{Value: valueReceiverStringer{Password: "secret", Value: "stringer-val"}, Name: "test"}
 	logger.Info("test", zap.Any("data", w))
 	require.NoError(t, logger.Sync())
 
@@ -1289,7 +1289,7 @@ func TestSanitizer_StringerInMap(t *testing.T) {
 	logger, buf := newSanitizedLogger()
 
 	m := map[string]interface{}{
-		"stringer": customStringer{Password: "secret", Value: "map-val"},
+		"stringer": valueReceiverStringer{Password: "secret", Value: "map-val"},
 		"other":    "ok",
 	}
 	logger.Info("test", zap.Any("data", m))
@@ -1300,6 +1300,24 @@ func TestSanitizer_StringerInMap(t *testing.T) {
 
 	data := res["data"].(map[string]interface{})
 	require.Equal(t, "stringer:map-val", data["stringer"])
+	require.Equal(t, "ok", data["other"])
+}
+
+func TestSanitizer_StringerInMapPointer(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	m := map[string]interface{}{
+		"stringer": pointerReceiverStringer{Password: "secret", Value: "map-val"},
+		"other":    "ok",
+	}
+	logger.Info("test", zap.Any("data", m))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].(map[string]interface{})
+	require.Equal(t, "ptr_stringer:map-val", data["stringer"])
 	require.Equal(t, "ok", data["other"])
 }
 
@@ -1326,7 +1344,7 @@ func TestSanitizer_StringerInSlice(t *testing.T) {
 
 	s := []interface{}{
 		"ok",
-		customStringer{Password: "secret", Value: "slice-val"},
+		valueReceiverStringer{Password: "secret", Value: "slice-val"},
 	}
 	logger.Info("test", zap.Any("data", s))
 	require.NoError(t, logger.Sync())
@@ -1403,4 +1421,197 @@ func TestSanitizer_PointerReceiverStringer(t *testing.T) {
 
 	// Should use the pointer receiver String() method
 	require.Equal(t, "ptr_stringer:stringer-value", res["data"])
+}
+
+func TestSanitizer_ValueReceiverMarshalerAsPointer(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	c := &customMarshaler{Password: "should-not-appear", Value: "value-as-ptr"}
+	logger.Info("test", zap.Any("data", c))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	// Should use the value receiver MarshalJSON method
+	data := res["data"].(map[string]interface{})
+	require.Equal(t, "value-as-ptr", data["custom"])
+	require.Nil(t, data["Password"])
+}
+
+func TestSanitizer_ValueReceiverMarshaler(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	c := customMarshaler{Password: "should-not-appear", Value: "value-as-ptr"}
+	logger.Info("test", zap.Any("data", c))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	// Should use the value receiver MarshalJSON method
+	data := res["data"].(map[string]interface{})
+	require.Equal(t, "value-as-ptr", data["custom"])
+	require.Nil(t, data["Password"])
+}
+
+func TestSanitizer_ValueReceiverStringerAsPointer(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	// Pass by pointer, but the type implements fmt.Stringer with value receiver
+	c := &valueReceiverStringer{Password: "should-not-appear", Value: "stringer-as-ptr"}
+	logger.Info("test", zap.Any("data", c))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	// Should use the value receiver String() method
+	require.Equal(t, "stringer:stringer-as-ptr", res["data"])
+}
+
+func TestSanitizer_ValueReceiverStringer(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+	c := valueReceiverStringer{Password: "should-not-appear", Value: "stringer-as-ptr"}
+	logger.Info("test", zap.Any("data", c))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	// Should use the value receiver String() method
+	require.Equal(t, "stringer:stringer-as-ptr", res["data"])
+}
+
+func TestSanitizer_ValueReceiverMarshalerInStruct(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	type wrapper struct {
+		Value customMarshaler `json:"value"`
+		Name  string          `json:"name"`
+	}
+
+	w := wrapper{Value: customMarshaler{Password: "secret", Value: "struct-val"}, Name: "test"}
+	logger.Info("test", zap.Any("data", w))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].(map[string]interface{})
+	value := data["value"].(map[string]interface{})
+	require.Equal(t, "struct-val", value["custom"])
+	require.Equal(t, "test", data["name"])
+}
+
+func TestSanitizer_ValueReceiverMarshalerInStructAsPointer(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	type wrapper struct {
+		Value *customMarshaler `json:"value"`
+		Name  string           `json:"name"`
+	}
+
+	w := wrapper{Value: &customMarshaler{Password: "secret", Value: "struct-val"}, Name: "test"}
+	logger.Info("test", zap.Any("data", w))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].(map[string]interface{})
+	value := data["value"].(map[string]interface{})
+	require.Equal(t, "struct-val", value["custom"])
+	require.Equal(t, "test", data["name"])
+}
+
+func TestSanitizer_ValueReceiverStringerInStruct(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	type wrapper struct {
+		Value *valueReceiverStringer `json:"value"`
+		Name  string                 `json:"name"`
+	}
+
+	w := wrapper{Value: &valueReceiverStringer{Password: "secret", Value: "stringer-struct-val"}, Name: "test"}
+	logger.Info("test", zap.Any("data", w))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].(map[string]interface{})
+	require.Equal(t, "stringer:stringer-struct-val", data["value"])
+	require.Equal(t, "test", data["name"])
+}
+
+func TestSanitizer_ValueReceiverMarshalerInMap(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	m := map[string]interface{}{
+		"marshaler": &customMarshaler{Password: "secret", Value: "map-val"},
+		"other":     "ok",
+	}
+	logger.Info("test", zap.Any("data", m))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].(map[string]interface{})
+	marshaler := data["marshaler"].(map[string]interface{})
+	require.Equal(t, "map-val", marshaler["custom"])
+	require.Equal(t, "ok", data["other"])
+}
+
+func TestSanitizer_ValueReceiverStringerInMap(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	m := map[string]interface{}{
+		"stringer": &valueReceiverStringer{Password: "secret", Value: "map-stringer-val"},
+		"other":    "ok",
+	}
+	logger.Info("test", zap.Any("data", m))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].(map[string]interface{})
+	require.Equal(t, "stringer:map-stringer-val", data["stringer"])
+	require.Equal(t, "ok", data["other"])
+}
+
+func TestSanitizer_ValueReceiverMarshalerInSlice(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	s := []interface{}{
+		"ok",
+		&customMarshaler{Password: "secret", Value: "slice-val"},
+	}
+	logger.Info("test", zap.Any("data", s))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].([]interface{})
+	require.Equal(t, "ok", data[0])
+	marshaler := data[1].(map[string]interface{})
+	require.Equal(t, "slice-val", marshaler["custom"])
+}
+
+func TestSanitizer_ValueReceiverStringerInSlice(t *testing.T) {
+	logger, buf := newSanitizedLogger()
+
+	s := []interface{}{
+		"ok",
+		&valueReceiverStringer{Password: "secret", Value: "slice-stringer-val"},
+	}
+	logger.Info("test", zap.Any("data", s))
+	require.NoError(t, logger.Sync())
+
+	var res map[string]interface{}
+	require.NoError(t, json.Unmarshal(buf.Bytes(), &res))
+
+	data := res["data"].([]interface{})
+	require.Equal(t, "ok", data[0])
+	require.Equal(t, "stringer:slice-stringer-val", data[1])
 }
