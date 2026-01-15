@@ -122,7 +122,7 @@ func (z ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		}()
 	}
 
-	return nil
+	return z.underlying.Write(entry, fields)
 }
 
 func (z ZapCore) Sync() error {

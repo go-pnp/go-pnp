@@ -23,7 +23,7 @@ func newOptions(opts []optionutil.Option[options]) *options {
 	}, opts...)
 }
 
-type Option func(*options)
+type Option = optionutil.Option[options]
 
 func WithRegex(re *regexp.Regexp) Option {
 	return func(c *options) {

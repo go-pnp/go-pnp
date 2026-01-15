@@ -1,6 +1,8 @@
 package pnpzapsanitize
 
 import (
+	"encoding"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -8,6 +10,13 @@ import (
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+)
+
+var (
+	jsonMarshalerType = reflect.TypeOf((*json.Marshaler)(nil)).Elem()
+	textMarshalerType = reflect.TypeOf((*encoding.TextMarshaler)(nil)).Elem()
+	stringerType      = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
+	errorType         = reflect.TypeOf((*error)(nil)).Elem()
 )
 
 type fieldHidingCore struct {
@@ -72,6 +81,14 @@ func (c *fieldHidingCore) sanitizeField(field zapcore.Field) zapcore.Field {
 }
 
 func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool) interface{} {
+	if !val.IsValid() {
+		return nil
+	}
+
+	if preserved, ok := c.getPreservedValue(val); ok {
+		return preserved
+	}
+
 	for val.Kind() == reflect.Ptr || val.Kind() == reflect.Interface {
 		if val.IsNil() {
 			return nil
@@ -80,7 +97,23 @@ func (c *fieldHidingCore) sanitizeValue(val reflect.Value, seen map[uintptr]bool
 		val = val.Elem()
 	}
 
-	if !val.IsValid() || !val.CanInterface() {
+	if !val.IsValid() {
+		return nil
+	}
+
+	// Check again after dereferencing
+	if preserved, ok := c.getPreservedValue(val); ok {
+		return preserved
+	}
+
+	switch val.Kind() {
+	case reflect.Chan, reflect.Func, reflect.UnsafePointer:
+		return fmt.Sprintf("<%s>", val.Type().String())
+	case reflect.Complex64, reflect.Complex128:
+		return fmt.Sprintf("%v", val.Complex())
+	}
+
+	if !val.CanInterface() {
 		return nil
 	}
 
@@ -224,4 +257,60 @@ func (c *fieldHidingCore) sanitizeSlice(val reflect.Value, seen map[uintptr]bool
 	}
 
 	return sanitizedSlice
+}
+
+// getPreservedValue checks if a value should be preserved (not sanitized) because it
+// implements a special interface like json.Marshaler, encoding.TextMarshaler, error, or fmt.Stringer.
+func (c *fieldHidingCore) getPreservedValue(val reflect.Value) (interface{}, bool) {
+	if !val.CanInterface() {
+		return nil, false
+	}
+
+	t := val.Type()
+
+	// Preserve byte slices for base64 encoding by zap
+	if t.Kind() == reflect.Slice && t.Elem().Kind() == reflect.Uint8 {
+		return val.Interface(), true
+	}
+
+	if result, ok := c.getPreservedIfaceValue(val, t); ok {
+		return result, true
+	}
+
+	// Check pointer type for pointer receiver implementations
+	// This handles cases where the method is defined with a pointer receiver
+	// but we have a value (e.g., passed by value to zap.Any)
+	if t.Kind() != reflect.Ptr && c.implementsPreservedInterface(reflect.PointerTo(t)) {
+		// Create an addressable copy and return a pointer to it
+		// so that the pointer receiver methods can be called
+		ptr := reflect.New(t)
+		ptr.Elem().Set(val)
+
+		return c.getPreservedIfaceValue(ptr, ptr.Type())
+	}
+
+	return nil, false
+}
+
+func (c *fieldHidingCore) getPreservedIfaceValue(val reflect.Value, t reflect.Type) (interface{}, bool) {
+	if t.Implements(jsonMarshalerType) || t.Implements(textMarshalerType) {
+		return val.Interface(), true
+	}
+
+	if t.Implements(errorType) {
+		return val.Interface().(error).Error(), true
+	}
+
+	if t.Implements(stringerType) {
+		return val.Interface().(fmt.Stringer).String(), true
+	}
+
+	return nil, false
+}
+
+func (c *fieldHidingCore) implementsPreservedInterface(t reflect.Type) bool {
+	return t.Implements(jsonMarshalerType) ||
+		t.Implements(textMarshalerType) ||
+		t.Implements(errorType) ||
+		t.Implements(stringerType)
 }
