@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/go-pnp/jobber"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/fx"
 
 	"github.com/go-pnp/go-pnp/logging"
@@ -15,6 +17,7 @@ type invokeJobberRunnerParams struct {
 	Lc         fx.Lifecycle
 	Shutdowner fx.Shutdowner
 	Job        jobber.Job
+	Tracer     trace.Tracer
 	Logger     *logging.Logger `optional:"true"`
 }
 
@@ -29,7 +32,11 @@ func Module(workerName string, workerProvider any, workerOptions ...jobber.Optio
 		),
 		logging.DecorateNamed(fmt.Sprintf("%s_worker", workerName)),
 		fx.Invoke(func(params invokeJobberRunnerParams) {
-			workerRunner := jobber.NewRunner(params.Job, workerOptions...)
+			opts := []jobber.OptionFunc{
+				jobber.WithMiddlewares(traceMiddleware(params.Tracer, workerName)),
+			}
+			opts = append(opts, workerOptions...)
+			workerRunner := jobber.NewRunner(params.Job, opts...)
 			params.Lc.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
 					params.Logger.Info(ctx, "Starting worker")
@@ -54,4 +61,17 @@ func Module(workerName string, workerProvider any, workerOptions ...jobber.Optio
 			})
 		}),
 	)
+}
+
+func traceMiddleware(tracer trace.Tracer, workerName string) jobber.Middleware {
+	return func(next jobber.HandleFunc) jobber.HandleFunc {
+		return func(ctx context.Context) error {
+			ctx, span := tracer.Start(ctx, "job "+workerName)
+			defer span.End()
+
+			span.SetAttributes(attribute.String("job.name", workerName))
+
+			return next(ctx)
+		}
+	}
 }
