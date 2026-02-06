@@ -9,7 +9,7 @@ require (
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient v0.1.4
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.11
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.57.0
-	go.uber.org/fx v1.23.0
+	go.uber.org/fx v1.24.0
 	google.golang.org/grpc v1.68.0
 )
 
@@ -21,7 +21,7 @@ require (
 	go.opentelemetry.io/otel v1.32.0 // indirect
 	go.opentelemetry.io/otel/metric v1.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.32.0 // indirect
-	go.uber.org/dig v1.18.0 // indirect
+	go.uber.org/dig v1.19.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/net v0.31.0 // indirect
