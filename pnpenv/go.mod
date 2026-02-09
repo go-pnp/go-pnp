@@ -4,7 +4,7 @@ go 1.22.0
 
 require (
 	github.com/caarlos0/env/v10 v10.0.0
-	github.com/go-pnp/go-pnp v1.1.3
+	github.com/go-pnp/go-pnp v1.1.4
 	go.uber.org/fx v1.23.0
 )
 
