@@ -6,7 +6,7 @@ require (
 	github.com/go-pnp/go-pnp v1.1.3
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.20.5
-	go.uber.org/fx v1.23.0
+	go.uber.org/fx v1.24.0
 )
 
 require (
@@ -16,7 +16,7 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.60.1 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	go.uber.org/dig v1.18.0 // indirect
+	go.uber.org/dig v1.19.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/sys v0.27.0 // indirect
