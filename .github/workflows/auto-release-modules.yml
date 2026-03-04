@@ -10,26 +10,19 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Check if Dependabot commit
-        id: check
-        run: |
-          message=$(git log -1 --pretty=%s)
-          if echo "$message" | grep -q '^Bump .* from .* to '; then
-            echo "is_dependabot=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "is_dependabot=false" >> "$GITHUB_OUTPUT"
-          fi
+          fetch-tags: true
 
       - name: Detect changed modules and create tags
-        if: steps.check.outputs.is_dependabot == 'true'
         run: |
           changed_files=$(git diff --name-only HEAD~1 HEAD)
+          echo "Changed files:"
+          echo "$changed_files"
 
           modules=$(echo "$changed_files" | grep 'go\.mod$' | sed 's|/go\.mod$||' | grep -v '^go\.mod$' || true)
 
@@ -39,6 +32,7 @@ jobs:
           fi
 
           for module in $modules; do
+            echo "Processing module: ${module}"
             latest_tag=$(git tag --list "${module}/v*" --sort=-v:refname | head -1)
 
             if [ -z "$latest_tag" ]; then
@@ -46,6 +40,7 @@ jobs:
               continue
             fi
 
+            echo "Latest tag: ${latest_tag}"
             version=${latest_tag##*/v}
             major=$(echo "$version" | cut -d. -f1)
             minor=$(echo "$version" | cut -d. -f2)
@@ -53,7 +48,7 @@ jobs:
 
             new_tag="${module}/v${major}.${minor}.$((patch + 1))"
 
-            echo "Tagging ${new_tag}"
+            echo "Creating tag: ${new_tag}"
             git tag "$new_tag"
             git push origin "$new_tag"
           done
