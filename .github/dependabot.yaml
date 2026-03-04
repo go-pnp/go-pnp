@@ -34,5 +34,9 @@ updates:
       - /sql/pnpgormprometheus/
       - /sql/pnpgorm/
 
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
     schedule:
       interval: daily
