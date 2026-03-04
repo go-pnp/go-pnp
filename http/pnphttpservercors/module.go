@@ -42,7 +42,15 @@ type newCORSParams struct {
 
 func newCORS(params newCORSParams) (*cors.Cors, error) {
 	if params.Config.AllowAll {
-		return cors.AllowAll(), nil
+		return cors.New(cors.Options{
+			AllowedOrigins:      []string{"*"},
+			AllowedHeaders:      params.Config.AllowedHeaders,
+			AllowedMethods:      params.Config.AllowedMethods,
+			ExposedHeaders:      params.Config.ExposedHeaders,
+			AllowCredentials:    params.Config.AllowCredentials,
+			AllowPrivateNetwork: params.Config.AllowPrivateNetwork,
+			MaxAge:              params.Config.MaxAge,
+		}), nil
 	}
 	logger := params.Logger.Named("cors")
 
@@ -60,7 +68,12 @@ func newCORS(params newCORSParams) (*cors.Cors, error) {
 	}
 
 	return cors.New(cors.Options{
-		AllowedHeaders: params.Config.AllowedHeaders,
+		AllowedHeaders:      params.Config.AllowedHeaders,
+		AllowedMethods:      params.Config.AllowedMethods,
+		ExposedHeaders:      params.Config.ExposedHeaders,
+		AllowCredentials:    params.Config.AllowCredentials,
+		AllowPrivateNetwork: params.Config.AllowPrivateNetwork,
+		MaxAge:              params.Config.MaxAge,
 		AllowOriginFunc: func(origin string) bool {
 			if params.Config.AllowAll {
 				return true
