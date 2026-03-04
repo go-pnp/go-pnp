@@ -1,4 +1,4 @@
-name: Dependabot auto-merge
+name: Dependabot auto-merge and release
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  dependabot:
+  auto-merge:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
     steps:
@@ -22,3 +22,59 @@ jobs:
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Wait for merge
+        run: |
+          for i in $(seq 1 12); do
+            state=$(gh pr view "$PR_URL" --json state --jq '.state')
+            if [ "$state" = "MERGED" ]; then
+              echo "PR merged"
+              exit 0
+            fi
+            echo "Waiting for merge... ($i/12)"
+            sleep 5
+          done
+          echo "Timed out waiting for merge"
+          exit 1
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Detect changed modules and create tags
+        run: |
+          changed_files=$(git diff --name-only HEAD~1 HEAD)
+          echo "Changed files:"
+          echo "$changed_files"
+
+          modules=$(echo "$changed_files" | grep 'go\.mod$' | sed 's|/go\.mod$||' | grep -v '^go\.mod$' || true)
+
+          if [ -z "$modules" ]; then
+            echo "No module go.mod files changed"
+            exit 0
+          fi
+
+          for module in $modules; do
+            echo "Processing module: ${module}"
+            latest_tag=$(git tag --list "${module}/v*" --sort=-v:refname | head -1)
+
+            if [ -z "$latest_tag" ]; then
+              echo "No existing tag for ${module}, skipping"
+              continue
+            fi
+
+            echo "Latest tag: ${latest_tag}"
+            version=${latest_tag##*/v}
+            major=$(echo "$version" | cut -d. -f1)
+            minor=$(echo "$version" | cut -d. -f2)
+            patch=$(echo "$version" | cut -d. -f3)
+
+            new_tag="${module}/v${major}.${minor}.$((patch + 1))"
+
+            echo "Creating tag: ${new_tag}"
+            git tag "$new_tag"
+            git push origin "$new_tag"
+          done
