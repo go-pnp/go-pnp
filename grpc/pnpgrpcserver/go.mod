@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/grpc/pnpgrpcserver
 go 1.24.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.3
+	github.com/go-pnp/go-pnp v1.1.4
 	github.com/pkg/errors v0.9.1
 	go.uber.org/fx v1.24.0
 	google.golang.org/grpc v1.79.1
