@@ -1,7 +1,12 @@
-name: Merge all Dependabot PRs
+name: Merge Dependabot PR
 
 on:
   workflow_dispatch:
+    inputs:
+      pr-number:
+        description: "PR number to merge"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -11,18 +16,11 @@ jobs:
   merge:
     runs-on: ubuntu-latest
     steps:
-      - name: Approve and merge all Dependabot PRs
+      - name: Approve and merge PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ inputs.pr-number }}
         run: |
-          prs=$(gh pr list --repo "$REPO" --author 'app/dependabot' --json number --jq '.[].number')
-          if [ -z "$prs" ]; then
-            echo "No Dependabot PRs found"
-            exit 0
-          fi
-          for pr in $prs; do
-            echo "Processing PR #$pr"
-            gh pr review --approve "$pr" --repo "$REPO"
-            gh pr merge --auto --squash "$pr" --repo "$REPO"
-          done
+          gh pr review --approve "$PR_NUMBER" --repo "$REPO"
+          gh pr merge --auto --squash "$PR_NUMBER" --repo "$REPO"
