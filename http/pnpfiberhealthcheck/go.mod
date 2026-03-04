@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/http/pnpfiberhealthcheck
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v1.1.3
+	github.com/go-pnp/go-pnp v1.1.4
 	github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.7
 	github.com/go-pnp/go-pnp/http/pnpfiber v0.0.16
 	github.com/gofiber/fiber/v2 v2.52.5
