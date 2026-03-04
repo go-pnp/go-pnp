@@ -5,7 +5,7 @@ go 1.22.7
 toolchain go1.23.1
 
 require (
-	github.com/go-pnp/go-pnp v1.1.3
+	github.com/go-pnp/go-pnp v1.1.4
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.11
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
 	go.uber.org/fx v1.23.0
