@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/go-pnp/go-pnp v1.1.4
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.12
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.1.0
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	go.uber.org/fx v1.24.0
 	google.golang.org/grpc v1.79.1
 )
