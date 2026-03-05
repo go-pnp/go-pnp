@@ -7,7 +7,7 @@ require (
 	go.uber.org/fx v1.24.0
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/driver/postgres v1.5.10
-	gorm.io/driver/sqlite v1.5.6
+	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.30.0
 )
 
