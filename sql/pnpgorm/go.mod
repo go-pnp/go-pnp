@@ -5,10 +5,10 @@ go 1.22
 require (
 	github.com/go-pnp/go-pnp v1.1.4
 	go.uber.org/fx v1.24.0
-	gorm.io/driver/mysql v1.5.7
+	gorm.io/driver/mysql v1.6.0
 	gorm.io/driver/postgres v1.5.10
 	gorm.io/driver/sqlite v1.5.6
-	gorm.io/gorm v1.25.12
+	gorm.io/gorm v1.30.0
 )
 
 require (
