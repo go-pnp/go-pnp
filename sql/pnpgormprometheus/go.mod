@@ -9,7 +9,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.20.5
 	go.uber.org/fx v1.24.0
-	gorm.io/gorm v1.25.12
+	gorm.io/gorm v1.31.1
 )
 
 require (
@@ -40,5 +40,5 @@ require (
 	google.golang.org/protobuf v1.35.2 // indirect
 	gorm.io/driver/mysql v1.5.7 // indirect
 	gorm.io/driver/postgres v1.5.10 // indirect
-	gorm.io/driver/sqlite v1.5.6 // indirect
+	gorm.io/driver/sqlite v1.6.0 // indirect
 )
