@@ -7,7 +7,7 @@ require (
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.12
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.3
 	go.uber.org/fx v1.24.0
-	google.golang.org/grpc v1.79.1
+	google.golang.org/grpc v1.79.2
 )
 
 require (
