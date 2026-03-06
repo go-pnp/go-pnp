@@ -11,8 +11,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-pnp/go-pnp v1.1.4 h1:zMixI9n1sbUjWBUe7THq8sK14bMTJRrV2mUXVhL2snU=
 github.com/go-pnp/go-pnp v1.1.4/go.mod h1:0h51lf0yewEw9MDWC4gTNeOiaOuzGPWRksmSX/+AQtg=
-github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.11 h1:lnwqbaxxLu06D6gvIBfQUwpXSdlwf59g+Gfm/wRtf+Y=
-github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.11/go.mod h1:SihAWa6NzQsGSthaNy+pDFT2h5WzCzgCvzB4H/ZJZto=
+github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.13 h1:4TvrlNN2uRZIMmc6K1nZ3iVZi2Mj39wrm1/5XUscrfo=
+github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.13/go.mod h1:5LC5FedzYb7DqJTfSCRyCXAi/VjYx0lmiFbXsTPv3Qs=
 github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.12 h1:G/GHmew7BEPUMKlMkS9pcx6SykFpMQCmJjxCKyeROKw=
 github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.12/go.mod h1:7cQLsw0c6dj51sTgZPM88t8inxfLnjA1GIHLB/FoNDU=
 github.com/go-sql-driver/mysql v1.7.0/go.mod h1:OXbVy3sEdcQ2Doequ6Z5BW6fXNQTmx+9S1MCJN5yJMI=
