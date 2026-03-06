@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	github.com/go-pnp/go-pnp v1.1.4
 	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.12
-	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.11
+	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.13
 	github.com/gorilla/mux v1.8.1
 	github.com/prometheus/client_golang v1.23.2
 	go.uber.org/fx v1.24.0
