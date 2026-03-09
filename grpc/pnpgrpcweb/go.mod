@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/go-pnp/go-pnp v1.1.4
-	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.12
+	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.14
 	github.com/gorilla/mux v1.8.1
 	github.com/improbable-eng/grpc-web v0.15.0
 	go.uber.org/fx v1.24.0
