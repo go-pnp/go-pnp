@@ -6,7 +6,7 @@ require (
 	github.com/go-pnp/go-pnp v1.1.4
 	github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.8
 	github.com/go-pnp/go-pnp/http/pnpfiber v0.0.17
-	github.com/gofiber/fiber/v2 v2.52.5
+	github.com/gofiber/fiber/v2 v2.52.12
 	go.uber.org/fx v1.24.0
 )
 
@@ -26,5 +26,5 @@ require (
 	go.uber.org/dig v1.19.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/sys v0.27.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
 )
