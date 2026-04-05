@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"cloud.google.com/go/pubsub"
+	"cloud.google.com/go/pubsub/v2/apiv1/pubsubpb"
 	"github.com/ThreeDotsLabs/watermill"
-	"github.com/ThreeDotsLabs/watermill-googlecloud/pkg/googlecloud"
+	"github.com/ThreeDotsLabs/watermill-googlecloud/v2/pkg/googlecloud"
 	"github.com/ThreeDotsLabs/watermill-redisstream/pkg/redisstream"
 	wsql "github.com/ThreeDotsLabs/watermill-sql/v4/pkg/sql"
 	"github.com/ThreeDotsLabs/watermill/message"
@@ -20,6 +20,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"github.com/samber/lo"
 	"go.uber.org/fx"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 type SubscriberConfig struct {
@@ -163,15 +164,17 @@ func newGCloudPubSubTransport(params newGCloudPubSubTransportParams) (message.Pu
 	return result, subscriberFactoryFn(func(handler string, subConfig *SubscriberConfig) (message.Subscriber, error) {
 		subscriberConfig := optionutil.ApplyOptions(&googlecloud.SubscriberConfig{
 			ProjectID: params.Config.GCloudPubSub.ProjectID,
-			SubscriptionConfig: pubsub.SubscriptionConfig{
-				EnableMessageOrdering: true,
-				RetryPolicy: &pubsub.RetryPolicy{
-					MinimumBackoff: time.Second,
-					MaximumBackoff: time.Minute,
-				},
-			},
 			GenerateSubscriptionName: func(topic string) string {
 				return params.Config.GCloudPubSub.SubscriptionNamePrefix + topic + "_" + handler
+			},
+			GenerateSubscription: func(params googlecloud.GenerateSubscriptionParams) *pubsubpb.Subscription {
+				return &pubsubpb.Subscription{
+					EnableMessageOrdering: true,
+					RetryPolicy: &pubsubpb.RetryPolicy{
+						MinimumBackoff: durationpb.New(time.Second),
+						MaximumBackoff: durationpb.New(time.Minute),
+					},
+				}
 			},
 			Unmarshaler: NewGCloudPubSubUnmarshaler(googlecloud.DefaultMarshalerUnmarshaler{}),
 		}, subConfig.GcloudPubSubHandlerSubscriberConfigOption...)

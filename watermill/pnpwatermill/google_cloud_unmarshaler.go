@@ -3,8 +3,8 @@ package pnpwatermill
 import (
 	"context"
 
-	"cloud.google.com/go/pubsub"
-	"github.com/ThreeDotsLabs/watermill-googlecloud/pkg/googlecloud"
+	"cloud.google.com/go/pubsub/v2"
+	"github.com/ThreeDotsLabs/watermill-googlecloud/v2/pkg/googlecloud"
 	"github.com/ThreeDotsLabs/watermill/message"
 )
 
