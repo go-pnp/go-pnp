@@ -1,6 +1,8 @@
 package pnpwatermillsentry
 
 import (
+	"context"
+
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/getsentry/sentry-go"
 
@@ -24,6 +26,16 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 	return moduleBuilder.Build()
 }
 
+// startSpanOrTransaction creates a child span if a transaction already exists
+// in the context, otherwise starts a new root transaction.
+func startSpanOrTransaction(ctx context.Context, name, op string) *sentry.Span {
+	if span := sentry.SpanFromContext(ctx); span != nil {
+		return sentry.StartSpan(ctx, op, sentry.WithDescription(name))
+	}
+
+	return sentry.StartTransaction(ctx, name, sentry.WithOpName(op))
+}
+
 func newMiddleware(options *options, client *sentry.Client) ordering.OrderedItem[message.HandlerMiddleware] {
 	return ordering.OrderedItem[message.HandlerMiddleware]{
 		Value: func(h message.HandlerFunc) message.HandlerFunc {
@@ -42,14 +54,14 @@ func newMiddleware(options *options, client *sentry.Client) ordering.OrderedItem
 				topic := message.SubscribeTopicFromCtx(msg.Context())
 				handlerName := message.HandlerNameFromCtx(msg.Context())
 
-				span := sentry.StartSpan(msg.Context(), handlerName)
+				span := startSpanOrTransaction(msg.Context(), handlerName, "watermill.handler")
 				defer span.Finish()
 
 				msg.SetContext(span.Context())
 
 				scope.SetSpan(span)
-				scope.SetTag("topic", topic)
-				scope.SetTag("handler", handlerName)
+				scope.SetTag("watermill.topic", topic)
+				scope.SetTag("watermill.handler", handlerName)
 
 				return h(msg)
 			}
