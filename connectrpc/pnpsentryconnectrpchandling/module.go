@@ -89,14 +89,17 @@ func (i Interceptor) WrapStreamingHandler(handlerFunc connect.StreamingHandlerFu
 
 func setRequestInfo(scope *sentry.Scope, spec connect.Spec, headers map[string][]string) {
 	service, method := splitProcedure(spec.Procedure)
+	pkg, svcName := splitService(service)
 	scope.SetTag("connectrpc.procedure", spec.Procedure)
-	scope.SetTag("connectrpc.service", service)
+	scope.SetTag("connectrpc.package", pkg)
+	scope.SetTag("connectrpc.service", svcName)
 	scope.SetTag("connectrpc.method", method)
 	scope.SetTag("connectrpc.stream_type", spec.StreamType.String())
 
 	data := map[string]interface{}{
 		"procedure":   spec.Procedure,
-		"service":     service,
+		"package":     pkg,
+		"service":     svcName,
 		"method":      method,
 		"stream_type": spec.StreamType.String(),
 	}
@@ -132,4 +135,13 @@ func splitProcedure(procedure string) (service, method string) {
 	}
 
 	return procedure, ""
+}
+
+// splitService splits "package.Service" into package and service name.
+func splitService(service string) (pkg, svcName string) {
+	if i := strings.LastIndex(service, "."); i >= 0 {
+		return service[:i], service[i+1:]
+	}
+
+	return "", service
 }
