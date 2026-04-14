@@ -1,0 +1,29 @@
+version: '3'
+
+tasks:
+  run:
+    desc: Run the example server
+    cmd: go run main.go
+
+  test:
+    desc: Call Test RPC with ConnectRPC protocol
+    cmd: >
+      curl -s -X POST http://localhost:8080/TestService/Test
+      -H "Content-Type: application/json"
+      -d '{"name": "World"}'
+
+  test-with-trace:
+    desc: Call Test RPC with sentry-trace and baggage headers
+    cmd: >
+      curl -s -X POST http://localhost:8080/TestService/Test
+      -H "Content-Type: application/json"
+      -H "sentry-trace: 00000000000000000000000000000001-0000000000000001-1"
+      -H "baggage: sentry-trace_id=00000000000000000000000000000001,sentry-public_key=test,sentry-sample_rate=1.0"
+      -d '{"name": "World"}'
+
+  panic:
+    desc: Call WithPanic RPC to test panic handling
+    cmd: >
+      curl -s -X POST http://localhost:8080/TestService/WithPanic
+      -H "Content-Type: application/json"
+      -d '{"name": "World"}'

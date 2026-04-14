@@ -39,7 +39,10 @@ func newMiddleware(options *options, client *sentry.Client) ordering.OrderedItem
 					defer hub.PopScope()
 				}
 
-				span := sentry.StartSpan(request.Context(), fmt.Sprintf("%s %s", request.Method, request.URL.Path))
+				name := fmt.Sprintf("%s %s", request.Method, request.URL.Path)
+				span := startSpanOrTransaction(request.Context(), name, "http.server",
+					request.Header.Get("sentry-trace"), request.Header.Get("baggage"),
+				)
 				defer span.Finish()
 				request = request.WithContext(span.Context())
 
