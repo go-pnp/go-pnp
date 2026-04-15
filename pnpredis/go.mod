@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/pnpredis
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v1.1.4
+	github.com/go-pnp/go-pnp v1.1.5
 	github.com/redis/go-redis/v9 v9.7.0
 	go.uber.org/fx v1.24.0
 )
@@ -15,6 +15,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	go.uber.org/dig v1.19.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0 // indirect
+	go.uber.org/zap v1.27.1 // indirect
 	golang.org/x/sys v0.27.0 // indirect
 )
