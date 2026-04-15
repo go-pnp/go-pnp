@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/http/pnppromhttp
 go 1.23.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.4
+	github.com/go-pnp/go-pnp v1.1.5
 	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.14
 	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.13
 	github.com/gorilla/mux v1.8.1
@@ -22,7 +22,7 @@ require (
 	github.com/prometheus/procfs v0.16.1 // indirect
 	go.uber.org/dig v1.19.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0 // indirect
+	go.uber.org/zap v1.27.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
