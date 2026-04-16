@@ -8,8 +8,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-pnp/go-pnp v1.1.5 h1:Wh9PeuEvVudRTmcWdU7ctbvgdyO9Y/V+wGLjYYevm4A=
 github.com/go-pnp/go-pnp v1.1.5/go.mod h1:Mh136zyPw8qN17tiKcZQ271ScnaDstRr4MJpsjLaG4c=
-github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.14 h1:Sj2nHB0xt9TymOkZ0cwsOI8+gpah4YA4jnilmiqqvWg=
-github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.14/go.mod h1:A1SJpSqDlTuzpBGUfz0D7ZS3UiLNh/6j5WFnGzixQTc=
+github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.15 h1:CjHpHlXU/TzQXRkAiv4WwBxpG37V1Mw1Zl9FfcortGQ=
+github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.15/go.mod h1:dkYIE7Z3/WUvYWSxcMb1IcYdQ4sHaHBxqcMh2+Ur1Fw=
 github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.13 h1:4TvrlNN2uRZIMmc6K1nZ3iVZi2Mj39wrm1/5XUscrfo=
 github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.13/go.mod h1:5LC5FedzYb7DqJTfSCRyCXAi/VjYx0lmiFbXsTPv3Qs=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
