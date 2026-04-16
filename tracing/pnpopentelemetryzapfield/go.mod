@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/go-pnp/go-pnp v1.1.5
-	github.com/go-pnp/go-pnp/logging/pnpzap v0.0.16
+	github.com/go-pnp/go-pnp/logging/pnpzap v0.0.17
 	go.opentelemetry.io/otel/trace v1.43.0
 	go.uber.org/fx v1.24.0
 )
