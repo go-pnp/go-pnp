@@ -88,8 +88,8 @@ github.com/go-playground/universal-translator v0.17.0/go.mod h1:UkSxE5sNxxRwHyU+
 github.com/go-playground/validator/v10 v10.2.0/go.mod h1:uOYAAleCW8F/7oMFd6aG0GOhaH6EGOAJShg8Id5JGkI=
 github.com/go-pnp/go-pnp v1.1.5 h1:Wh9PeuEvVudRTmcWdU7ctbvgdyO9Y/V+wGLjYYevm4A=
 github.com/go-pnp/go-pnp v1.1.5/go.mod h1:Mh136zyPw8qN17tiKcZQ271ScnaDstRr4MJpsjLaG4c=
-github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.14 h1:Sj2nHB0xt9TymOkZ0cwsOI8+gpah4YA4jnilmiqqvWg=
-github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.14/go.mod h1:A1SJpSqDlTuzpBGUfz0D7ZS3UiLNh/6j5WFnGzixQTc=
+github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.15 h1:CjHpHlXU/TzQXRkAiv4WwBxpG37V1Mw1Zl9FfcortGQ=
+github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.15/go.mod h1:dkYIE7Z3/WUvYWSxcMb1IcYdQ4sHaHBxqcMh2+Ur1Fw=
 github.com/go-sql-driver/mysql v1.4.0/go.mod h1:zAC/RDZ24gD3HViQzih4MyKcchzm+sOG5ZlKdlhCg5w=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
 github.com/gobwas/httphead v0.0.0-20180130184737-2c6c146eadee/go.mod h1:L0fX3K22YWvt/FAX9NnzrNzcI4wNYi9Yku4O0LKYflo=
