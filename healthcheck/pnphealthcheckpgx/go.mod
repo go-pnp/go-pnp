@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/go-pnp/go-pnp v1.1.5
 	github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.9
-	github.com/jackc/pgx/v5 v5.9.1
+	github.com/jackc/pgx/v5 v5.9.2
 	go.uber.org/fx v1.24.0
 )
 
