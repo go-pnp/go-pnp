@@ -6,10 +6,10 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-pnp/go-pnp v1.1.5 h1:Wh9PeuEvVudRTmcWdU7ctbvgdyO9Y/V+wGLjYYevm4A=
 github.com/go-pnp/go-pnp v1.1.5/go.mod h1:Mh136zyPw8qN17tiKcZQ271ScnaDstRr4MJpsjLaG4c=
-github.com/go-pnp/go-pnp/logging/pnpzap v0.0.17 h1:aopX52yhpeGmA8+E8mAUR64UPNPjREmT+2DrA1oUOI0=
-github.com/go-pnp/go-pnp/logging/pnpzap v0.0.17/go.mod h1:01v0cjh1Wz5EfC7oTEeBGjES14yrFoRB085D+ixy/Ic=
-github.com/go-pnp/go-pnp/pnpenv v1.0.4 h1:PvPn6Mx74oUZbk0UivTsPLDsZ5mvwMofkDwPp+8Y/H4=
-github.com/go-pnp/go-pnp/pnpenv v1.0.4/go.mod h1:w8oBlbBBP30EGlkA6UYColaPgDlZ/IJPJ31qjZ+JWYE=
+github.com/go-pnp/go-pnp/logging/pnpzap v0.0.18 h1:s6ZskyHssplgCYC/7b+K+UCLMgB5ZAW4R8/Md4LLntg=
+github.com/go-pnp/go-pnp/logging/pnpzap v0.0.18/go.mod h1:vXkfWTpNbE0nTr6IyjtBk3PnNekYwqpuptaUg07TCLA=
+github.com/go-pnp/go-pnp/pnpenv v1.0.5 h1:msUAcdRbHEkIJpr2UotVbW0BtgvHVWkWJIWnlcR/5T8=
+github.com/go-pnp/go-pnp/pnpenv v1.0.5/go.mod h1:QqRdXRIuECMV05xsZHZR+WUn/Kn+AwLH1N3hiPkizt4=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
