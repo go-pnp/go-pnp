@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/go-pnp/go-pnp v1.1.5
-	github.com/gofiber/fiber/v2 v2.52.12
+	github.com/gofiber/fiber/v2 v2.52.13
 	go.uber.org/fx v1.24.0
 )
 
