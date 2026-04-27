@@ -10,8 +10,8 @@ github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.9 h1:ii0r6PCfAhyU5tqXQi
 github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.9/go.mod h1:gB8F+hulwwnjEYEtFRzF4RKZEv85P6W0c9wqnYy2FUE=
 github.com/go-pnp/go-pnp/http/pnpfiber v0.0.18 h1:zikWX3hwd5A4X/tERy9TbkedvK+y/1VoekCfkWooAWY=
 github.com/go-pnp/go-pnp/http/pnpfiber v0.0.18/go.mod h1:vxQBYcJXYR/l6sFsqUk2bAhWVI5UpFXWK7MQRrcgtFk=
-github.com/gofiber/fiber/v2 v2.52.12 h1:0LdToKclcPOj8PktUdIKo9BUohjjwfnQl42Dhw8/WUw=
-github.com/gofiber/fiber/v2 v2.52.12/go.mod h1:YEcBbO/FB+5M1IZNBP9FO3J9281zgPAreiI1oqg8nDw=
+github.com/gofiber/fiber/v2 v2.52.13 h1:TOKP64iqC9b5P49VrBW5tHhUOvDyrtJ0xePEfzJbCbk=
+github.com/gofiber/fiber/v2 v2.52.13/go.mod h1:YEcBbO/FB+5M1IZNBP9FO3J9281zgPAreiI1oqg8nDw=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/klauspost/compress v1.17.11 h1:In6xLpyWOi1+C7tXUUWv2ot1QvBjxevKAaI6IXrJmUc=
