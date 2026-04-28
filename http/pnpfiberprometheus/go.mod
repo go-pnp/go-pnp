@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	github.com/go-pnp/go-pnp v1.1.5
-	github.com/go-pnp/go-pnp/http/pnpfiber v0.0.19
+	github.com/go-pnp/go-pnp/http/pnpfiber v0.0.20
 	github.com/gofiber/fiber/v2 v2.52.13
 	github.com/prometheus/client_golang v1.23.2
 	go.uber.org/fx v1.24.0
