@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/go-pnp/go-pnp v1.1.5
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.17
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.18
 	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.14
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.1.0
 	github.com/prometheus/client_golang v1.23.2
