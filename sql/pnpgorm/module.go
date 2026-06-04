@@ -7,7 +7,6 @@ import (
 	"go.uber.org/fx"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
@@ -31,10 +30,6 @@ func Module(driver string, opts ...optionutil.Option[options]) fx.Option {
 		builder.Provide(NewPostgresDialector)
 		builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[Config](options.configPrefix))
 		builder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[Config](options.configPrefix))
-	case "sqlite":
-		builder.Provide(NewSQLiteDialector)
-		builder.ProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigProvider[SQLiteConfig](options.configPrefix))
-		builder.PublicProvideIf(!options.configFromContainer, configutil.NewPrefixedConfigInfoProvider[SQLiteConfig](options.configPrefix))
 	default:
 		panic("unsupported driver")
 	}
@@ -49,9 +44,7 @@ func NewMySQLDialector(config *Config) gorm.Dialector {
 func NewPostgresDialector(config *Config) gorm.Dialector {
 	return postgres.Open(config.DSN)
 }
-func NewSQLiteDialector(config *SQLiteConfig) gorm.Dialector {
-	return sqlite.Open(config.Path)
-}
+
 func PluginProvider(target any) any {
 	return fxutil.GroupProvider[gorm.Plugin]("pnpgorm.gorm_plugins", target)
 }
