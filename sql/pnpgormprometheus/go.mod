@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	github.com/go-pnp/go-pnp v1.1.5
 	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.14
-	github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.16
+	github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.17
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.23.2
 	go.uber.org/fx v1.24.0
@@ -24,7 +24,6 @@ require (
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/mattn/go-sqlite3 v1.14.24 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.66.1 // indirect
@@ -40,5 +39,4 @@ require (
 	google.golang.org/protobuf v1.36.8 // indirect
 	gorm.io/driver/mysql v1.6.0 // indirect
 	gorm.io/driver/postgres v1.6.0 // indirect
-	gorm.io/driver/sqlite v1.6.0 // indirect
 )
