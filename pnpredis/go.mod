@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/go-pnp/go-pnp v1.1.5
-	github.com/redis/go-redis/v9 v9.20.1
+	github.com/redis/go-redis/v9 v9.21.0
 	go.uber.org/fx v1.24.0
 )
 
