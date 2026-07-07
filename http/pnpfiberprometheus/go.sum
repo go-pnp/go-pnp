@@ -10,8 +10,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-pnp/go-pnp v1.1.5 h1:Wh9PeuEvVudRTmcWdU7ctbvgdyO9Y/V+wGLjYYevm4A=
 github.com/go-pnp/go-pnp v1.1.5/go.mod h1:Mh136zyPw8qN17tiKcZQ271ScnaDstRr4MJpsjLaG4c=
-github.com/go-pnp/go-pnp/http/pnpfiber v0.0.20 h1:9OTKK/EWjDfBWBDQgEoBIZyoCQtY0ZMVdBlOXKf8+44=
-github.com/go-pnp/go-pnp/http/pnpfiber v0.0.20/go.mod h1:w6tpcGXw6biagM1WhNTTf4OWQiykKJttf8ri2lP+/8U=
+github.com/go-pnp/go-pnp/http/pnpfiber v0.0.21 h1:bWoc6LSXZvOS2edmj1NWtO6TToatvZQ42wROSv+a5P0=
+github.com/go-pnp/go-pnp/http/pnpfiber v0.0.21/go.mod h1:yP8j7/+SXgYmz03YqLw7Zp+YF5tNWPLgnQ5envVOgKc=
 github.com/gofiber/fiber/v2 v2.52.14 h1:Of3L+9qVFaQNwPlcmEdl5IIodHz8BSE0j37R7rWu4pE=
 github.com/gofiber/fiber/v2 v2.52.14/go.mod h1:YEcBbO/FB+5M1IZNBP9FO3J9281zgPAreiI1oqg8nDw=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
