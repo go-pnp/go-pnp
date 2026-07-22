@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/go-pnp/go-pnp v1.1.5
-	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.14
+	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.15
 	github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.18
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.24.0
