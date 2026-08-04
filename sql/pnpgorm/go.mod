@@ -6,7 +6,7 @@ require (
 	github.com/go-pnp/go-pnp v1.1.5
 	go.uber.org/fx v1.24.0
 	gorm.io/driver/mysql v1.6.0
-	gorm.io/driver/postgres v1.6.1
+	gorm.io/driver/postgres v1.6.2
 	gorm.io/gorm v1.31.2
 )
 
