@@ -7,7 +7,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	go.uber.org/fx v1.24.0
 	google.golang.org/grpc v1.83.0
-	google.golang.org/protobuf v1.36.11
+	google.golang.org/protobuf v1.36.12
 )
 
 require (
