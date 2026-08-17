@@ -6,7 +6,7 @@ require (
 	github.com/go-pnp/go-pnp v1.1.5
 	github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.9
 	github.com/go-pnp/go-pnp/http/pnpfiber v0.0.21
-	github.com/gofiber/fiber/v2 v2.52.14
+	github.com/gofiber/fiber/v2 v2.52.15
 	go.uber.org/fx v1.24.0
 )
 
