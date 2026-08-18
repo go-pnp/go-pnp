@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/go-pnp/go-pnp v1.1.5
-	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.22
+	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.23
 	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.16
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.1.0
 	github.com/prometheus/client_golang v1.24.1
@@ -29,5 +29,5 @@ require (
 	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.40.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
+	google.golang.org/protobuf v1.36.12 // indirect
 )
