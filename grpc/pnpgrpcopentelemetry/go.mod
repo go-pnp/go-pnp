@@ -8,7 +8,7 @@ require (
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.23
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.70.0
 	go.uber.org/fx v1.24.0
-	google.golang.org/grpc v1.83.0
+	google.golang.org/grpc v1.83.1
 )
 
 require (
