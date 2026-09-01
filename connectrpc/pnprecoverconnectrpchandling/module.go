@@ -7,14 +7,13 @@ import (
 	"github.com/go-pnp/go-pnp/connectrpc/pnpconnectrpchandling"
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
 	"github.com/go-pnp/go-pnp/pkg/ordering"
-	"github.com/pkg/errors"
 	"go.uber.org/fx"
 
 	"github.com/go-pnp/go-pnp/fxutil"
 )
 
 func Module(opts ...optionutil.Option[options]) fx.Option {
-	options := optionutil.ApplyOptions(&options{}, opts...)
+	options := newOptions(opts...)
 
 	builder := &fxutil.OptionsBuilder{
 		PrivateProvides: options.fxPrivate,
@@ -28,11 +27,12 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 }
 
 type Interceptor struct {
+	panicHandler PanicHandler
 }
 
 func NewInterceptor(options *options) ordering.OrderedItem[connect.Interceptor] {
 	return ordering.OrderedItem[connect.Interceptor]{
-		Value: &Interceptor{},
+		Value: &Interceptor{panicHandler: options.panicHandler},
 		Order: options.order,
 	}
 }
@@ -41,7 +41,7 @@ func (i Interceptor) WrapUnary(unaryFunc connect.UnaryFunc) connect.UnaryFunc {
 	return func(ctx context.Context, request connect.AnyRequest) (_ connect.AnyResponse, rErr error) {
 		defer func() {
 			if panicValue := recover(); panicValue != nil {
-				rErr = connect.NewError(connect.CodeInternal, errors.New("internal error"))
+				rErr = i.panicHandler(ctx, request.Spec(), panicValue)
 			}
 		}()
 
@@ -57,7 +57,7 @@ func (i Interceptor) WrapStreamingHandler(handlerFunc connect.StreamingHandlerFu
 	return func(ctx context.Context, conn connect.StreamingHandlerConn) (rErr error) {
 		defer func() {
 			if panicValue := recover(); panicValue != nil {
-				rErr = connect.NewError(connect.CodeInternal, errors.New("internal error"))
+				rErr = i.panicHandler(ctx, conn.Spec(), panicValue)
 			}
 		}()
 
