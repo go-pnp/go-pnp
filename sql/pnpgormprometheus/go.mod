@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/go-pnp/go-pnp v1.1.5
 	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.16
-	github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.20
+	github.com/go-pnp/go-pnp/sql/pnpgorm v0.0.21
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.24.1
 	go.uber.org/fx v1.24.0
@@ -36,5 +36,5 @@ require (
 	golang.org/x/text v0.40.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gorm.io/driver/mysql v1.6.0 // indirect
-	gorm.io/driver/postgres v1.6.2 // indirect
+	gorm.io/driver/postgres v1.6.3 // indirect
 )
