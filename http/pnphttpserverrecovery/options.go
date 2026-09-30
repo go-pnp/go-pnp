@@ -37,7 +37,8 @@ func WithOrder(order int) optionutil.Option[options] {
 	}
 }
 
-// WithPanicHandler is an option to set custom panic handler.
+// WithPanicHandler is an option to set custom panic handler. Before any panic handler is called, the
+// panic is logged with its stack through *logging.Logger when one is provided (http.ErrAbortHandler is not logged).
 func WithPanicHandler(panicHandler PanicHandler) optionutil.Option[options] {
 	return func(o *options) {
 		o.panicHandler = panicHandler
