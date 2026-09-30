@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/http/pnphttpserverrecovery
 go 1.22.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.3
+	github.com/go-pnp/go-pnp v1.2.0
 	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.13
 	github.com/gorilla/mux v1.8.1
 	github.com/stretchr/testify v1.11.1
@@ -22,4 +22,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
+// TODO: drop once github.com/go-pnp/go-pnp v1.2.0 is tagged; until then it builds against the unreleased pkg/panicutil.
 replace github.com/go-pnp/go-pnp => ../..
