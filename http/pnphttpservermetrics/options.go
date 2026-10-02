@@ -1,16 +1,25 @@
 package pnphttpservermetrics
 
 import (
+	"net/http"
+
 	"github.com/go-pnp/go-pnp/pkg/optionutil"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+// requestLabel is a metric label whose value is derived from the incoming request.
+type requestLabel struct {
+	name  string
+	value func(*http.Request) string
+}
+
 type options struct {
-	fxPrivate   bool
-	namespace   string
-	subsystem   string
-	order       int
-	constLabels prometheus.Labels
+	fxPrivate     bool
+	namespace     string
+	subsystem     string
+	order         int
+	constLabels   prometheus.Labels
+	requestLabels []requestLabel
 }
 
 func newOptions(opts ...optionutil.Option[options]) *options {
@@ -48,5 +57,13 @@ func WithConstLabels(constLabels prometheus.Labels) optionutil.Option[options] {
 func WithOrder(order int) optionutil.Option[options] {
 	return func(o *options) {
 		o.order = order
+	}
+}
+
+// WithRequestLabel adds a label to every metric of the module whose value is computed from the request.
+// The value function must return a bounded set of values: label cardinality is the caller's responsibility.
+func WithRequestLabel(name string, value func(*http.Request) string) optionutil.Option[options] {
+	return func(o *options) {
+		o.requestLabels = append(o.requestLabels, requestLabel{name: name, value: value})
 	}
 }
