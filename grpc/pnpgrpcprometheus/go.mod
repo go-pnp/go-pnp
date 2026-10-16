@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/go-pnp/go-pnp v1.1.5
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.26
-	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.16
+	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.17
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.1.1
 	github.com/prometheus/client_golang v1.25.0
 	go.uber.org/fx v1.24.0
