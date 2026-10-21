@@ -112,18 +112,20 @@ func abortingHandler(http.ResponseWriter, *http.Request) {
 	panic(http.ErrAbortHandler)
 }
 
-func teapotPanicHandler(w http.ResponseWriter, _ any) {
+func teapotPanicHandler(w http.ResponseWriter, _ *http.Request, _ any) {
 	w.WriteHeader(http.StatusTeapot)
 }
 
 type recordingPanicHandler struct {
-	handledPanicValues []any
+	handledPanicValues   []any
+	requestContextValues []any
 }
 
-func (h *recordingPanicHandler) handle(w http.ResponseWriter, panicValue any) {
+func (h *recordingPanicHandler) handle(w http.ResponseWriter, r *http.Request, panicValue any) {
 	h.handledPanicValues = append(h.handledPanicValues, panicValue)
+	h.requestContextValues = append(h.requestContextValues, r.Context().Value(requestContextKey{}))
 
-	teapotPanicHandler(w, panicValue)
+	teapotPanicHandler(w, r, panicValue)
 }
 
 func TestPanicIsLoggedWithStackAndRequestContextBeforeDefaultResponse(t *testing.T) {
@@ -146,7 +148,7 @@ func TestPanicIsAnsweredWithoutLogger(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, recorder.Code)
 }
 
-func TestCustomPanicHandlerIsCalledAfterPanicIsLogged(t *testing.T) {
+func TestCustomPanicHandlerReplacesDefaultOneAndGetsRequest(t *testing.T) {
 	logger, entries := newRecordingLogger()
 	panicHandler := &recordingPanicHandler{}
 
@@ -157,22 +159,28 @@ func TestCustomPanicHandlerIsCalledAfterPanicIsLogged(t *testing.T) {
 
 	assert.Equal(t, http.StatusTeapot, recorder.Code)
 	assert.Equal(t, []any{"boom"}, panicHandler.handledPanicValues)
-	require.Len(t, *entries, 1)
-	require.EqualError(t, (*entries)[0].err, "panic: boom")
+	assert.Equal(t, []any{"request-context"}, panicHandler.requestContextValues)
+	assert.Empty(t, *entries)
 }
 
-func TestAbortHandlerPanicIsPassedToPanicHandlerWithoutLogging(t *testing.T) {
+func TestAbortHandlerPanicIsAnsweredWithoutLogging(t *testing.T) {
 	logger, entries := newRecordingLogger()
+
+	recorder := serve(startMiddleware(t, pnphttpserverrecovery.Module(), fx.Supply(logger)), abortingHandler)
+
+	assert.Equal(t, http.StatusInternalServerError, recorder.Code)
+	assert.Empty(t, *entries)
+}
+
+func TestAbortHandlerPanicIsPassedToCustomPanicHandler(t *testing.T) {
 	panicHandler := &recordingPanicHandler{}
 
 	recorder := serve(startMiddleware(t,
 		pnphttpserverrecovery.Module(pnphttpserverrecovery.WithPanicHandler(panicHandler.handle)),
-		fx.Supply(logger),
 	), abortingHandler)
 
 	assert.Equal(t, http.StatusTeapot, recorder.Code)
 	assert.Equal(t, []any{http.ErrAbortHandler}, panicHandler.handledPanicValues)
-	assert.Empty(t, *entries)
 }
 
 func TestRequestWithoutPanicIsPassedThrough(t *testing.T) {
@@ -203,16 +211,20 @@ func TestModuleUsesPanicHandlerFromContainer(t *testing.T) {
 }
 
 func TestModuleProvidesDefaultPanicHandlerToContainer(t *testing.T) {
+	logger, entries := newRecordingLogger()
+
 	var panicHandler pnphttpserverrecovery.PanicHandler
 
-	app := fxtest.New(t, pnphttpserverrecovery.Module(), fx.Populate(&panicHandler))
+	app := fxtest.New(t, pnphttpserverrecovery.Module(), fx.Supply(logger), fx.Populate(&panicHandler))
 	app.RequireStart()
 	t.Cleanup(app.RequireStop)
 
 	recorder := httptest.NewRecorder()
-	panicHandler(recorder, "boom")
+	panicHandler(recorder, httptest.NewRequest(http.MethodGet, "/", nil), "boom")
 
 	assert.Equal(t, http.StatusInternalServerError, recorder.Code)
+	require.Len(t, *entries, 1)
+	require.EqualError(t, (*entries)[0].err, "panic: boom")
 }
 
 func TestPrivateModuleKeepsItsOwnPanicHandlerNextToACustomOne(t *testing.T) {

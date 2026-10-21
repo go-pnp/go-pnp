@@ -15,7 +15,7 @@ func main() {
 		pnphttpserver.Module(),
 		pnphttpserverrecovery.Module(
 			pnphttpserverrecovery.WithOrder(0),
-			pnphttpserverrecovery.WithPanicHandler(func(w http.ResponseWriter, panicValue any) {
+			pnphttpserverrecovery.WithPanicHandler(func(w http.ResponseWriter, r *http.Request, panicValue any) {
 				w.Write([]byte("Ooops, smth bad happened"))
 			}),
 		),

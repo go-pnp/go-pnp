@@ -1,7 +1,6 @@
 package pnphttpserverrecovery
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-pnp/go-pnp/fxutil"
@@ -20,10 +19,28 @@ func Module(opts ...optionutil.Option[options]) fx.Option {
 		PrivateProvides: options.fxPrivate,
 	}
 	moduleBuilder.Supply(options)
-	moduleBuilder.SupplyIf(!options.panicHandlerFromContainer, options.panicHandler)
+	moduleBuilder.SupplyIf(!options.panicHandlerFromContainer && options.panicHandler != nil, options.panicHandler)
+	moduleBuilder.ProvideIf(!options.panicHandlerFromContainer && options.panicHandler == nil, newDefaultPanicHandler)
 	moduleBuilder.Provide(pnphttpserver.HandlerMiddlewareProvider(newMiddleware))
 
 	return moduleBuilder.Build()
+}
+
+type NewDefaultPanicHandlerParams struct {
+	fx.In
+
+	Logger *logging.Logger `optional:"true"`
+}
+
+// newDefaultPanicHandler logs the panic with its stack (http.ErrAbortHandler is not logged) and responds with 500.
+func newDefaultPanicHandler(params NewDefaultPanicHandlerParams) PanicHandler {
+	return func(w http.ResponseWriter, r *http.Request, panicValue any) {
+		if panicValue != http.ErrAbortHandler { //nolint:errorlint // net/http compares ErrAbortHandler with ==
+			params.Logger.WithError(panicutil.NewError(panicValue)).Error(r.Context(), "http handler panicked")
+		}
+
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 }
 
 type NewMiddlewareParams struct {
@@ -31,22 +48,17 @@ type NewMiddlewareParams struct {
 
 	Options      *options
 	PanicHandler PanicHandler
-	Logger       *logging.Logger `optional:"true"`
 }
 
 func newMiddleware(params NewMiddlewareParams) ordering.OrderedItem[pnphttpserver.HandlerMiddleware] {
 	return ordering.OrderedItem[pnphttpserver.HandlerMiddleware]{
 		Value: func(handler http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				defer func(ctx context.Context) {
+				defer func() {
 					if panicValue := recover(); panicValue != nil {
-						if panicValue != http.ErrAbortHandler { //nolint:errorlint // net/http compares ErrAbortHandler with ==
-							params.Logger.WithError(panicutil.NewError(panicValue)).Error(ctx, "http handler panicked")
-						}
-
-						params.PanicHandler(w, panicValue)
+						params.PanicHandler(w, r, panicValue)
 					}
-				}(r.Context())
+				}()
 
 				handler.ServeHTTP(w, r)
 			})
