@@ -62,7 +62,6 @@ func (z ZapCore) With(fields []zapcore.Field) zapcore.Core {
 				result.hub = sentry.GetHubFromContext(ctx)
 			}
 		}
-
 	}
 
 	return result
@@ -86,40 +85,9 @@ func (z ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		zapcore.FatalLevel:  sentry.LevelFatal,
 	}[entry.Level]
 	levelValue := sentryLevelValues[level]
-	trace := sentry.NewStacktrace()
-
-	for i, frame := range trace.Frames {
-		// if fram abspath and linno matches then we skip all that left
-		if frame.AbsPath == entry.Caller.File && frame.Lineno == entry.Caller.Line {
-			trace.Frames = trace.Frames[:i+1]
-			break
-		}
-	}
 
 	if levelValue >= z.reportLevelValue {
-		go func() {
-
-			hub := z.hub
-			if hub == nil {
-				hub = sentry.NewHub(z.client, sentry.NewScope())
-			}
-
-			var event *sentry.Event
-			if z.err != nil {
-				event = z.client.EventFromException(z.err, level)
-				event.Message = entry.Message
-				event.Logger = entry.LoggerName
-			} else {
-				event = &sentry.Event{
-					Level:     level,
-					Message:   entry.Message,
-					Logger:    entry.LoggerName,
-					Timestamp: entry.Time,
-				}
-			}
-
-			hub.CaptureEvent(event)
-		}()
+		z.captureEvent(entry, level)
 	}
 
 	return z.underlying.Write(entry, fields)
@@ -127,4 +95,43 @@ func (z ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 func (z ZapCore) Sync() error {
 	return z.underlying.Sync()
+}
+
+func (z ZapCore) captureEvent(entry zapcore.Entry, level sentry.Level) {
+	trace := sentry.NewStacktrace()
+
+	for i, frame := range trace.Frames {
+		// if fram abspath and linno matches then we skip all that left
+		if frame.AbsPath == entry.Caller.File && frame.Lineno == entry.Caller.Line {
+			trace.Frames = trace.Frames[:i+1]
+
+			break
+		}
+	}
+
+	hub := z.hub
+	if hub == nil {
+		hub = sentry.NewHub(z.client, sentry.NewScope())
+	}
+
+	var event *sentry.Event
+	if z.err != nil {
+		event = z.client.EventFromException(z.err, level)
+		event.Message = entry.Message
+		event.Logger = entry.LoggerName
+
+		if sentry.ExtractStacktrace(z.err) == nil {
+			event.Exception[len(event.Exception)-1].Stacktrace = trace
+		}
+	} else {
+		event = &sentry.Event{
+			Level:     level,
+			Message:   entry.Message,
+			Logger:    entry.LoggerName,
+			Timestamp: entry.Time,
+			Threads:   []sentry.Thread{{Stacktrace: trace, Current: true}},
+		}
+	}
+
+	hub.CaptureEvent(event)
 }
