@@ -42,27 +42,8 @@ func (z ZapCore) With(fields []zapcore.Field) zapcore.Core {
 	newFields := make([]zapcore.Field, len(fields))
 	copy(newFields, fields)
 
-	result := ZapCore{
-		underlying:       z.underlying.With(newFields),
-		client:           z.client,
-		hub:              z.hub,
-		err:              z.err,
-		flushTimeout:     z.flushTimeout,
-		reportLevelValue: z.reportLevelValue,
-	}
-
-	for _, field := range fields {
-		switch field.Key {
-		case "error":
-			if err, ok := field.Interface.(error); ok {
-				result.err = err
-			}
-		case "context":
-			if ctx, ok := field.Interface.(context.Context); ok {
-				result.hub = sentry.GetHubFromContext(ctx)
-			}
-		}
-	}
+	result := z.withSentryFields(fields)
+	result.underlying = z.underlying.With(newFields)
 
 	return result
 }
@@ -87,7 +68,7 @@ func (z ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	levelValue := sentryLevelValues[level]
 
 	if levelValue >= z.reportLevelValue {
-		z.captureEvent(entry, level)
+		z.withSentryFields(fields).captureEvent(entry, level)
 	}
 
 	return z.underlying.Write(entry, fields)
@@ -95,6 +76,24 @@ func (z ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 func (z ZapCore) Sync() error {
 	return z.underlying.Sync()
+}
+
+// withSentryFields returns a copy of the core with the error and hub taken from the "error" and "context" fields.
+func (z ZapCore) withSentryFields(fields []zapcore.Field) ZapCore {
+	for _, field := range fields {
+		switch field.Key {
+		case "error":
+			if err, ok := field.Interface.(error); ok {
+				z.err = err
+			}
+		case "context":
+			if ctx, ok := field.Interface.(context.Context); ok {
+				z.hub = sentry.GetHubFromContext(ctx)
+			}
+		}
+	}
+
+	return z
 }
 
 func (z ZapCore) captureEvent(entry zapcore.Entry, level sentry.Level) {

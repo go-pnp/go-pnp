@@ -61,6 +61,26 @@ func TestZapCoreWriteAttachesCallerStacktrace(t *testing.T) {
 	assertLastFrameFunction(t, lastException(t, receiveEvent(t, capturedEvents)).Stacktrace, "newErrorWithStack")
 }
 
+func TestZapCoreWriteUsesPerCallFields(t *testing.T) {
+	logger, client, capturedEvents := newSentryLogger(t)
+
+	logger.Error("failed", zap.Error(errors.New("db down")))
+
+	if exception := lastException(t, receiveEvent(t, capturedEvents)); exception.Value != "db down" {
+		t.Fatalf("expected exception value %q, got %q", "db down", exception.Value)
+	}
+
+	hub := sentry.NewHub(client, sentry.NewScope())
+	hub.Scope().SetTag("source", "per-call context")
+	ctx := sentry.SetHubOnContext(context.Background(), hub)
+
+	logger.Error("failed", zap.Field{Key: "context", Type: zapcore.SkipType, Interface: ctx})
+
+	if event := receiveEvent(t, capturedEvents); event.Tags["source"] != "per-call context" {
+		t.Fatalf("expected event captured with per-call context hub, got tags %v", event.Tags)
+	}
+}
+
 func newSentryLogger(t *testing.T) (*zap.Logger, *sentry.Client, <-chan *sentry.Event) {
 	t.Helper()
 
