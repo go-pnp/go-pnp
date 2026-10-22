@@ -42,28 +42,8 @@ func (z ZapCore) With(fields []zapcore.Field) zapcore.Core {
 	newFields := make([]zapcore.Field, len(fields))
 	copy(newFields, fields)
 
-	result := ZapCore{
-		underlying:       z.underlying.With(newFields),
-		client:           z.client,
-		hub:              z.hub,
-		err:              z.err,
-		flushTimeout:     z.flushTimeout,
-		reportLevelValue: z.reportLevelValue,
-	}
-
-	for _, field := range fields {
-		switch field.Key {
-		case "error":
-			if err, ok := field.Interface.(error); ok {
-				result.err = err
-			}
-		case "context":
-			if ctx, ok := field.Interface.(context.Context); ok {
-				result.hub = sentry.GetHubFromContext(ctx)
-			}
-		}
-
-	}
+	result := z.withSentryFields(fields)
+	result.underlying = z.underlying.With(newFields)
 
 	return result
 }
@@ -86,40 +66,9 @@ func (z ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 		zapcore.FatalLevel:  sentry.LevelFatal,
 	}[entry.Level]
 	levelValue := sentryLevelValues[level]
-	trace := sentry.NewStacktrace()
-
-	for i, frame := range trace.Frames {
-		// if fram abspath and linno matches then we skip all that left
-		if frame.AbsPath == entry.Caller.File && frame.Lineno == entry.Caller.Line {
-			trace.Frames = trace.Frames[:i+1]
-			break
-		}
-	}
 
 	if levelValue >= z.reportLevelValue {
-		go func() {
-
-			hub := z.hub
-			if hub == nil {
-				hub = sentry.NewHub(z.client, sentry.NewScope())
-			}
-
-			var event *sentry.Event
-			if z.err != nil {
-				event = z.client.EventFromException(z.err, level)
-				event.Message = entry.Message
-				event.Logger = entry.LoggerName
-			} else {
-				event = &sentry.Event{
-					Level:     level,
-					Message:   entry.Message,
-					Logger:    entry.LoggerName,
-					Timestamp: entry.Time,
-				}
-			}
-
-			hub.CaptureEvent(event)
-		}()
+		z.withSentryFields(fields).captureEvent(entry, level)
 	}
 
 	return z.underlying.Write(entry, fields)
@@ -127,4 +76,61 @@ func (z ZapCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 
 func (z ZapCore) Sync() error {
 	return z.underlying.Sync()
+}
+
+// withSentryFields returns a copy of the core with the error and hub taken from the "error" and "context" fields.
+func (z ZapCore) withSentryFields(fields []zapcore.Field) ZapCore {
+	for _, field := range fields {
+		switch field.Key {
+		case "error":
+			if err, ok := field.Interface.(error); ok {
+				z.err = err
+			}
+		case "context":
+			if ctx, ok := field.Interface.(context.Context); ok {
+				z.hub = sentry.GetHubFromContext(ctx)
+			}
+		}
+	}
+
+	return z
+}
+
+func (z ZapCore) captureEvent(entry zapcore.Entry, level sentry.Level) {
+	trace := sentry.NewStacktrace()
+
+	for i, frame := range trace.Frames {
+		// if fram abspath and linno matches then we skip all that left
+		if frame.AbsPath == entry.Caller.File && frame.Lineno == entry.Caller.Line {
+			trace.Frames = trace.Frames[:i+1]
+
+			break
+		}
+	}
+
+	hub := z.hub
+	if hub == nil {
+		hub = sentry.NewHub(z.client, sentry.NewScope())
+	}
+
+	var event *sentry.Event
+	if z.err != nil {
+		event = z.client.EventFromException(z.err, level)
+		event.Message = entry.Message
+		event.Logger = entry.LoggerName
+
+		if sentry.ExtractStacktrace(z.err) == nil {
+			event.Exception[len(event.Exception)-1].Stacktrace = trace
+		}
+	} else {
+		event = &sentry.Event{
+			Level:     level,
+			Message:   entry.Message,
+			Logger:    entry.LoggerName,
+			Timestamp: entry.Time,
+			Threads:   []sentry.Thread{{Stacktrace: trace, Current: true}},
+		}
+	}
+
+	hub.CaptureEvent(event)
 }

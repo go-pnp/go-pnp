@@ -17,7 +17,7 @@ func main() {
 		fx.Provide(
 
 			func() pnphttpserverrecovery.PanicHandler {
-				return func(w http.ResponseWriter, panicValue any) {
+				return func(w http.ResponseWriter, r *http.Request, panicValue any) {
 					w.WriteHeader(http.StatusInternalServerError)
 					w.Write([]byte("Something went wrong"))
 				}
