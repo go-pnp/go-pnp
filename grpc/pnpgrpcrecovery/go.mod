@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/grpc/pnpgrpcrecovery
 go 1.25.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.5
+	github.com/go-pnp/go-pnp v1.2.0
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.26
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.4
 	go.uber.org/fx v1.24.0
