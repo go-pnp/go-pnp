@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/nats/pnpnats
 go 1.26.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.5
+	github.com/go-pnp/go-pnp v1.2.0
 	github.com/nats-io/nats.go v1.54.0
 	go.uber.org/fx v1.24.0
 )
