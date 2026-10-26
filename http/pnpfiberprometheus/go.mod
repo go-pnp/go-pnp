@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/http/pnpfiberprometheus
 go 1.26.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.5
+	github.com/go-pnp/go-pnp v1.2.0
 	github.com/go-pnp/go-pnp/http/pnpfiber v0.0.22
 	github.com/gofiber/fiber/v2 v2.52.15
 	github.com/prometheus/client_golang v1.25.0
