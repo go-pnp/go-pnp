@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/healthcheck/pnphealthcheckpgx
 go 1.25.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.5
+	github.com/go-pnp/go-pnp v1.2.0
 	github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.9
 	github.com/jackc/pgx/v5 v5.11.0
 	go.uber.org/fx v1.24.0
