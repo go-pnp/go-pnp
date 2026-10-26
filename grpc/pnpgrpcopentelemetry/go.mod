@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/grpc/pnpgrpcopentelemetry
 go 1.26.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.5
+	github.com/go-pnp/go-pnp v1.2.0
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcclient v0.1.4
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.26
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.72.0
