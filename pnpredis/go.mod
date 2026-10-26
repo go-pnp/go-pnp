@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/pnpredis
 go 1.26.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.5
+	github.com/go-pnp/go-pnp v1.2.0
 	github.com/redis/go-redis/v9 v9.23.0
 	go.uber.org/fx v1.24.0
 )
