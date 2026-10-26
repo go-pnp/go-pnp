@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/http/pnphttphealthcheck
 go 1.22
 
 require (
-	github.com/go-pnp/go-pnp v1.1.5
+	github.com/go-pnp/go-pnp v1.2.0
 	github.com/go-pnp/go-pnp/healthcheck/pnphealthcheck v0.0.9
 	github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.15
 	github.com/gorilla/mux v1.8.1
