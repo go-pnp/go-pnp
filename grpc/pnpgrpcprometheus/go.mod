@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/grpc/pnpgrpcprometheus
 go 1.26.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.5
+	github.com/go-pnp/go-pnp v1.2.0
 	github.com/go-pnp/go-pnp/grpc/pnpgrpcserver v0.0.26
 	github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.17
 	github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus v1.1.1
