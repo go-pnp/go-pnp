@@ -4,8 +4,8 @@ github.com/caarlos0/env/v10 v10.0.0 h1:yIHUBZGsyqCnpTkbjk8asUlx6RFhhEs+h7TOBdgdz
 github.com/caarlos0/env/v10 v10.0.0/go.mod h1:ZfulV76NvVPw3tm591U4SwL3Xx9ldzBP9aGxzeN7G18=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
-github.com/go-pnp/go-pnp v1.1.5 h1:Wh9PeuEvVudRTmcWdU7ctbvgdyO9Y/V+wGLjYYevm4A=
-github.com/go-pnp/go-pnp v1.1.5/go.mod h1:Mh136zyPw8qN17tiKcZQ271ScnaDstRr4MJpsjLaG4c=
+github.com/go-pnp/go-pnp v1.2.0 h1:9tA8g/xLr+/H9SayTuyGywW9j5rfUHXMjX8WeOkHmfg=
+github.com/go-pnp/go-pnp v1.2.0/go.mod h1:81va6BMgueyk93qsymlvsW21M/AgtxXh4ACF7wwFERo=
 github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.15 h1:CjHpHlXU/TzQXRkAiv4WwBxpG37V1Mw1Zl9FfcortGQ=
 github.com/go-pnp/go-pnp/http/pnphttpserver v0.0.15/go.mod h1:dkYIE7Z3/WUvYWSxcMb1IcYdQ4sHaHBxqcMh2+Ur1Fw=
 github.com/go-pnp/go-pnp/prometheus/pnpprometheus v0.0.17 h1:inPxlqT+QUq8VQdwu0pkuSSXs9OnIR1Brk/ojU1LDxI=
