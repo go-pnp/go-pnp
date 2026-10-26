@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/tracing/pnpopentelemetryzapfield
 go 1.26.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.5
+	github.com/go-pnp/go-pnp v1.2.0
 	github.com/go-pnp/go-pnp/logging/pnpzap v0.0.19
 	go.opentelemetry.io/otel/trace v1.47.0
 	go.uber.org/fx v1.24.0
