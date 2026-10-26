@@ -3,7 +3,7 @@ module github.com/go-pnp/go-pnp/prometheus/pnpprometheus
 go 1.26.0
 
 require (
-	github.com/go-pnp/go-pnp v1.1.5
+	github.com/go-pnp/go-pnp v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.25.0
 	go.uber.org/fx v1.24.0
